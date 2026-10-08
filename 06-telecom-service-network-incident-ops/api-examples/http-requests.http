@@ -1,0 +1,9 @@
+### Health
+GET http://localhost:8000/health
+
+### Read record with over-broad role header
+GET http://localhost:8000/records/REC-0001
+X-User-Role: operator
+
+### AI summary
+POST http://localhost:8000/ai/summarize/REC-0001

@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "test": "playwright test",
+    "lint": "echo scaffold"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.46.0"
+  },
+  "dependencies": {}
+}

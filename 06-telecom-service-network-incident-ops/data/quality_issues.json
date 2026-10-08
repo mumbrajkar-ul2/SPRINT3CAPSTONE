@@ -1,0 +1,42 @@
+{
+  "seeded_issues": {
+    "devices": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "circuits": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "alarms": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "incidents": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "service_orders": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "ai_invocations": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ]
+  },
+  "domain_authenticity_note": "Defects are intentionally realistic: discoverable through profiling and tests, not only through labels.",
+  "safety_note": "All data is synthetic."
+}

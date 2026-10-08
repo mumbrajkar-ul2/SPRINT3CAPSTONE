@@ -1,0 +1,51 @@
+{
+  "repo": "06-telecom-service-network-incident-ops",
+  "title": "Telecommunications: Service Provisioning, Network & Incident Operations",
+  "csv_files": {
+    "devices.csv": 354,
+    "circuits.csv": 354,
+    "alarms.csv": 354,
+    "incidents.csv": 354,
+    "service_orders.csv": 354,
+    "ai_invocations.csv": 354
+  },
+  "seeded_defects": {
+    "devices": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "circuits": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "alarms": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "incidents": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "service_orders": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ],
+    "ai_invocations": [
+      "duplicate business key",
+      "blank mandatory fields",
+      "impossible timestamp",
+      "out-of-range score or risk marker"
+    ]
+  },
+  "jsonl_events": 3000
+}

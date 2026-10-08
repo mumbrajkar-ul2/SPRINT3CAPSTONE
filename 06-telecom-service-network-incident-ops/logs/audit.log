@@ -1,0 +1,7 @@
+{"ts": "2026-10-08T18:58:26.259133", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}
+{"ts": "2026-10-08T18:58:49.394239", "action": "record.read", "details": {"record_id": "REC-0001", "role": "operator"}}
+{"ts": "2026-10-08T18:58:49.423408", "action": "record.read", "details": {"record_id": "DOES-NOT-EXIST", "role": "operator"}}
+{"ts": "2026-10-08T18:58:49.428949", "action": "record.read", "details": {"record_id": "REC-0001", "role": "operator"}}
+{"ts": "2026-10-08T18:58:49.434307", "action": "record.read", "details": {"record_id": "REC-0001", "role": "clinician"}}
+{"ts": "2026-10-08T18:58:49.478925", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}
+{"ts": "2026-10-08T18:58:49.524986", "action": "ai.summary", "details": {"record_id": "DOES-NOT-EXIST", "model": "local-sim-v1"}}

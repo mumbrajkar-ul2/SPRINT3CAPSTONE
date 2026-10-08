@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[project]
+name = "06-telecom-service-network-incident-ops"
+version = "0.1.0"
+description = "Brownfield AI-FDE workshop repo"
+requires-python = ">=3.10"

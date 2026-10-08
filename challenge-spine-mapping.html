@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Challenge guide against Spine stages 0A–20</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f5f3;
+    --surface: #ffffff;
+    --text: #1c1b19;
+    --muted: #5c5852;
+    --line: #d9d4cc;
+    --match: #1f7a45;
+    --partial: #8a5a12;
+    --none: #9b2c2c;
+    --match-bg: #e7f4ec;
+    --partial-bg: #f8efdc;
+    --none-bg: #f8e6e6;
+    --info-bg: #e8f0f8;
+    --warn-bg: #f8efdc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b1b1b;
+      --surface: #242424;
+      --text: #f3f1ee;
+      --muted: #b7b1a8;
+      --line: #3a3835;
+      --match: #7dcea0;
+      --partial: #e2b86a;
+      --none: #f0a0a0;
+      --match-bg: #1c3326;
+      --partial-bg: #3a2e18;
+      --none-bg: #3a1e1e;
+      --info-bg: #1c2a38;
+      --warn-bg: #3a2e18;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.45 "Segoe UI", Calibri, sans-serif;
+  }
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 20px; margin: 32px 0 8px; }
+  p { margin: 0 0 12px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+  .note {
+    border: 1px solid var(--line);
+    background: var(--warn-bg);
+    padding: 12px 14px;
+    margin: 16px 0;
+  }
+  .note.info { background: var(--info-bg); }
+  .note strong { display: block; margin-bottom: 4px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0 8px; }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    min-width: 140px;
+    padding: 10px 12px;
+  }
+  .stat b { display: block; font-size: 28px; line-height: 1.1; }
+  .stat.match b { color: var(--match); }
+  .stat.partial b { color: var(--partial); }
+  .stat.none b { color: var(--none); }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .bars { display: grid; gap: 8px; margin-top: 12px; }
+  .bar-row { display: grid; grid-template-columns: 92px 1fr 36px; gap: 8px; align-items: center; }
+  .bar-name { font-size: 13px; }
+  .bar {
+    display: flex;
+    height: 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .seg { height: 100%; }
+  .seg.match { background: var(--match); }
+  .seg.partial { background: var(--partial); }
+  .seg.none { background: var(--none); }
+  .legend { display: flex; gap: 16px; font-size: 13px; margin: 8px 0 4px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 4px; vertical-align: middle; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+  button, input {
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+  }
+  button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+  input { min-width: 280px; flex: 1; }
+  .wrap { overflow: auto; border: 1px solid var(--line); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { position: sticky; top: 0; background: var(--surface); }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  tr.match td:first-child { border-left: 3px solid var(--match); }
+  tr.partial td:first-child { border-left: 3px solid var(--partial); }
+  tr.none td:first-child { border-left: 3px solid var(--none); }
+  .tag {
+    display: inline-block;
+    padding: 1px 6px;
+    font-size: 12px;
+    border: 1px solid var(--line);
+  }
+  .tag.match { background: var(--match-bg); color: var(--match); }
+  .tag.partial { background: var(--partial-bg); color: var(--partial); }
+  .tag.none { background: var(--none-bg); color: var(--none); }
+  caption { text-align: left; caption-side: bottom; color: var(--muted); font-size: 13px; padding: 8px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Challenge guide against Spine stages 0A–20</h1>
+  <p class="muted">This page is the HTML copy of the challenge–spine mapping canvas. It compares the 16 core transformation challenges with Spine stages 0A, 0B, 0C, and 1 through 20. Stages 21–42 appear only to show where a missing requirement is required later. Source: Brownfield Repo Transformation Challenge Guide and AI FDE End-to-End Production Delivery Spine.</p>
+
+  <div class="note">
+    <strong>Stages 0A through 20 cover discovery and the build. The control challenges come later.</strong>
+    Repo discovery and the behavioural baseline are the two challenges this range satisfies. Cost, AI boundaries, dependency scanning, and authorization start here as drafts or partial files. Identity, secrets, infrastructure as code, policy as code, CI/CD, observability, performance, failure engineering, security abuse cases, audit evidence, the production go or no-go, and the evidence pack are still open. Executable policy-as-code is also absent from the later stages.
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <h2>Requirement coverage by challenge</h2>
+  <p class="muted small">Each bar is one challenge. The length of each color is the count of requirements. Match means a stage in 0A–20 requires the same work. Partial means a related file exists and the pass test is still open. No mapping means this range does not require that work. The three parts of a bar add up to the requirement count for that challenge.</p>
+  <div class="legend">
+    <span><i class="swatch seg match"></i>Match</span>
+    <span><i class="swatch seg partial"></i>Partial</span>
+    <span><i class="swatch seg none"></i>No mapping</span>
+  </div>
+  <div class="bars" id="bars"></div>
+  <p class="muted small">Source: 16 core challenges in the Brownfield Repo Transformation Challenge Guide, scored against the required files in Spine stages 0A–20. Unit: requirement count. A requirement is a deliverable, an execution-focus check, or an acceptance standard.</p>
+
+  <h2>How each challenge sits in this range</h2>
+  <p class="muted small">Covered means the pass test is met and every named output has a required file. Mostly covered means the pass test is met and at least one named output is still missing. Adjacent only means there is no full match and at most two related files. Partial means this range starts the work and the pass test is still open.</p>
+  <div class="wrap">
+    <table id="summary">
+      <thead>
+        <tr><th>Challenge</th><th>In stages 0A–20</th><th class="num">Match</th><th class="num">Partial</th><th class="num">Unmapped</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="note info">
+    <strong>Files with similar names that hold a different record</strong>
+    Stage 4 records KPI measurement quality. The baseline challenge asks for a profile of synthetic data. Stage 5 records process delay and rework. The performance challenge asks for bottlenecks under load. Stage 1 records whether to start the engagement. The readiness challenge asks for a production release decision. Stage 13 links requirements to tests. Challenge 8 asks for a production trace. Challenge 14 asks for a decision evidence chain. Stage 11 records data provenance. Challenge 14 asks for decision provenance. Stage 14 records migration rollback. Challenge 11 asks for runtime recovery. Stage 12 records business rules as a specification. Challenge 6 asks for executable policy.
+  </div>
+
+  <h2>Element mapping</h2>
+  <p class="muted" id="shown"></p>
+  <div class="controls">
+    <button type="button" data-filter="all" aria-pressed="true">All</button>
+    <button type="button" data-filter="match" aria-pressed="false">Matches</button>
+    <button type="button" data-filter="partial" aria-pressed="false">Partial</button>
+    <button type="button" data-filter="none" aria-pressed="false">No mapping</button>
+    <input id="q" type="search" placeholder="Filter by challenge, file, or stage" aria-label="Filter requirements">
+  </div>
+  <div class="wrap">
+    <table id="detail">
+      <thead>
+        <tr>
+          <th>Challenge</th>
+          <th>Kind</th>
+          <th>Requirement</th>
+          <th>Coverage</th>
+          <th>Stages 0A–20</th>
+          <th>What those stages require</th>
+          <th>Later stage</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="muted small">A match row means the stage’s required file is the challenge’s work product. A partial row means related work exists and the pass test is still open. A no-mapping row means finishing stages 0A–20 leaves that requirement open, even when a file has a similar name. A blank stage cell means no stage in that range requires the work. The last column names the later Spine stage that requires it, when one exists.</p>
+</main>
+<script>
+const DATA = {"challenges": [{"id": 1, "short": "1 Repo", "name": "Understand Existing Repo"}, {"id": 2, "short": "2 Baseline", "name": "Establish Behavioural Baseline"}, {"id": 3, "short": "3 Identity", "name": "Identity & Least Privilege"}, {"id": 4, "short": "4 Secrets", "name": "Secrets & Encryption"}, {"id": 5, "short": "5 IaC", "name": "Infrastructure as Code"}, {"id": 6, "short": "6 Policy", "name": "Policy as Code"}, {"id": 7, "short": "7 Supply", "name": "CI/CD & Supply Chain"}, {"id": 8, "short": "8 Observe", "name": "Observability & Traceability"}, {"id": 9, "short": "9 AI guard", "name": "AI Security & Guardrails"}, {"id": 10, "short": "10 Perf", "name": "Performance & Scalability"}, {"id": 11, "short": "11 Failure", "name": "Reliability & Failure Engineering"}, {"id": 12, "short": "12 FinOps", "name": "Cost & AI FinOps"}, {"id": 13, "short": "13 Sec test", "name": "Automated Security Validation"}, {"id": 14, "short": "14 Audit", "name": "Auditability & Compliance Evidence"}, {"id": 15, "short": "15 Go/No-Go", "name": "Production Readiness Gate"}, {"id": 16, "short": "16 Evidence", "name": "Production Evidence Pack"}], "elements": [{"challenge": 1, "kind": "Deliverable", "element": "Current-state architecture map", "coverage": "match", "stages": "0A, 5, 7", "artifacts": "high-level-architecture.md, system-landscape.md (0A and 5), architecture-drift.md", "later": "—"}, {"challenge": 1, "kind": "Deliverable", "element": "Component inventory", "coverage": "match", "stages": "0A, 5", "artifacts": "technology-inventory.md, brownfield-inventory.md", "later": "—"}, {"challenge": 1, "kind": "Deliverable", "element": "Business flow reconstruction", "coverage": "match", "stages": "0A, 5", "artifacts": "workflow-overview.md, current-process-map.md, business-workflow-map.md", "later": "—"}, {"challenge": 1, "kind": "Deliverable", "element": "Data and integration map", "coverage": "match", "stages": "0A, 5", "artifacts": "data-flow-overview.md, integration-overview.md, integration-landscape.md", "later": "—"}, {"challenge": 1, "kind": "Deliverable", "element": "AI subsystem discovery", "coverage": "partial", "stages": "0A", "artifacts": "Technology inventory and the system landscape record what is present. No artifact is an AI-subsystem dossier.", "later": "8 qualifies future AI; it does not discover an existing AI subsystem"}, {"challenge": 1, "kind": "Deliverable", "element": "Brownfield risk register", "coverage": "match", "stages": "0A, 5, 7", "artifacts": "initial-risk-register.md, dependency-hotspots.md, technical-debt-register.md", "later": "—"}, {"challenge": 1, "kind": "Execution focus", "element": "Ownership boundaries", "coverage": "partial", "stages": "0B, 2", "artifacts": "scope-boundaries.md and decision-rights-map.md. Provisional engagement boundaries and stakeholder authority, not component ownership.", "later": "37 service and data ownership"}, {"challenge": 1, "kind": "Acceptance standard", "element": "Evidence comes from code, data, configuration, tests, or repository documentation", "coverage": "match", "stages": "0A", "artifacts": "Stage 0A plus the global contract: cite repository paths and separate fact, inference, assumption, and unknown.", "later": "—"}, {"challenge": 2, "kind": "Deliverable", "element": "Baseline test report, including available checks and smoke tests", "coverage": "match", "stages": "7", "artifacts": "baseline-test-results.md. Run existing tests where safe. Smoke tests are not named separately.", "later": "—"}, {"challenge": 2, "kind": "Deliverable", "element": "Behaviour snapshot, including current API and ETL behaviour", "coverage": "match", "stages": "0A, 5, 7", "artifacts": "baseline-behaviour.md, critical-workflow-inventory.md, workflow and data-flow overviews", "later": "—"}, {"challenge": 2, "kind": "Deliverable", "element": "Characterization tests for risky legacy behaviour", "coverage": "partial", "stages": "7, 16", "artifacts": "Stage 7 writes characterization-test-plan.md and does not change behaviour. Stage 16 runs characterization tests after transformation.", "later": "—"}, {"challenge": 2, "kind": "Deliverable", "element": "Data quality baseline from a profile of synthetic data", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 4 baseline-data-quality.md rates KPI measurement quality. Stage 11 synthetic-data-strategy.md is a forward data plan.", "later": "11 data-quality rules are target rules, not a current-data profile"}, {"challenge": 2, "kind": "Deliverable", "element": "Current defect list", "coverage": "partial", "stages": "7", "artifacts": "security-code-quality-findings.md and technical-debt-register.md. Findings, not a defect list split into intended behaviour and bugs.", "later": "—"}, {"challenge": 2, "kind": "Acceptance standard", "element": "Intended legacy behaviour is distinguishable from defects", "coverage": "match", "stages": "7, 16", "artifacts": "Critical workflows must be preserved. behavior-difference-report.md explains every difference from the Stage 7 baseline.", "later": "—"}, {"challenge": 3, "kind": "Deliverable", "element": "Current role matrix for human roles, service accounts, AI identities, and vendor accounts", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 0A security overview and Stage 2 stakeholder-needs-matrix.md describe people and authority, not application roles.", "later": "22 tool permissions, 27 identity-rbac-hardening, 33 vendor inventory"}, {"challenge": 3, "kind": "Deliverable", "element": "Target access matrix", "coverage": "partial", "stages": "10, 12, 20", "artifacts": "security-architecture.md, security-spec.md, access-control-implementation.md. Authorization design, not a role-by-resource-by-context matrix.", "later": "27 identity-rbac-hardening.md"}, {"challenge": 3, "kind": "Deliverable", "element": "Policy input model (role, resource, purpose, scope, risk)", "coverage": "none", "stages": "—", "artifacts": "No stage requires purpose, scope, or risk as access-policy inputs. Contextual RBAC plus ABAC is not named.", "later": "24 security-control-matrix and 27 still do not require this five-part input model"}, {"challenge": 3, "kind": "Deliverable", "element": "Negative access tests", "coverage": "none", "stages": "—", "artifacts": "Stage 16 runs security tests as a class. It does not require negative access cases.", "later": "24 security-test-plan.md and security-test-results.md"}, {"challenge": 3, "kind": "Deliverable", "element": "Privilege reduction backlog", "coverage": "none", "stages": "—", "artifacts": "Security findings at Stage 7 are not a privilege-reduction backlog.", "later": "27 identity-rbac-hardening.md"}, {"challenge": 3, "kind": "Acceptance standard", "element": "Access decisions consider role, resource, purpose, scope, and risk context", "coverage": "none", "stages": "—", "artifacts": "Stage 20 requires authentication and authorization without those five inputs.", "later": "Not stated as an acceptance bar in later stages either"}, {"challenge": 4, "kind": "Execution focus", "element": "Find hardcoded credentials, unsafe examples, sensitive log data, weak tokens, and missing encryption assumptions", "coverage": "partial", "stages": "7", "artifacts": "security-code-quality-findings.md covers security and data handling. Log review and encryption assumptions are not required.", "later": "24 data-protection-controls.md, 27 secrets-hardening.md"}, {"challenge": 4, "kind": "Deliverable", "element": "Secrets inventory", "coverage": "none", "stages": "—", "artifacts": "No inventory artifact in this window.", "later": "27 secrets-hardening.md"}, {"challenge": 4, "kind": "Deliverable", "element": "Remediation plan for unsafe secrets", "coverage": "none", "stages": "—", "artifacts": "Stage 15 improves configuration inside the modernization. It does not require a secrets remediation plan.", "later": "27 hardening-plan.md and secrets-hardening.md"}, {"challenge": 4, "kind": "Deliverable", "element": "Cleaned configuration model", "coverage": "partial", "stages": "15", "artifacts": "Modernization includes configuration. No cleaned model and no proof that example config is safe.", "later": "27 removes test secrets and insecure defaults"}, {"challenge": 4, "kind": "Deliverable", "element": "Sensitive-field handling checklist", "coverage": "partial", "stages": "11, 12", "artifacts": "PII, retention, and access controls in the data strategy; security-spec.md. Not a field-handling checklist.", "later": "24 privacy-impact-assessment.md and data-protection-controls.md"}, {"challenge": 4, "kind": "Deliverable", "element": "Rotation evidence plan", "coverage": "none", "stages": "—", "artifacts": "Credential and key rotation is not required in this window.", "later": "27 secrets-hardening.md, 41 secret-key-revocation.md"}, {"challenge": 4, "kind": "Acceptance standard", "element": "No sensitive value is required in committed code or unsafe example configuration", "coverage": "none", "stages": "—", "artifacts": "This bar is not a stage completion gate in 0A–20.", "later": "27 removes debug behaviour, test secrets, and insecure defaults"}, {"challenge": 5, "kind": "Deliverable", "element": "IaC gap report (incomplete IaC, hidden setup, environment drift, bootstrap gaps, manual dependencies)", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 7 architecture-drift.md is code and module drift. Stage 0A only notes deployment clues.", "later": "Not a named IaC gap report later. Nearest: 10 and 30 deployment architecture"}, {"challenge": 5, "kind": "Deliverable", "element": "Reproducible setup guide", "coverage": "none", "stages": "—", "artifacts": "No stage requires documented steps that reproduce the local environment.", "later": "38 handover asks the receiving team to deploy independently, which is later and broader"}, {"challenge": 5, "kind": "Deliverable", "element": "Environment model", "coverage": "partial", "stages": "0B, 10", "artifacts": "environment-access-boundaries.md limits access. deployment-architecture.md is the target. Neither is a reproducible environment model.", "later": "30 environment-promotion-plan.md"}, {"challenge": 5, "kind": "Deliverable", "element": "Configuration ownership map", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 2 decision-rights-map.md is stakeholder authority, not configuration ownership.", "later": "37 service-ownership-map.md and change-governance.md"}, {"challenge": 5, "kind": "Deliverable", "element": "Deployment dependency list", "coverage": "partial", "stages": "10, 14", "artifacts": "deployment-architecture.md and dependency-sequence.md. The sequence is migration order, not a list of deploy dependencies.", "later": "30 deployment-strategy.md"}, {"challenge": 5, "kind": "Acceptance standard", "element": "A new team can reproduce the intended local environment from documented steps", "coverage": "none", "stages": "—", "artifacts": "No completion gate in this window says this.", "later": "38 operator exercises include deploy, which is a handover test rather than an IaC guide"}, {"challenge": 6, "kind": "Deliverable", "element": "Policy catalogue for access, AI approval, data use, operational safety, and production readiness", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 12 business-rules.md and security-spec.md are specifications. Stage 0B approval and data-use files are prose constraints.", "later": "25 compliance-control-matrix.md maps obligations to controls. It is still not a policy catalogue."}, {"challenge": 6, "kind": "Deliverable", "element": "Policy-as-code rules", "coverage": "none", "stages": "—", "artifacts": "No stage requires executable policy.", "later": "Not required later in the spine either"}, {"challenge": 6, "kind": "Deliverable", "element": "Allow and deny examples", "coverage": "none", "stages": "—", "artifacts": "No allow/deny policy fixtures are required.", "later": "Not required later in the spine either"}, {"challenge": 6, "kind": "Deliverable", "element": "Policy tests", "coverage": "none", "stages": "—", "artifacts": "No policy-test artifact is required.", "later": "23 human-control-test-results.md tests approval gates, not policy-as-code"}, {"challenge": 6, "kind": "Deliverable", "element": "Exception-handling model for policy", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 12 error-handling-spec.md specifies application errors, not policy exceptions.", "later": "25 risk-acceptance-register.md is risk acceptance, not a policy exception model"}, {"challenge": 6, "kind": "Acceptance standard", "element": "At least one high-risk decision is governed by executable policy with positive and negative cases", "coverage": "none", "stages": "—", "artifacts": "No stage sets this bar.", "later": "Not required later in the spine either"}, {"challenge": 7, "kind": "Deliverable", "element": "Pipeline improvement plan (CI gaps, test stages, manual release controls)", "coverage": "none", "stages": "—", "artifacts": "No CI/CD pipeline assessment or design is required in this window.", "later": "27 supply-chain-controls.md and CI/CD hardening; 30 release and deployment plans"}, {"challenge": 7, "kind": "Deliverable", "element": "Dependency risk register", "coverage": "partial", "stages": "7, 16", "artifacts": "dependency-map.md, obsolete-library findings, dependency-scan-summary.md. A map and a scan, not a risk register with owners and disposition.", "later": "27 vulnerability-register.md and vulnerability-disposition.md"}, {"challenge": 7, "kind": "Deliverable", "element": "SBOM recommendation", "coverage": "none", "stages": "—", "artifacts": "SBOM is not mentioned in stages 0A–20.", "later": "27 sbom-summary.md"}, {"challenge": 7, "kind": "Deliverable", "element": "Security scan plan", "coverage": "partial", "stages": "16", "artifacts": "security-scan-summary.md and dependency-scan-summary.md are results. A scan plan is not required.", "later": "27 scan-results.md"}, {"challenge": 7, "kind": "Deliverable", "element": "Release evidence checklist", "coverage": "partial", "stages": "18", "artifacts": "evidence-checklist.md is the evidence required to finish a work item. It is not a release checklist, and it is not produced by a pipeline.", "later": "30 release-plan.md, deployment-evidence.md, go-no-go-criteria.md"}, {"challenge": 7, "kind": "Acceptance standard", "element": "The pipeline generates evidence, not only command output", "coverage": "none", "stages": "—", "artifacts": "The global contract requires cited workshop artifacts. It does not require a pipeline that emits release evidence.", "later": "30 deployment-evidence.md is the nearest later artifact"}, {"challenge": 8, "kind": "Deliverable", "element": "Trace design correlating UI, API, legacy jobs, ETL, AI invocation, policy decision, human approval, and audit", "coverage": "partial", "stages": "10, 12, 20", "artifacts": "Observability is an architecture topic, a spec, and an implementation hook. Cross-surface correlation is not required.", "later": "31 tracing-spec.md, ai-telemetry-spec.md, agent-telemetry-spec.md"}, {"challenge": 8, "kind": "Deliverable", "element": "Log schema", "coverage": "partial", "stages": "12", "artifacts": "observability-spec.md can hold logging. A log schema is not a named artifact.", "later": "31 logging-spec.md"}, {"challenge": 8, "kind": "Deliverable", "element": "Metric catalogue", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 4 kpi-dictionary.md is a business KPI dictionary, not an operational metric catalogue.", "later": "31 metrics-spec.md"}, {"challenge": 8, "kind": "Deliverable", "element": "Dashboard sketch", "coverage": "none", "stages": "—", "artifacts": "No dashboard artifact is required in this window.", "later": "31 dashboard-catalog.md"}, {"challenge": 8, "kind": "Deliverable", "element": "SLO proposal", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stages 3, 9, and 12 require NFRs. They do not require an SLO with an indicator, target, and window.", "later": "31 slo-sla-definitions.md and error-budget-policy.md"}, {"challenge": 8, "kind": "Deliverable", "element": "Incident reconstruction example", "coverage": "none", "stages": "—", "artifacts": "No stage asks the team to reconstruct one business event from telemetry.", "later": "29 tabletop-scenario.md; 31 observability-validation.md"}, {"challenge": 8, "kind": "Acceptance standard", "element": "One business event can be explained end to end on a production trail", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 5 explains the business process. That is a different end-to-end from a correlated production trail.", "later": "31 observability architecture and tracing spec"}, {"challenge": 9, "kind": "Execution focus", "element": "Locate where AI output can influence an operational decision", "coverage": "match", "stages": "8, 20", "artifacts": "deterministic-vs-ai-boundaries.md, minimum-agency-assessment.md, deterministic-ai-boundary.md", "later": "—"}, {"challenge": 9, "kind": "Deliverable", "element": "Trust-boundary diagram", "coverage": "partial", "stages": "8, 20", "artifacts": "Boundary documents exist. A diagram across prompt, retrieval, tools, and output is not required.", "later": "24 attack-surface-map.md and threat-model.md"}, {"challenge": 9, "kind": "Execution focus", "element": "Prompt-injection tests", "coverage": "none", "stages": "—", "artifacts": "No prompt-injection test is required in this window.", "later": "24 prompt-injection-controls.md; 26 red-team-plan.md and red-team-findings.md"}, {"challenge": 9, "kind": "Execution focus", "element": "Retrieval trust checks", "coverage": "partial", "stages": "11, 19", "artifacts": "retrieval-strategy.md and grounding-results.md measure groundedness. They are not a trust check on retrieved content.", "later": "24 and 26 cover poisoning, leakage, and bad retrieval in incident scope at 29"}, {"challenge": 9, "kind": "Execution focus", "element": "Output schema validation", "coverage": "match", "stages": "19", "artifacts": "Structured outputs are part of the intelligence layer.", "later": "—"}, {"challenge": 9, "kind": "Deliverable", "element": "AI risk register", "coverage": "partial", "stages": "8, 9, 10", "artifacts": "product-risks.md and architecture-risk-register.md. No AI-specific risk register.", "later": "24 residual-security-risks.md and responsible-ai-controls.md"}, {"challenge": 9, "kind": "Deliverable", "element": "Guardrail test pack", "coverage": "partial", "stages": "19", "artifacts": "Hallucination, unsupported claims, abstention, and grounding results. Not a security guardrail pack.", "later": "26 adversarial datasets and red-team findings"}, {"challenge": 9, "kind": "Deliverable", "element": "Model and version provenance design", "coverage": "partial", "stages": "19", "artifacts": "prompt-registry.md and model-configuration.md version the assets. They do not tie a decision to a model version.", "later": "25 model-card.md, system-card.md, ai-system-register.md"}, {"challenge": 9, "kind": "Deliverable", "element": "Approval workflow so AI output cannot skip a human gate", "coverage": "partial", "stages": "0B, 2", "artifacts": "provisional-human-approval-rules.md and approval-authority-map.md. Provisional rules and stakeholder authority, not an AI-output workflow.", "later": "23 hitl-workflow.md, approval-gates.md, autonomy-matrix.md"}, {"challenge": 9, "kind": "Deliverable", "element": "Unsafe-output handling rules", "coverage": "none", "stages": "—", "artifacts": "Stage 19 measures abstention. It does not define what happens to unsafe output.", "later": "24 responsible-ai-controls.md and prompt-injection-controls.md"}, {"challenge": 9, "kind": "Acceptance standard", "element": "AI recommendations do not silently become operational decisions", "coverage": "partial", "stages": "8, 20", "artifacts": "Minimum agency and a deterministic/AI split are required. The enforced approval gate is not in this window.", "later": "23 autonomy matrix and approval gates"}, {"challenge": 10, "kind": "Deliverable", "element": "Performance baseline for API, ETL, event volume, data access, and synchronous chains, using synthetic data", "coverage": "none", "stages": "—", "artifacts": "No load profile is required. Stage 11 synthetic data is a substitution plan, not a load dataset.", "later": "28 capacity-plan.md; 31 latency telemetry"}, {"challenge": 10, "kind": "Execution focus", "element": "AI latency measurement", "coverage": "partial", "stages": "0C, 19", "artifacts": "Provisional latency envelope and quality-latency-cost-results.md for the intelligence layer only.", "later": "31 model latency in ai-telemetry-spec.md; 32 actual-vs-baseline analysis"}, {"challenge": 10, "kind": "Deliverable", "element": "Bottleneck list", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 5 process-bottlenecks.md records process delay, rework, and handoffs, not technical bottlenecks under load.", "later": "28 capacity-plan.md and failure-mode analysis"}, {"challenge": 10, "kind": "Deliverable", "element": "Load scenarios", "coverage": "none", "stages": "—", "artifacts": "No load scenario artifact is required.", "later": "28 capacity-plan.md"}, {"challenge": 10, "kind": "Deliverable", "element": "Scaling recommendations", "coverage": "partial", "stages": "10", "artifacts": "Scalability is one criterion for choosing an architecture. Recommendations are not drawn from measured load.", "later": "28 capacity-plan.md; 40 scale-out backlog"}, {"challenge": 10, "kind": "Deliverable", "element": "Data-access performance findings", "coverage": "none", "stages": "—", "artifacts": "Stages 7 and 11 cover data handling and access control, not data-access performance.", "later": "Not a named later artifact. Nearest: 28 capacity plan"}, {"challenge": 10, "kind": "Acceptance standard", "element": "Technical bottlenecks are tied to business impact", "coverage": "none", "stages": "—", "artifacts": "No stage requires this link.", "later": "35 value-leakage includes latency leakage, which is an outcome view rather than a load study"}, {"challenge": 11, "kind": "Deliverable", "element": "Failure-mode catalogue with injection for duplicates, stale data, AI timeout, partner or API failure, telemetry gaps, and partial batch failure", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 12 error-handling-spec.md specifies application errors. It is not a failure-injection catalogue.", "later": "21 failure-semantics for integration; 28 failure-mode-analysis.md and failure-injection results"}, {"challenge": 11, "kind": "Deliverable", "element": "Idempotency plan", "coverage": "partial", "stages": "20", "artifacts": "Stage 20 says to implement idempotency. There is no plan and no test evidence.", "later": "21 reconciliation and failure semantics; 28 retry policy"}, {"challenge": 11, "kind": "Deliverable", "element": "Retry and circuit-breaker strategy", "coverage": "none", "stages": "—", "artifacts": "Retries in Stage 0C are a cost assumption, not a resilience strategy.", "later": "28 timeout-retry-policy.md and circuit-breaker-policy.md"}, {"challenge": 11, "kind": "Deliverable", "element": "Degraded-mode design", "coverage": "none", "stages": "—", "artifacts": "No stage defines what keeps running when a dependency fails.", "later": "28 graceful-degradation-design.md and ai-disabled-mode.md"}, {"challenge": 11, "kind": "Deliverable", "element": "Recovery evidence", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 14 rollback-strategy.md is migration and cutover rollback, not runtime recovery evidence.", "later": "28 failure-injection-results.md; 29 recovery-procedure.md and tabletop-results.md"}, {"challenge": 11, "kind": "Acceptance standard", "element": "The system defines what continues safely when dependencies fail", "coverage": "none", "stages": "—", "artifacts": "No stage sets this bar.", "later": "28 resilience-readiness.md"}, {"challenge": 12, "kind": "Deliverable", "element": "AI cost baseline for tokens and model calls", "coverage": "partial", "stages": "0C, 8, 19", "artifacts": "preliminary-finops-baseline.md, cost-scenarios.md, economics-baseline-reconciliation.md, quality-latency-cost-results.md. Provisional, and retired if Stage 8 rejects AI.", "later": "32 baseline-vs-actual-token-analysis.md"}, {"challenge": 12, "kind": "Deliverable", "element": "Cost per workflow", "coverage": "partial", "stages": "0C", "artifacts": "cost-scenarios.md and volume assumptions. Not a measured cost-per-workflow sheet.", "later": "32 cost-per-workflow.md"}, {"challenge": 12, "kind": "Deliverable", "element": "Retry and fallback cost analysis", "coverage": "partial", "stages": "0C", "artifacts": "Retries sit inside token-flow and loop budgets. solution-scenarios.md contrasts build paths. Neither is a fallback-cost analysis.", "later": "32 model-usage-analysis.md and token-leakage-analysis.md"}, {"challenge": 12, "kind": "Execution focus", "element": "Event-processing cost", "coverage": "partial", "stages": "0C", "artifacts": "volume-assumptions.md and infrastructure consumption, only where evidence already exists.", "later": "32 tco-model.md"}, {"challenge": 12, "kind": "Execution focus", "element": "Observability-volume cost", "coverage": "none", "stages": "—", "artifacts": "Cost of logs, metrics, and traces is not required.", "later": "32 includes infrastructure cost. Observability volume is still not named."}, {"challenge": 12, "kind": "Deliverable", "element": "Optimization backlog", "coverage": "none", "stages": "—", "artifacts": "No cost-optimization backlog is required in this window.", "later": "32 optimization-backlog.md"}, {"challenge": 12, "kind": "Deliverable", "element": "FinOps dashboard fields", "coverage": "none", "stages": "—", "artifacts": "No FinOps dashboard spec is required in this window.", "later": "32 production-token-dashboard-spec.md"}, {"challenge": 12, "kind": "Acceptance standard", "element": "Cost is explained per business outcome, not only as total spend", "coverage": "partial", "stages": "0C", "artifacts": "Provisional ceilings for cost per request and cost per case. Not measured cost per business outcome.", "later": "32 cost-per-outcome.md, cost-per-case.md, cost-per-workflow.md"}, {"challenge": 13, "kind": "Deliverable", "element": "Security test suite plan", "coverage": "partial", "stages": "16", "artifacts": "Security and dependency scans are run and summarized. The plan does not cover the abuse cases named in the challenge.", "later": "24 security-test-plan.md; 26 tevv-plan.md and red-team-plan.md"}, {"challenge": 13, "kind": "Deliverable", "element": "Negative tests", "coverage": "none", "stages": "—", "artifacts": "Negative security tests are not a required artifact.", "later": "24 security-test-results.md; 26 adversarial-dataset-spec.md"}, {"challenge": 13, "kind": "Deliverable", "element": "Scanning checklist", "coverage": "none", "stages": "—", "artifacts": "Stage 16 produces scan results, not a scanning checklist.", "later": "27 scan-results.md and vulnerability-disposition.md"}, {"challenge": 13, "kind": "Deliverable", "element": "Abuse-case evidence for unauthorized access, policy bypass, prompt injection, sensitive-data leakage, and unsafe AI actions", "coverage": "none", "stages": "—", "artifacts": "Those cases are not required tests in this window.", "later": "26 red-team-findings.md and remediation-evidence.md"}, {"challenge": 13, "kind": "Deliverable", "element": "Security remediation backlog", "coverage": "partial", "stages": "7, 16", "artifacts": "technical-debt-register.md and remaining-debt-register.md. Debt registers, not a security remediation backlog.", "later": "26 remediation-evidence.md; 27 vulnerability-disposition.md"}, {"challenge": 13, "kind": "Acceptance standard", "element": "Security claims are backed by repeatable validation", "coverage": "partial", "stages": "16", "artifacts": "Repeatable for static, dependency, and security scans. Not for the abuse cases the challenge names.", "later": "26 tevv-release-gate.md"}, {"challenge": 14, "kind": "Deliverable", "element": "Audit gap report", "coverage": "none", "stages": "—", "artifacts": "No audit-gap artifact is required.", "later": "25 audit-evidence-index.md"}, {"challenge": 14, "kind": "Deliverable", "element": "Decision provenance model (actor, request, data used, model and version, policy result, approval, final action, missing evidence)", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 11 provenance-policy.md is data and citation provenance. Stage 13 is requirements-to-test traceability. Stage 19 registries are not tied to a business event.", "later": "25 audit-evidence-index.md and model card; 42 executive-evidence-index.md. A decision-provenance model is still not named."}, {"challenge": 14, "kind": "Deliverable", "element": "Evidence chain for one business event", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 13 test-to-evidence-map.md chains delivery evidence, not a business-event audit trail.", "later": "25 audit-evidence-index.md"}, {"challenge": 14, "kind": "Deliverable", "element": "Compliance evidence mapping", "coverage": "none", "stages": "—", "artifacts": "Compliance obligations are not mapped in this window.", "later": "25 compliance-obligations.md and compliance-control-matrix.md"}, {"challenge": 14, "kind": "Deliverable", "element": "Before-and-after audit example", "coverage": "none", "stages": "—", "artifacts": "No before/after audit example is required.", "later": "Not a named later artifact. Nearest: 25 audit index and 42 evidence index"}, {"challenge": 14, "kind": "Execution focus", "element": "Auditability hooks in the application", "coverage": "partial", "stages": "20", "artifacts": "Stage 20 tells the build to implement auditability hooks. That is not an evidence chain.", "later": "25 evidence-retention-policy.md and audit-evidence-index.md"}, {"challenge": 14, "kind": "Acceptance standard", "element": "The chain shows what happened, who or what influenced it, and what cannot yet be proven", "coverage": "none", "stages": "—", "artifacts": "The global contract records unknowns on each artifact. It does not reconstruct one decision.", "later": "25 and 42 assemble assurance evidence, without this reconstruction exercise"}, {"challenge": 15, "kind": "Deliverable", "element": "Production readiness checklist", "coverage": "partial", "stages": "7, 12, 19, 20", "artifacts": "repo-transformation-readiness.md, spec-readiness.md, intelligence-release-gate.md, application-readiness.md. Stage gates, not a production checklist.", "later": "27 production-readiness-checklist.md"}, {"challenge": 15, "kind": "Deliverable", "element": "Residual risk register for the production decision", "coverage": "partial", "stages": "0A, 10, 14, 18", "artifacts": "Several risk registers exist. None is a consolidated production residual-risk register with accepted risk.", "later": "30 release outcome; FINAL residual-risk-register.md"}, {"challenge": 15, "kind": "Deliverable", "element": "Production go / no-go decision", "coverage": "none", "stages": "—", "artifacts": "Not counted: Stage 1 engagement-go-no-go.md is Go, Conditional Go, or No-Go for the engagement, not for production release.", "later": "30 go-no-go-criteria.md and release-outcome.md"}, {"challenge": 15, "kind": "Deliverable", "element": "Risk owner table", "coverage": "partial", "stages": "2", "artifacts": "decision-rights-map.md records who may decide. It is not a table of production risk owners.", "later": "25 accountability-map.md; 37 raci.md"}, {"challenge": 15, "kind": "Deliverable", "element": "Deferred work list", "coverage": "partial", "stages": "9, 16", "artifacts": "non-goals.md, future scope, remaining-debt-register.md", "later": "FINAL implemented-vs-deferred.md"}, {"challenge": 15, "kind": "Acceptance standard", "element": "The team states what is production-ready, what is not, and which risk is accepted", "coverage": "none", "stages": "—", "artifacts": "Each stage gate states readiness for that stage only. The production statement is outside this window.", "later": "27 production-readiness-checklist.md and 30 release-outcome.md"}, {"challenge": 16, "kind": "Deliverable", "element": "Final evidence pack", "coverage": "none", "stages": "—", "artifacts": "Stages accumulate separate files. No stage assembles them into a pack.", "later": "42 executive-evidence-index.md and the final as-built PRD"}, {"challenge": 16, "kind": "Deliverable", "element": "Executive summary", "coverage": "none", "stages": "—", "artifacts": "No executive summary is required in this window.", "later": "42 executive-narrative.md and problem-to-value-story.md"}, {"challenge": 16, "kind": "Deliverable", "element": "Test, security-scan, and AI-evaluation evidence available to a pack", "coverage": "partial", "stages": "7, 16, 19", "artifacts": "Baseline and validation results, scan summaries, and intelligence evaluation results exist as stage files. They are not packaged.", "later": "42 tevv-summary.md and executive-evidence-index.md"}, {"challenge": 16, "kind": "Deliverable", "element": "Observability, reliability, and FinOps evidence in the pack", "coverage": "none", "stages": "—", "artifacts": "Those evidence classes are not produced in this window, so they cannot be packed.", "later": "28 resilience evidence, 31 observability validation, 32 FinOps, packed at 42"}, {"challenge": 16, "kind": "Execution focus", "element": "Runbooks included in the pack", "coverage": "none", "stages": "—", "artifacts": "No runbook is required in this window.", "later": "29 incident playbook; 31 operational-runbook.md"}, {"challenge": 16, "kind": "Deliverable", "element": "Production readiness decision inside the pack", "coverage": "none", "stages": "—", "artifacts": "Same gap as the production go/no-go. Stage gates are not that decision.", "later": "30 release-outcome.md, cited from 42"}, {"challenge": 16, "kind": "Acceptance standard", "element": "A reviewer can verify the transformation without a verbal explanation", "coverage": "none", "stages": "—", "artifacts": "The global contract makes each file self-citing. It does not produce the pack this standard requires.", "later": "42 executive-evidence-index.md"}]};
+const LABELS = { match: "Match", partial: "Partial", none: "No mapping" };
+
+function verdictFor(items) {
+  const acceptance = items.find((item) => item.kind === "Acceptance standard");
+  const matches = items.filter((item) => item.coverage === "match").length;
+  const partials = items.filter((item) => item.coverage === "partial").length;
+  const missingOutputs = items.filter((item) => item.kind === "Deliverable" && item.coverage === "none").length;
+  if (matches + partials === 0) return "Not in this window";
+  if (acceptance && acceptance.coverage === "match" && missingOutputs === 0) return "Covered";
+  if (acceptance && acceptance.coverage === "match") return "Mostly covered";
+  if (matches === 0 && partials <= 2) return "Adjacent only";
+  return "Partial";
+}
+
+function tone(verdict) {
+  if (verdict === "Covered" || verdict === "Mostly covered") return "match";
+  if (verdict === "Not in this window" || verdict === "Adjacent only") return "none";
+  return "partial";
+}
+
+const summary = DATA.challenges.map((challenge) => {
+  const items = DATA.elements.filter((item) => item.challenge === challenge.id);
+  return {
+    ...challenge,
+    match: items.filter((item) => item.coverage === "match").length,
+    partial: items.filter((item) => item.coverage === "partial").length,
+    none: items.filter((item) => item.coverage === "none").length,
+    verdict: verdictFor(items),
+  };
+});
+
+const totals = {
+  match: DATA.elements.filter((item) => item.coverage === "match").length,
+  partial: DATA.elements.filter((item) => item.coverage === "partial").length,
+  none: DATA.elements.filter((item) => item.coverage === "none").length,
+};
+
+const stats = document.getElementById("stats");
+[
+  ["match", totals.match, "Elements that match"],
+  ["partial", totals.partial, "Partial overlaps"],
+  ["none", totals.none, "No mapping in 0A–20"],
+  ["", DATA.elements.length, "Requirements compared"],
+].forEach(([cls, value, label]) => {
+  const el = document.createElement("div");
+  el.className = "stat " + cls;
+  el.innerHTML = "<b></b><span></span>";
+  el.querySelector("b").textContent = String(value);
+  el.querySelector("span").textContent = label;
+  stats.appendChild(el);
+});
+
+const max = Math.max(...summary.map((row) => row.match + row.partial + row.none));
+const bars = document.getElementById("bars");
+summary.forEach((row) => {
+  const wrap = document.createElement("div");
+  wrap.className = "bar-row";
+  const name = document.createElement("div");
+  name.className = "bar-name";
+  name.textContent = row.short;
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  bar.title = row.name + ": " + row.match + " match, " + row.partial + " partial, " + row.none + " unmapped";
+  ["match", "partial", "none"].forEach((key) => {
+    if (!row[key]) return;
+    const seg = document.createElement("div");
+    seg.className = "seg " + key;
+    seg.style.width = (row[key] / max * 100) + "%";
+    bar.appendChild(seg);
+  });
+  const count = document.createElement("div");
+  count.className = "bar-name";
+  count.textContent = String(row.match + row.partial + row.none);
+  wrap.append(name, bar, count);
+  bars.appendChild(wrap);
+});
+
+const summaryBody = document.querySelector("#summary tbody");
+summary.forEach((row) => {
+  const tr = document.createElement("tr");
+  tr.className = tone(row.verdict);
+  [row.id + ". " + row.name, row.verdict, row.match, row.partial, row.none].forEach((value, index) => {
+    const td = document.createElement("td");
+    if (index > 1) td.className = "num";
+    td.textContent = String(value);
+    tr.appendChild(td);
+  });
+  summaryBody.appendChild(tr);
+});
+
+let filter = "all";
+const shown = document.getElementById("shown");
+const detailBody = document.querySelector("#detail tbody");
+const search = document.getElementById("q");
+
+function render() {
+  const needle = search.value.trim().toLowerCase();
+  const rows = DATA.elements.filter((item) => {
+    if (filter !== "all" && item.coverage !== filter) return false;
+    if (!needle) return true;
+    const challenge = DATA.challenges.find((entry) => entry.id === item.challenge);
+    const haystack = [challenge ? challenge.name : "", item.kind, item.element, item.stages, item.artifacts, item.later].join(" ").toLowerCase();
+    return haystack.includes(needle);
+  });
+  shown.textContent = rows.length + " of " + DATA.elements.length + " requirements shown. A blank stage cell means no stage in 0A–20 requires that work.";
+  detailBody.replaceChildren();
+  rows.forEach((item) => {
+    const challenge = DATA.challenges.find((entry) => entry.id === item.challenge);
+    const tr = document.createElement("tr");
+    tr.className = item.coverage;
+    const cells = [
+      item.challenge + ". " + (challenge ? challenge.name : ""),
+      item.kind,
+      item.element,
+      LABELS[item.coverage],
+      item.stages === "—" ? "" : item.stages,
+      item.artifacts,
+      item.later === "—" ? "" : item.later,
+    ];
+    cells.forEach((value, index) => {
+      const td = document.createElement("td");
+      if (index === 3) {
+        const tag = document.createElement("span");
+        tag.className = "tag " + item.coverage;
+        tag.textContent = value;
+        td.appendChild(tag);
+      } else {
+        td.textContent = value;
+      }
+      tr.appendChild(td);
+    });
+    detailBody.appendChild(tr);
+  });
+}
+
+document.querySelectorAll(".controls button").forEach((button) => {
+  button.addEventListener("click", () => {
+    filter = button.dataset.filter;
+    document.querySelectorAll(".controls button").forEach((other) => {
+      other.setAttribute("aria-pressed", other === button ? "true" : "false");
+    });
+    render();
+  });
+});
+search.addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
