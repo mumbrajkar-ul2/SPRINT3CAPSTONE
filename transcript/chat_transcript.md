@@ -427,3 +427,123 @@ Fixed in `Execution Plan.md` section 5:
 - The "Why this order" list now has one line per step, including Phase 4 and 5 before 6, 6 before 7, 7 before 8, 9 last.
 
 The same diagram fix was applied to the plan file so the two stay in step. The playbook README order table was already linear and did not change.
+
+## 2026-10-08 18:04
+
+**Model:** Grok 4.7
+
+### User
+
+Understand the pre-requisites for building and running the application code in @06-telecom-service-network-incident-ops . Install the pre-requisites and build and run the application. If there are certain limitations that prevent the application from being built or run, share the information. If any actions need to be taken, let me know the steps to address them.
+
+### Assistant
+
+The API is running. Open http://127.0.0.1:8011/docs . I confirmed the page in a browser. It lists GET /health, GET /records/{record_id}, and POST /ai/summarize/{record_id}. Live calls returned 200 for all three: health is ok, REC-0001 returns the first device row, and the AI route returns the local-sim-v1 synthetic summary.
+
+What the repo needs, and what is installed:
+
+- Python 3.10 or newer. This machine has 3.13.5. CI pins 3.11. The app runs on 3.13.
+- A virtual environment and the six pins in requirements.txt (FastAPI 0.115.0, uvicorn 0.30.6, pydantic 2.8.2, pytest 8.3.2, python-dotenv 1.0.1, PyYAML 6.0.2). Installed in 06-telecom-service-network-incident-ops/.venv during Phase 0.
+- httpx, which the test client needs and requirements.txt does not list. Installed in the venv only (0.28.1). pytest then passed 3 tests.
+- Node is present (v22.18.0) but the portal has nothing to build.
+
+The README Quick Start command does not start the app. `uvicorn apps/api.main:app` fails with `No module named 'apps/api'`. The working command is:
+
+```text
+cd 06-telecom-service-network-incident-ops
+.\.venv\Scripts\python.exe -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8011
+```
+
+On Windows the venv activates with `.\.venv\Scripts\Activate.ps1`. The README line `. .venv/bin/activate` is the bash form. `make` is not installed, so the Makefile targets are not usable here. Run pytest, the sanity check, and the ETL with the venv Python directly.
+
+The Angular portal cannot be built or run. apps/web holds two TypeScript files (a component and a fetch wrapper) and a package.json whose dependencies are empty. There is no angular.json, no index.html, no bootstrap, and no build script. The README says this is deliberate. GET / on the API returns 404, and the fetch wrapper calls /api/records, which also returns 404. The Playwright file tests/playwright/operations.spec.ts opens / and checks that a body is visible. It cannot pass until a page is served there.
+
+Steps if you want to close the gaps:
+
+1. Tests on a clean install: add `httpx` to requirements.txt, then `pip install -r requirements.txt` in a fresh venv. I did not edit requirements.txt.
+2. README: change the uvicorn line to `uvicorn apps.api.main:app --reload`.
+3. Portal: that is Phase 7 work. A small served page, then `npm install` in apps/web, a Playwright config, and `npx playwright install` before `npm test` can run.
+
+The server is left running on port 8011.
+
+## 2026-10-08 19:50
+
+**Model:** Grok 4.7
+
+### User
+
+run the app
+
+### Assistant
+
+The API is already running. `GET http://127.0.0.1:8011/health` returned 200 with `{"status":"ok","repo":"06-telecom-service-network-incident-ops"}`.
+
+Open http://127.0.0.1:8011/docs for the three routes. The portal under `apps/web` still has no page to serve.
+
+## 2026-10-08 20:14
+
+**Model:** Grok 4.7
+
+### User
+
+explain the functionality of the application in @06-telecom-service-network-incident-ops in layman words
+
+### Assistant
+
+The files describe a telecom operations desk. Staff would take a customer order for a circuit, group a flood of alarms into one incident, look up how a device is connected and ask for a suggested next step, then check that an approved fix really worked. The running program does not do those jobs yet. It does three small things, plus two batch scripts.
+
+What you can call today, at http://127.0.0.1:8011/docs :
+
+1. Health. `GET /health` answers "the program is up" and names the repo.
+2. Device lookup. `GET /records/{id}` reads one spreadsheet, `data/synthetic/devices.csv` (354 fake device rows). If the id is in that file, you get that row: hostname, site, management address, firmware, and similar fields. If the id is not in the file, you still get a row: the first row, whose id is `REC-0001`. The caller can believe a missing device exists. A role header is checked against a short allow list (`admin`, `operator`, `clinician`, `engineer`, `ai_agent`). No header is treated as `operator`. A role outside the list gets a JSON message that says forbidden, with HTTP status 200. Each allowed read appends one line to `logs/audit.log`: time, action, the id asked for, and the role. The line does not say which row was actually returned.
+3. A short write-up. `POST /ai/summarize/{id}` loads that same device row, waits a hundredth of a second, and returns a fixed sentence: a synthetic summary for that id, the line "Review and approve before action", a token count that is twice the word count of the prompt, and `guardrail_status: not_enforced`. There is no role check on this call. The audit line stores the id and the model name `local-sim-v1`. Nothing is sent to a real model. Nothing is changed on a device.
+
+Two scripts sit beside the API. `etl/run_daily_batch.py --sample` counts the device rows and counts how many have a blank field. It prints the counts. It does not set those rows aside. `legacy/reconcile_legacy.py` counts the same device rows and keeps a shared database login inside the script.
+
+The screen under `apps/web` is a sketch. It names a title and five columns, and it knows the two API paths. It does not open in a browser. `GET /` on the API returns 404.
+
+The other spreadsheets (circuits, alarms, incidents, service orders, AI call records, and 3000 event lines) sit on disk. The API does not read them. A policy file exists and is not called. So an order, an alarm storm, a topology question, and a checked fix are described in `docs/domain-specific-spec.md`. None of those four runs from the first step to the last in the program you have now.
+
+## 2026-10-09 12:49
+
+**Model:** Grok 4.7
+
+### User
+
+Create a Telecom Application Modernization.md that includes a table with a list of the Features described by the repository in @06-telecom-service-network-incident-ops . Against each Feature (column 1), describe the evidence of that feature in the repo (column 2), applicable modernization opportunities based on the 16 Challenge Areas for that specific feature (column 3) and the stage (or stages) in the playbook folder where that modernization element can be addressed (column 4) and how the modernization can be addressed (column 5). Here are the features for the telecom operations desk app - Staff would take a customer order for a circuit, group a flood of alarms into one incident, look up how a device is connected and ask for a suggested next step, then check that an approved fix really worked
+
+### Assistant
+
+`Telecom Application Modernization.md` is at the project root. It has one row for each of the four desk jobs you named.
+
+Each row has the five columns you asked for: the feature, the file evidence, the challenge areas that change that feature, the playbook stage files, and the concrete change that stage makes.
+
+The order row cites `service_orders.csv` (including `ORD-00002` with `retry_count` 4052) and the fact that the API reads `devices.csv` only. Its stages run from the baseline and the AI-versus-no-AI table through policy, retries, audit, and the PRD, which must say whether this flow is built or left visible.
+
+The alarm row cites `storm_batch_id`, `dedupe_key`, alarm `ALA-00002` (last seen before first seen), and incident severities `gold` and `bronze`. The build step is `S07-application-and-demo.md`: `GET /alarms/storms/{storm_batch_id}`.
+
+The lookup-and-suggestion row cites the two live routes, `guardrail_status: not_enforced`, and the three assistant names in `current-state.md`. That row carries the most stages, from identity through the guardrailed `POST /ai/recommend/{id}`.
+
+The approved-fix row cites the missing execute route, the unfinished incident-response runbook, and the drill list that is not yet tests. A model does not get execute agency. `POST /approvals/{id}` records the human decision and does not push a change.
+
+Challenges 1, 2, 5, 7, 15, and 16, plus the semantic layer, the second model, and the defence, apply to every row in the same way. They sit in a second table under the feature map. A worked example under that table follows alarm `ALA-00002` from the CSV through S02, S03, S04-11, and S07.
+
+## 2026-10-09 13:11
+
+**Model:** Grok 4.7
+
+### User
+
+Based on the above suggestions, update the Execution Plan and Playbook Elements to reflect the changes. Update the Project Intent with the details of the application functionality and its limitations from @Telecom Application Modernization.md that was not covered earlier.
+
+### Assistant
+
+Updated four documents so the demo scope and the two limits match.
+
+**Execution Plan.md.** Challenge 11 now includes a test that flags an alarm like `ALA-00002` (last seen before first seen) and does not open an incident. That test is separate from the `stale_topology_flag` drill. Phase 6 requires the PRD to name every flow as implemented or as not implemented with a reason. When the demo stays topology lookup plus alarm-storm dedupe, order provisioning stays unimplemented because no route reads `service_orders.csv` or `circuits.csv`, and remediation validation stays unimplemented because this packet does not apply a live change. Phase 7 keeps `POST /ai/summarize/{id}` and adds `POST /ai/recommend/{id}`. It does not add order or fix-validation routes.
+
+**Playbook.** `S04-11-reliability.md` adds the sixth drill and cites the YAML rule id. `S06-prd.md` and `S06R-prd-review.md` require the two sentences, and they allow the PRD to pick another demo flow if it says why and moves that flow onto the implement list. `S07-application-and-demo.md` says to keep summarize and to call recommend from the demo page.
+
+**Telecom Application Modernization.md.** The order row no longer says S02 puts the missing flow on the defect list, no longer tells S2Q to pick rules, and no longer says S04-06 writes a provisioning-status policy. The lookup row says summarize stays and recommend is added. The approved-fix row says the "did the fix work" check stays unimplemented. The worked example points the `ALA-00002` pair at the new timestamp drill.
+
+**Project_Intent.md.** New section 2.7 states what the three live calls and two scripts do, the file evidence for each of the four desk jobs, and what the API does not run. It records the build scope and the two limits. Section 5.2 points at 2.7. The D5 done test now includes those two sentences.

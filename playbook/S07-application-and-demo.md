@@ -32,7 +32,8 @@ Exclude: any route the PRD does not name; any EXECUTE path before the four gates
    - GET /health.
    - GET /records/{id}: 404 on a missing id (this replaces the characterization test that locked the first-row fallback; note the swap). Role check via the S04-03 matrix and S04-06 policy.
    - GET /alarms/storms/{storm_batch_id}: groups alarms by dedupe_key using apps/api/services/dedupe.py; returns raw count, deduped count, and the alarm ids. Numbers labelled REAL.
-   - POST /ai/recommend/{id}: runs policy, prompt allow-list, schema, timeout (S04-09 gateway); returns one of RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK; never EXECUTE from this route; writes the audit row with provenance before returning.
+   - POST /ai/summarize/{id}: keep this route. S04-09 hardens it. Do not remove it.
+   - POST /ai/recommend/{id}: new route on the same gateway. Runs policy, prompt allow-list, schema, timeout; returns one of RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK; never EXECUTE from this route; writes the audit row with provenance before returning. The demo page calls this route.
    - POST /approvals/{id}: a named human persona records approve or reject with a reason; writes an audit row with approval_id; returns the decision. It does not execute anything.
    - GET /audit/{correlation_id}: from S05-14.
    - No EXECUTE route unless the PRD lists it and all four gates exist. If built, it is reversible and validated, and a test proves it refuses without approval_id.
@@ -92,7 +93,7 @@ Cite prd.md requirement ids, semantic-layer ids, and the Phase 4 Half B tests. S
 
 | File | Must contain |
 |---|---|
-| Routes and tests | Six routes. 404 on missing id. Audit-first test. Timeout test. No EXECUTE without gates. |
+| Routes and tests | Summarize kept. Recommend added. 404 on missing id. Audit-first test. Timeout test. No EXECUTE without gates. No order or fix-validation route. |
 | Served page | Storm pick, dedupe result, recommendation, approve/reject, audit chain. Labels on numbers. |
 | `openapi-fragment.yaml` | All routes with schemas. |
 | `demo-script.md` | Header. One case, six steps, labels. Timeout variant. |

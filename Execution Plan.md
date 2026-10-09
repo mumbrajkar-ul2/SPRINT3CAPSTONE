@@ -8,7 +8,7 @@
 | Status | ACTIVE |
 | Evidence sources | `Project_Intent.md`; `AI-FDE_Brownfield_Repo_Transformation_Challenge_Guide.pdf`; `Semantic_Layer_capture.pdf`; `Assignment Material/Prompt_Anatomy.pdf`; `Assignment Material/Prompt Template.pdf`; `Assignment Material/Guidance on how to apply Prompt Anatomy to the 42 step Production Spine v2.docx`; the inherited repo `06-telecom-service-network-incident-ops` |
 | Assumptions | The inherited repo is the only system under change. All data is local and synthetic. No cloud account is needed to run it. |
-| Unresolved issues | The second model for Phase 8 is not yet named. The demo flow in Phase 6 is a recommendation until the PRD confirms it. |
+| Unresolved issues | The second model for Phase 8 is not yet named. The demo flow stays topology lookup plus alarm-storm dedupe unless the PRD picks another flow and says why. |
 | Residual risks | Time. Phases 4 to 8 contain the most work. The order below puts analysis first so a partial result still has evidence. |
 
 ## 1. What this file is
@@ -328,9 +328,9 @@ The analysis dimensions for every challenge are the ones in its challenge-guide 
 #### Challenge 11. Reliability and failure engineering
 
 - Half A: failure-mode catalogue from `docs/runbooks/failure-injection-drills.md` (missing correlation id, AI timeout, duplicate replay, stale master data, partial batch failure); idempotency plan (`dedupe_key`, order `retry_count`, event replay keyed by `correlation_id`); retry and circuit-breaker strategy; degraded-mode design (AI down: health and record read continue; recommendation returns HOLD_FOR_REVIEW); completed `docs/runbooks/incident-response.md` with severity, triage, rollback, comms, and evidence.
-- Half B: each drill becomes a test; recovery evidence is recorded from the runs.
+- Half B: each drill becomes a test; recovery evidence is recorded from the runs. One extra test applies the semantic-layer rule that alarm `last_seen_at` cannot precede `first_seen_at`. A row shaped like `ALA-00002` is flagged and does not become an incident. The stale-topology drill stays separate: that one checks `stale_topology_flag`.
 - Outputs in `docs/11-reliability/`; tests in `tests/reliability/`.
-- Completion gate: the design states what continues when each dependency fails, and the drill tests pass.
+- Completion gate: the design states what continues when each dependency fails, the drill tests pass, and the impossible-timestamp test passes.
 
 #### Challenge 12. Cost and AI FinOps
 
@@ -377,8 +377,9 @@ Steps:
 
 - Classify the four flows and three AI products as in `Project_Intent.md` 5.2, using the Phase 2Q table as the source. The AI limits section quotes the Phase 2Q pick and agency for every AI use.
 - Pick the demo flow. Recommended: topology lookup to AI recommendation, extended to a human decision, with alarm-storm dedupe as the deterministic analysis step. This flow exercises policy, guardrails, approval, and audit. The PRD may choose another flow and say why.
+- Name the flows the demo does not run, each with the reason. When the demo stays the recommended flow, two sentences are required. Order provisioning stays unimplemented because no route reads `service_orders.csv` or `circuits.csv`. Remediation validation stays unimplemented because this packet does not apply a live change, so there is no result to check. If the PRD picks one of those flows as the demo instead, say why and move that flow into the implement list. Every flow is either implemented or named, with a reason, on the will-not-implement list.
 - Write the PRD: users, workflows, AI limits, data, risk, non-functional needs, acceptance checks, success metrics. Every requirement cites a YAML id. Every acceptance check names a test.
-- State which routes the app will not implement and which inherited gaps stay visible.
+- State which routes the app will not implement and which inherited gaps stay visible. `POST /ai/summarize/{id}` stays. Phase 4 Challenge 9 hardens it. `POST /ai/recommend/{id}` is a new route. The demo page calls the recommend route.
 
 Outputs: `docs/prd/prd.md`, `docs/prd/traceability.md`.
 
@@ -396,7 +397,7 @@ Lifecycle linkage: cites the PRD, the YAML ids, and the Phase 4 Half B tests. Fe
 
 Steps:
 
-- Build from the PRD inside `apps/api/`: `/health`; `/records/{id}` returns 404 on a missing id; `/alarms/storms/{storm_batch_id}` correlates by `dedupe_key`; `/ai/recommend/{id}` runs policy, prompt allow-list, schema, timeout, and returns one of the four outcomes; `/approvals/{id}` records the human decision; `/audit/{correlation_id}` rebuilds the case. No EXECUTE route until all four gates exist. If one is built, it is reversible and validated.
+- Build from the PRD inside `apps/api/`: `/health`; `/records/{id}` returns 404 on a missing id; `/alarms/storms/{storm_batch_id}` correlates by `dedupe_key`; `/ai/recommend/{id}` runs policy, prompt allow-list, schema, timeout, and returns RECOMMEND_ONLY, HOLD_FOR_REVIEW, or BLOCK; `/approvals/{id}` records the human decision; `/audit/{correlation_id}` rebuilds the case. Keep `POST /ai/summarize/{id}` as the route Challenge 9 hardened. Do not remove it. No EXECUTE route until all four gates exist. If one is built, it is reversible and validated. Do not add order, circuit, or fix-validation routes.
 - UI: a small served page (static HTML or FastAPI templates) that walks the flow. The Angular scaffold stays documented as a scaffold unless time allows wiring it.
 - Update `data/contracts/openapi-fragment.yaml` to the full route set.
 - Demo script with one case: event, data used, policy result, model and version, human decision, audit rebuild. Each number has its honesty label.

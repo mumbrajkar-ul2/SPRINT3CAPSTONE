@@ -5,3 +5,5 @@
 {"ts": "2026-10-08T18:58:49.434307", "action": "record.read", "details": {"record_id": "REC-0001", "role": "clinician"}}
 {"ts": "2026-10-08T18:58:49.478925", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}
 {"ts": "2026-10-08T18:58:49.524986", "action": "ai.summary", "details": {"record_id": "DOES-NOT-EXIST", "model": "local-sim-v1"}}
+{"ts": "2026-10-09T01:05:34.969973", "action": "record.read", "details": {"record_id": "REC-0001", "role": "operator"}}
+{"ts": "2026-10-09T01:05:34.986947", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}

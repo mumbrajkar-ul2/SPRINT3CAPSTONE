@@ -41,7 +41,7 @@ Exclude: code; any term or status word that is not in the YAML; any requirement 
    - Non-functional needs: the SLO proposals (PROPOSED with owner), degraded mode, audit-before-state-change.
    - Acceptance checks: one per requirement; each names an existing or planned test file and test name.
    - Success metrics: metric ids from metrics.yaml.
-4. Routes: the list the app will implement (/health, /records/{id} with 404, /alarms/storms/{storm_batch_id}, /ai/recommend/{id}, /approvals/{id}, /audit/{correlation_id}) and the list it will not implement, with the reason. No EXECUTE route unless all four gates exist; if listed, it is reversible and validated.
+4. Routes: the list the app will implement (/health, /records/{id} with 404, /alarms/storms/{storm_batch_id}, /ai/recommend/{id}, /approvals/{id}, /audit/{correlation_id}). POST /ai/summarize/{id} stays. S04-09 hardens it. /ai/recommend is a new route. The demo page calls /ai/recommend. The list the app will not implement, each with a reason. When the demo stays the recommended flow, two sentences are required: order provisioning stays unimplemented because no route reads service_orders.csv or circuits.csv; remediation validation stays unimplemented because this packet does not apply a live change, so there is no result to check. If the PRD picks the order flow or the remediation flow as the demo instead, say why, and move that flow into the implement list. Every flow is either implemented or named, with a reason, on the will-not-implement list. No EXECUTE route unless all four gates exist; if listed, it is reversible and validated.
 5. Traceability: a table requirement id to YAML id to acceptance test to Phase 4 design file.
 For each requirement: id, text, YAML id, test, source design.
 
@@ -70,7 +70,7 @@ For each requirement: id, text, YAML id, test, source design.
 2. `06-telecom-service-network-incident-ops/docs/prd/traceability.md`
 
 ## Completion gate
-PASS when every requirement has a YAML id and a named test, the PRD and the YAML do not disagree on any term, and the demo flow is picked with a reason. CONDITIONAL PASS when one acceptance test is "planned" with the stage that writes it. BLOCKED when any requirement has no YAML id or the PRD defines a term on its own.
+PASS when every requirement has a YAML id and a named test, the PRD and the YAML do not disagree on any term, the demo flow is picked with a reason, and the two required "will not implement" sentences are present. CONDITIONAL PASS when one acceptance test is "planned" with the stage that writes it. BLOCKED when any requirement has no YAML id or the PRD defines a term on its own.
 
 ## Lifecycle linkage
 Cite ai-qualification.md, the semantic-layer files by id, and the Phase 4 and 5 design files. Stage S06R reviews this PRD before S07. Stage S07 builds only what this PRD names. Stage S08 gives the same PRD to the second model.
@@ -89,9 +89,9 @@ Cite ai-qualification.md, the semantic-layer files by id, and the Phase 4 and 5 
 
 | File | Must contain |
 |---|---|
-| `prd.md` | Header. Eight sections. Demo flow with reason. Routes implemented and not implemented. Every requirement has an id, a YAML id, and a test. |
+| `prd.md` | Header. Eight sections. Demo flow with reason. Routes implemented and not implemented. The order-provisioning sentence and the remediation-validation sentence, each with its reason. POST /ai/summarize kept. Every requirement has an id, a YAML id, and a test. |
 | `traceability.md` | Header. Requirement → YAML id → test → design file. |
 
 ## Done test
 
-Pick any requirement. Its YAML id resolves to an item in `semantic-layer/`. Its test name exists or is marked planned with a stage.
+Pick any requirement. Its YAML id resolves to an item in `semantic-layer/`. Its test name exists or is marked planned with a stage. The PRD states both required limits: order provisioning is not built, and remediation validation is not built, each with the reason above.

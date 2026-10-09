@@ -31,11 +31,11 @@ P2. Every term and status word in the PRD appears in glossary.md or a YAML file 
 P3. The AI limits section quotes pick, agency, and approval point from ai-qualification.md with no change in meaning.
 P4. No AI use has execute agency. No EXECUTE route is listed without the four gates (policy, approval, audit before state change, reversible and validated).
 P5. The demo flow is named with a reason, and its steps each carry a verb and a persona.
-P6. The routes-not-implemented list exists and gives a reason per route.
+P6. The routes-not-implemented list exists and gives a reason per route. When the demo is topology lookup plus alarm dedupe, the list includes both sentences: order provisioning stays unimplemented because no route reads service_orders.csv or circuits.csv; remediation validation stays unimplemented because this packet does not apply a live change. If the PRD picked another demo flow, that flow is on the implement list and the reason is written.
 P7. Every displayed number carries an honesty label.
 P8. No cutoff, threshold, or target appears without PROPOSED and an owner.
 P9. The acceptance checks cover: 404 on missing id; clinician denied; HOLD_FOR_REVIEW on timeout with no summary; audit row before state change; one case rebuilt by correlation_id.
-P10. Inherited gaps the app leaves visible are listed.
+P10. Inherited gaps the app leaves visible are listed. POST /ai/summarize/{id} is kept. /ai/recommend/{id} is the new route the demo page calls. No qualify, provision, retry, rollback, or fix-validation route is required.
 P11. Plain speech: pick three requirements at random and state whether a reader new to telecom knows what to picture.
 P12. Failure-list check from playbook/README.md: items 1 to 8, one row each.
 
@@ -71,7 +71,7 @@ Cite prd.md requirement ids and semantic-layer ids. Stage S07 may start only whe
 
 | File | Must contain |
 |---|---|
-| `docs/prd/prd-review.md` | Header. Twelve check rows plus eight failure-list rows. "Fixes required" list. |
+| `docs/prd/prd-review.md` | Header. Twelve check rows plus eight failure-list rows. P6 and P10 cite the two "will not implement" sentences and the kept summarize route. "Fixes required" list. |
 
 ## Done test
 

@@ -101,6 +101,27 @@ A language model is the program that writes text from a prompt. The challenge gu
 
 This file is the ordered work method. You need it after you finish this Project Intent. You follow it. You do not skip discovery or the semantic layer.
 
+### 2.7 What the program does today, and what this packet leaves out
+
+The domain spec names four desk jobs. The running program does three small things, plus two scripts. The build in this packet completes one job to a human decision and writes the other limits down.
+
+**What you can call today.** `GET /health` answers that the program is up. `GET /records/{id}` reads `data/synthetic/devices.csv` only. A missing id returns the first row, `REC-0001`. The response includes `mgmt_ip` and `credential_profile`. `POST /ai/summarize/{id}` has no role check. It puts the whole device row into a fixed prompt, waits 0.01 seconds, and returns a synthetic summary, the line "Review and approve before action", and `guardrail_status: not_enforced`. The model name is `local-sim-v1`. Nothing is sent to a hosted model. Nothing is changed on a device. `data/synthetic/ai_invocations.csv` has token and approval columns. The live gateway does not write that file. `apps/web` names a title and two API paths. It does not open in a browser. `GET /` returns 404.
+
+**What the files describe and the API does not run.**
+
+| Desk job | Where the words and rows are | What is missing in the running program |
+|---|---|---|
+| Take a customer order for a circuit | `docs/domain-specific-spec.md`. `service_orders.csv` (354 rows; `ORD-00002` is `failed` / `in_progress` with `retry_count` 4052). `circuits.csv` holds the circuit, the SLA tier, and `orphan_flag`. | No route reads an order or a circuit. |
+| Group a flood of alarms into one incident | `alarms.csv` has `storm_batch_id` and `dedupe_key`. Alarm `ALA-00002` has last seen on 23 February 2026 and first seen on 31 July 2026. `incidents.csv` uses `gold` and `bronze` as severity (`INC-00002`, `INC-00005`). `known-gaps.md` lists `alarm_storms` and `duplicate_tickets`. | The API does not open `alarms.csv` or `incidents.csv`. |
+| Look up a device and ask for a next step | `current-state.md` names Network Incident Copilot, Configuration Assistant, and Capacity Intelligence. The live summarize route is the only AI call. `known-gaps.md` lists `stale_topology` and `risky_ai_config_suggestion`. | The suggestion can describe `REC-0001` when the caller asked for an id that is not in the file. There is no approval id. |
+| Check that an approved fix worked | `incident-response.md` says severity, triage, rollback, communication, and evidence are missing. `failure-injection-drills.md` names five drills. They are a list, not tests. `known-gaps.md` lists `overpowered_automation_account`. | No route applies a change. No route reads the device again and records whether the fix worked. |
+
+**What this packet will build, and what it will leave written as not built.** The demo flow is topology lookup, a human decision, and alarm-storm dedupe. Later stages add `GET /alarms/storms/{storm_batch_id}`, `POST /ai/recommend/{id}`, and `POST /approvals/{id}`. `POST /ai/summarize/{id}` stays. The guardrail stage hardens it. The recommend route is new. The demo page calls the recommend route.
+
+Order provisioning stays unimplemented because no route reads `service_orders.csv` or `circuits.csv`. Remediation validation stays unimplemented because this packet does not apply a live change, so there is no result to check. The PRD states both sentences. Qualify, provision, retry, rollback, and a "did the fix work" route are not added.
+
+One data defect does get a test. Alarm `last_seen_at` cannot precede `first_seen_at`. A row shaped like `ALA-00002` is flagged and does not become an incident. That test is separate from the check on `stale_topology_flag`.
+
 ---
 
 ## 3. What is expected
@@ -131,7 +152,7 @@ Worked example for row 3: `POST /ai/summarize/REC-0001` returns `recommendation:
 | D2. Behavioural baseline | Test report, behaviour snapshot, characterization tests, data-quality baseline, defect list. | You can point to a behaviour you must keep and a defect you must fix. Missing-record fallback is one of those defects. |
 | D3. Semantic layer | The `semantic-layer/` tree from `Semantic_Layer_capture.pdf`. | `entities.yaml`, `relationships.yaml`, `status-taxonomy.yaml`, `business-rules.yaml`, `metrics.yaml`, `access-semantics.yaml`, and `ai-context-policy.yaml` exist. Schema tests pass. Glossary matches YAML. |
 | D4. Spine controls | Identity, secrets, IaC, policy-as-code, CI/CD, observability, AI guardrails, performance, reliability, FinOps, security tests, audit chain. | At least one high-risk decision is governed by executable policy with allow and deny cases. AI output cannot silently become an action. |
-| D5. PRD | Product Requirements Document written from the semantic layer and D4. | It names users, workflows, AI limits, data, risk, non-functional needs, acceptance checks, and success metrics. |
+| D5. PRD | Product Requirements Document written from the semantic layer and D4. | It names users, workflows, AI limits, data, risk, non-functional needs, acceptance checks, and success metrics. It names the demo flow. It states that order provisioning and remediation validation are not built, each with the reason in section 2.7. |
 | D6. Working application and demo | A running system built from the PRD. | The demo walks one of the four business flows to a human decision. One case can be rebuilt from the audit row. |
 | D7. Second-model test and app comparison | The same semantic layer is given to a new model. Two apps are compared. | Meanings did not drift. Differences are written. The YAML stayed the source of truth. |
 | D8. Production evidence pack | Proof, not only code. | A reviewer can verify the transformation without a verbal tour. The pack states ready, not ready, and accepted risk. |
@@ -294,7 +315,7 @@ The repo name is one product. The domain spec names four flows. The current-stat
 | Topology to AI recommendation | device / incident / alarm context | Ask the copilot or config assistant | None, if the output stays a recommendation |
 | Approved remediation to validation | An approved change | Apply, validate, or roll back | The live device or service change |
 
-The running code implements none of those four flows end to end. It implements health, a device-row read, and a synthetic summary.
+The running code implements none of those four flows end to end. It implements health, a device-row read, and a synthetic summary. Section 2.7 names the file evidence for each job, the routes this packet adds, and the two jobs that stay unimplemented when the demo stays topology lookup plus alarm-storm dedupe.
 
 ### 5.3 Analyse / recommend / decide / execute
 

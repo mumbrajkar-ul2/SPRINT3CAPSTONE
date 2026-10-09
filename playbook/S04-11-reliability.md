@@ -36,7 +36,7 @@ For each finding: finding, evidence, impact, risk, confidence, open questions.
 STOP after Half A. Return the seven-item final response. Wait for "Half A accepted".
 
 ## Required work (Half B, after acceptance)
-1. `tests/reliability/test_drills.py`: one test per drill. Missing correlation id: a UUID is created and logged. AI timeout: HOLD_FOR_REVIEW, no summary, /health still 200. Duplicate replay: the same alarm sent twice yields one alarm by dedupe_key (use a small in-memory dedupe helper in apps/api/services/dedupe.py). Stale master data: stale_topology_flag true yields HOLD_FOR_REVIEW. Partial batch failure: a CSV with one bad row makes the ETL report the bad row and continue with the rest (add a quarantine count to run_daily_batch.py without changing the existing count output).
+1. `tests/reliability/test_drills.py`: one test per drill. Missing correlation id: a UUID is created and logged. AI timeout: HOLD_FOR_REVIEW, no summary, /health still 200. Duplicate replay: the same alarm sent twice yields one alarm by dedupe_key (use a small in-memory dedupe helper in apps/api/services/dedupe.py). Stale master data: stale_topology_flag true yields HOLD_FOR_REVIEW. Partial batch failure: a CSV with one bad row makes the ETL report the bad row and continue with the rest (add a quarantine count to run_daily_batch.py without changing the existing count output). Impossible alarm timestamp: a row shaped like ALA-00002, where last_seen_at is before first_seen_at, is flagged and does not become an incident. Cite the business-rules.yaml id for that rule. This drill is separate from the stale_topology_flag drill.
 2. Add the breaker as a small in-process helper in apps/api/services/breaker.py with the PROPOSED thresholds read from settings.
 3. Run the drills. Record each run in docs/11-reliability/recovery-evidence.md.
 
@@ -56,7 +56,7 @@ STOP after Half A. Return the seven-item final response. Wait for "Half A accept
 |---|---|
 | AI-down behaviour today | Unknown as a designed mode; no timeout, no breaker, no fail-to-person |
 | Routes that do not call the model | /health, /records/{id} |
-| Drills named | missing correlation ids, AI timeout, duplicate replay, stale master data, partial batch failure |
+| Drills named | missing correlation ids, AI timeout, duplicate replay, stale master data, partial batch failure, plus the impossible-timestamp case ALA-00002 (last_seen_at before first_seen_at) |
 | Runbook sections missing | severity, triage, rollback, comms, evidence |
 | ETL today | counts blanks, does not quarantine |
 
@@ -72,7 +72,7 @@ Half B:
 7. `docs/11-reliability/recovery-evidence.md`
 
 ## Completion gate
-Half A PASS when the degraded-mode design states what continues for every dependency and the runbook has all five sections. Half B PASS when every drill test passes and the recovery evidence shows each run. CONDITIONAL PASS when a threshold is PROPOSED with an owner. BLOCKED when the AI-timeout drill returns a summary.
+Half A PASS when the degraded-mode design states what continues for every dependency and the runbook has all five sections. Half B PASS when every drill test passes, including the impossible-timestamp test, and the recovery evidence shows each run. CONDITIONAL PASS when a threshold is PROPOSED with an owner. BLOCKED when the AI-timeout drill returns a summary.
 
 ## Lifecycle linkage
 Cite docs/09-ai-guardrails/unsafe-output-handling-rules.md, docs/08-observability/trace-design.md, docs/10-performance/load-scenarios.md, and business-rules.yaml ids. Stage S07 uses dedupe.py in /alarms/storms. Stage S09 cites the degraded-mode design. Stage S10 answers defence questions 4 and 8 from here.
@@ -96,7 +96,7 @@ Cite docs/09-ai-guardrails/unsafe-output-handling-rules.md, docs/08-observabilit
 | `retry-and-circuit-breaker-strategy.md` | Header. Per-call retry rules, all PROPOSED with owner. |
 | `degraded-mode-design.md` | Header. Per dependency: continues, HOLD, stops. |
 | `incident-response.md` | All five sections filled. |
-| `test_drills.py` | Five passing drills. |
+| `test_drills.py` | Six passing drills. The sixth flags a last-seen-before-first-seen alarm and does not open an incident. |
 | `recovery-evidence.md` | Header. One run per drill. |
 
 ## Done test
