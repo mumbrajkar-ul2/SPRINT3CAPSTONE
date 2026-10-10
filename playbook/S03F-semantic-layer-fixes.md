@@ -40,7 +40,8 @@ You do not need a line when a fix only needs a business owner's name. S03F uses 
 
 ## Decisions for this round
 <!-- Fill in before pasting. One line per fix that offers a choice between options. Write "None" if no fix offers options. A fix that only needs a business owner uses operating-contract.md row 10. -->
-None
+Fix 3: Option B.
+Apply advisory A7 from semantic-layer-review.md.
 
 ## Objective
 Apply the "Fixes required" list from the newest semantic-layer review to `semantic-layer/` and to the other files the list names. Change nothing else. Keep the version. Rebuild and retest. Record each edit so the next S03R reviewer can check it. Do not review the tree. S03R does that in a fresh chat.

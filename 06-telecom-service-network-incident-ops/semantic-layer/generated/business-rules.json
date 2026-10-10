@@ -173,7 +173,7 @@
       ],
       "enforced_today": false,
       "enforcement_stage": "S04-09",
-      "stage_note": "Operating contract rows 2 and 9 and Project_Intent.md Appendix C name the four gates. The approver desk job is PROPOSED network_engineer with owner Mangesh (FDE) until S04-09 confirms it.",
+      "stage_note": "Operating contract rows 2 and 9 and Project_Intent.md Appendix C name the four gates. The approver desk job is PROPOSED network_engineer with owner Team-Force until S04-09 confirms it.",
       "source": [
         "docs/00-contract/operating-contract.md",
         "docs/02-baseline/ai-qualification.md",

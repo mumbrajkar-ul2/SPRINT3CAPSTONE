@@ -413,7 +413,7 @@ entities:
         references: concept.sla
         description: >-
           A score for how likely the service promise will be broken. 352 values sit between 0 and 1.
-          INC-00019 on file line 355 holds 1.42. The legal range is PROPOSED 0 to 1. Owner Unknown.
+          INC-00019 on file line 355 holds 1.42. The legal range is PROPOSED 0 to 1. Owner: Team-Force.
         api_reads_today: false
         source: [data/synthetic/incidents.csv, docs/02-baseline/data-quality-baseline.md]
 
@@ -482,7 +482,7 @@ entities:
         type: number
         description: >-
           How many times the build was tried again. Values run from 32 to 4995. 294 rows are at or above 1000.
-          The legal maximum is Unknown. The 1000 bound in the baseline is PROPOSED with owner Unknown.
+          The legal maximum is Unknown. The 1000 bound in the baseline is PROPOSED. Owner: Team-Force.
         api_reads_today: false
         source: [data/synthetic/service_orders.csv, docs/02-baseline/data-quality-baseline.md]
       - id: field.service_order.rollback_status

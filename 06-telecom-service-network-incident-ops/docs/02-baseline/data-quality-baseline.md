@@ -9,7 +9,7 @@
 | Evidence sources | `python docs/02-baseline/profile_data.py` on 2026-10-10; `docs/02-baseline/profile-output.json`; `data/manifest.json`; `data/quality_issues.json`; `data/synthetic/`; `docs/00-setup/replay-log.md`; `docs/01-discovery/data-and-integration-map.md` |
 | Assumptions | A blank cell is the seeded "blank mandatory fields" item. The repo does not name which columns are mandatory. A timestamp whose year is 1900 is impossible in these files because the other parsed values in that column are year 2026. |
 | Unresolved issues | The owner of the retry bound is Unknown. The owner of the `sla_breach_risk` range is Unknown. `service_orders.csv` and `ai_invocations.csv` have no date-time column. `devices.csv`, `circuits.csv`, and `alarms.csv` have no score column that this profile flagged. |
-| Residual risks | A later reader can treat the PROPOSED bounds as an approved rule. They are not approved. The owner is Unknown. |
+| Residual risks | A later reader can treat the PROPOSED bounds as an approved rule. They are not approved. Owner: Team-Force. |
 
 ## What this file is
 
@@ -82,7 +82,7 @@ The script flags a parsed timestamp whose year is not 2026. In these files that 
 
 ## service_orders.retry_count
 
-**PROPOSED bound: `retry_count` >= 1000. Owner: Unknown.**
+**PROPOSED bound: `retry_count` >= 1000. Owner: Team-Force.**
 
 The repo states no legal maximum. `Project_Intent.md` section 4.3 names values in the thousands as the known odd case. This baseline uses 1000 so that case is counted. The bound is not an approved business rule.
 
@@ -189,8 +189,8 @@ Why each Not found mark is Not found:
 
 Why the Confirmed score marks are Confirmed:
 
-- **incidents.** **PROPOSED range: `sla_breach_risk` from 0 to 1 inclusive. Owner: Unknown.** 352 numeric values sit in that range. 1 value is outside it: file line 355, `INC-00019`, `sla_breach_risk` `1.42`. 1 cell is blank. **Verified Fact. REAL.**
-- **service_orders.** 294 values of `retry_count` are at or above the PROPOSED bound of 1000. Owner: Unknown. See the retry section above.
+- **incidents.** **PROPOSED range: `sla_breach_risk` from 0 to 1 inclusive. Owner: Team-Force.** 352 numeric values sit in that range. 1 value is outside it: file line 355, `INC-00019`, `sla_breach_risk` `1.42`. 1 cell is blank. **Verified Fact. REAL.**
+- **service_orders.** 294 values of `retry_count` are at or above the PROPOSED bound of 1000. Owner: Team-Force. See the retry section above.
 - **ai_invocations.** `recommendation_risk` is a word on the other rows. One cell is numeric: file line 355, `AI_-00019`, `recommendation_risk` `1.42`. **Verified Fact. REAL.** The word counts are in `profile-output.json` under `ai_recommendation_risk.word_counts`. One of those words is `high_risk` (28 rows). That word is a label in the column. The Confirmed mark is the numeric cell `1.42`.
 
 **Assumption:** the blank cells on the `*BAD1` rows are the seeded "blank mandatory fields" item. The phrase in `quality_issues.json` does not list the columns.

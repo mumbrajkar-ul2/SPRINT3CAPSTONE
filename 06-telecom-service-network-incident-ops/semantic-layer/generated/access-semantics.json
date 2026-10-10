@@ -178,7 +178,7 @@
       "name": "incident triage",
       "description": "Working out what is wrong and what to do next on an open incident.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "docs/domain-specific-spec.md"
@@ -189,7 +189,7 @@
       "name": "network change planning",
       "description": "Preparing a change to a device or circuit before anyone approves it.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "docs/02-baseline/ai-qualification.md"
@@ -200,7 +200,7 @@
       "name": "field repair",
       "description": "Fixing or replacing equipment at a site.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "docs/domain-specific-spec.md"
@@ -211,7 +211,7 @@
       "name": "customer enquiry",
       "description": "Answering a customer's question about their circuit, order, or incident.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "docs/domain-specific-spec.md"
@@ -222,7 +222,7 @@
       "name": "scheduled automation",
       "description": "A machine running a planned step, such as the daily batch or an approved remediation.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "etl/run_daily_batch.py"
@@ -233,7 +233,7 @@
       "name": "vendor support",
       "description": "A supplier helping with the equipment they supplied.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "docs/domain-specific-spec.md"
@@ -244,7 +244,7 @@
       "name": "AI assistance",
       "description": "A model reading records so it can write a summary or a recommendation.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "apps/api/services/ai_gateway.py"
@@ -255,7 +255,7 @@
       "name": "audit review",
       "description": "Reading the audit log to see who did what.",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "policy/opa/access.rego",
         "apps/api/services/audit.py"
@@ -278,7 +278,7 @@
       "description": "Only rows whose site_id equals the caller's site. Devices carry site_id. Alarms reach a site through the device.",
       "filter_field": "field.device.site_id",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "data/synthetic/devices.csv"
       ]
@@ -289,7 +289,7 @@
       "description": "Only rows whose customer_id equals the customer in the enquiry. Circuits, incidents, and service orders carry customer_id.",
       "filter_field": "field.circuit.customer_id",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "data/synthetic/circuits.csv",
         "data/synthetic/incidents.csv",
@@ -302,7 +302,7 @@
       "description": "Only the incident the caller is working on, plus the device and alarm rows tied to it. The alarm-to-incident join is Unknown, so today this scope can name the incident row only.",
       "filter_field": "field.incident.incident_id",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "data/synthetic/incidents.csv",
         "docs/02-baseline/ai-qualification.md"
@@ -314,7 +314,7 @@
       "description": "Only devices whose vendor is the caller's company. The vendor column holds status words today, so this scope cannot be computed until that column holds supplier names.",
       "filter_field": "field.device.vendor",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "source": [
         "data/synthetic/devices.csv",
         "docs/02-baseline/defect-list.md"
@@ -477,7 +477,7 @@
       "event_count": 435,
       "api_role_today": "role.operator",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "grants": [
         {
           "action": "action.read",
@@ -547,7 +547,7 @@
       "event_count": 440,
       "api_role_today": "role.engineer",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "grants": [
         {
           "action": "action.read",
@@ -599,7 +599,7 @@
       "event_count": 422,
       "api_role_today": null,
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "grants": [
         {
           "action": "action.read",
@@ -629,7 +629,7 @@
       "event_count": 420,
       "api_role_today": null,
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "grants": [
         {
           "action": "action.read",
@@ -661,7 +661,7 @@
       "event_count": 444,
       "api_role_today": null,
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "grants": [
         {
           "action": "action.read",
@@ -702,7 +702,7 @@
       "event_count": 424,
       "api_role_today": null,
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "grants": [
         {
           "action": "action.read",
@@ -735,7 +735,7 @@
       "event_count": 415,
       "api_role_today": "role.ai_agent",
       "proposed": true,
-      "owner": "Mangesh (FDE)",
+      "owner": "Team-Force",
       "grants": [
         {
           "action": "action.read",

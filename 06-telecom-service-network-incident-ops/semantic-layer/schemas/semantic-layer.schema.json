@@ -473,6 +473,28 @@
         }
       ]
     },
+    "agency_level": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "properties": {
+            "id": { "pattern": "^agency\\.(analyse|recommend|decide|execute)$" },
+            "name": { "enum": ["analyse", "recommend", "decide", "execute"] }
+          }
+        }
+      ]
+    },
+    "pick_word": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "properties": {
+            "id": { "pattern": "^pick\\.(rules|deterministic_code|workflow_automation|genai)$" },
+            "name": { "enum": ["rules", "deterministic_code", "workflow_automation", "genai"] }
+          }
+        }
+      ]
+    },
     "ai_use": {
       "allOf": [
         { "$ref": "#/$defs/named_item" },
@@ -497,7 +519,7 @@
       "allOf": [
         { "$ref": "#/$defs/file_base" },
         {
-          "required": ["model_today", "prompt_fields", "output_schema", "provenance", "outcomes", "fail_to_person", "ai_uses"],
+          "required": ["model_today", "prompt_fields", "output_schema", "provenance", "outcomes", "fail_to_person", "agency_levels", "picks", "ai_uses"],
           "properties": {
             "file": { "const": "ai-context-policy" },
             "model_today": {
@@ -587,6 +609,8 @@
                 }
               ]
             },
+            "agency_levels": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/agency_level" } },
+            "picks": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/pick_word" } },
             "ai_uses": { "type": "array", "minItems": 11, "items": { "$ref": "#/$defs/ai_use" } }
           }
         }

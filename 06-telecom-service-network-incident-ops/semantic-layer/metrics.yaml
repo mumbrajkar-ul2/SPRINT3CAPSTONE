@@ -6,7 +6,7 @@ file: metrics
 description: >-
   Measures that later stages compute and report. Each metric names the fields it reads, how it is worked out in
   words, and what the data shows today. No metric has a target value. A PROPOSED bound from the baseline is
-  recorded as a note with owner Unknown. It is not a target.
+  recorded as a note with Owner: Team-Force. It is not a target.
 source:
   - docs/02-baseline/data-quality-baseline.md
   - docs/02-baseline/defect-list.md
@@ -66,7 +66,7 @@ metrics:
     source_fields: [field.service_order.retry_count]
     today: 353 numeric values. Minimum 32. Maximum 4995. 294 at or above 1000. ORD-00002 has 4052.
     target: null
-    proposed_bound_note: The baseline uses 1000 as a PROPOSED bound so the odd case is counted. Owner Unknown. It is not an approved maximum and not a target.
+    proposed_bound_note: "The baseline uses 1000 as a PROPOSED bound so the odd case is counted. Owner: Team-Force. It is not an approved maximum and not a target."
     source: [data/synthetic/service_orders.csv, docs/02-baseline/data-quality-baseline.md, docs/02-baseline/defect-list.md]
 
   - id: metric.audit_completeness
@@ -80,9 +80,9 @@ metrics:
     live_source: logs/audit.log rows hold ts, action, and details. details holds record_id and role for a read, record_id and model for a summary.
     today: A record.read row fills ts, action, record_id, and a role string. An ai.summary row fills ts, action, record_id, and model. No row has actor, correlation_id, approval_id, or policy_result.
     target: null
-    required_fields_note: The required-field list above is PROPOSED. Owner Mangesh (FDE). Stage S05-14 confirms it. The repo does not define a full decision record.
+    required_fields_note: The required-field list above is PROPOSED. Owner Team-Force. Stage S05-14 confirms it. The repo does not define a full decision record.
     proposed: true
-    owner: Mangesh (FDE)
+    owner: Team-Force
     source: [apps/api/services/audit.py, docs/02-baseline/defect-list.md, docs/01-discovery/ai-subsystem-discovery.md, docs/transformation-roadmap.md]
 
   - id: metric.recommendation_latency
@@ -104,7 +104,7 @@ metrics:
     source_fields: [field.incident.sla_breach_risk]
     today: 352 values between 0 and 1. INC-00019 holds 1.42. One cell blank.
     target: null
-    proposed_bound_note: The baseline uses 0 to 1 inclusive as a PROPOSED range. Owner Unknown. It is not an approved range and not a target.
+    proposed_bound_note: "The baseline uses 0 to 1 inclusive as a PROPOSED range. Owner: Team-Force. It is not an approved range and not a target."
     source: [data/synthetic/incidents.csv, docs/02-baseline/data-quality-baseline.md, ../Project_Intent.md]
 
   - id: metric.alarm_storm_size
@@ -126,5 +126,5 @@ metrics:
     today: No live call records an outcome. The CSV columns guardrail_status and approval_required hold the generic status words, not the four outcome words. This metric is 0 for all four outcomes today.
     target: null
     proposed: true
-    owner: Mangesh (FDE)
+    owner: Team-Force
     source: [docs/02-baseline/ai-qualification.md, data/synthetic/ai_invocations.csv, ../Project_Intent.md]

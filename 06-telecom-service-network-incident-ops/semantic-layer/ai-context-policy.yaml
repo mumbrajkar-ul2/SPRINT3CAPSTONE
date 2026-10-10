@@ -39,7 +39,7 @@ prompt_fields:
     Only the fields below may be placed in prompt text. Any field not listed stays out. The two forbidden device
     fields stay out whatever they hold. Credentials of any kind stay out.
   proposed: true
-  owner: Mangesh (FDE)
+  owner: Team-Force
   confirm_at: S04-09
   allowed:
     - field.device.device_id
@@ -101,7 +101,7 @@ output_schema:
     Every model answer is a JSON object with these fields. A missing field or a wrong type is a schema failure and
     hands the case to a person. The outcome field holds one of the four outcome words.
   proposed: true
-  owner: Mangesh (FDE)
+  owner: Team-Force
   confirm_at: S04-09
   fields_today: [model, summary, recommendation, token_estimate, source_count, guardrail_status]
   required:
@@ -267,7 +267,7 @@ fail_to_person:
     writes an audit row and hands the case to a named person. It never retries into an action. It never fills in a
     default answer.
   hand_to: persona.noc_operator
-  hand_to_label: PROPOSED desk job. Owner Mangesh (FDE). Stage S04-09 confirms.
+  hand_to_label: PROPOSED desk job. Owner Team-Force. Stage S04-09 confirms.
   audit_row_required: true
   timeout_seconds: null
   timeout_note: The repo states no timeout. Stage S04-09 sets one. This file does not invent the number.
@@ -297,7 +297,7 @@ fail_to_person:
       outcome: outcome.hold_for_review
       description: stale_topology_flag is empty. What a blank flag should do is Unknown. Until an owner decides, the case goes to the person.
       proposed: true
-      owner: Mangesh (FDE)
+      owner: Team-Force
       source: [docs/02-baseline/ai-qualification.md, data/synthetic/devices.csv]
     - id: failmode.forbidden_field_in_prompt
       name: forbidden field in prompt
@@ -305,6 +305,56 @@ fail_to_person:
       description: The prompt builder found mgmt_ip, credential_profile, or a credential name in the text. The call stops.
       source: [docs/02-baseline/defect-list.md, ../Project_Intent.md]
   source: [docs/00-contract/operating-contract.md, docs/02-baseline/ai-qualification.md]
+
+# ---------------------------------------------------------------------------
+# The four agency words. The agency key on each AI use, each outcome, and each access action holds one of these names.
+# Meanings copied from ai-qualification.md lines 18 and 19.
+# ---------------------------------------------------------------------------
+agency_levels:
+  - id: agency.analyse
+    name: analyse
+    description: Read stored fields and show them. Nothing changes.
+    source: [docs/02-baseline/ai-qualification.md, ../Project_Intent.md, semantic-layer/access-semantics.yaml]
+  - id: agency.recommend
+    name: recommend
+    description: Show text a person can accept or reject. Nothing changes until that person acts.
+    source: [docs/02-baseline/ai-qualification.md, ../Project_Intent.md]
+  - id: agency.decide
+    name: decide
+    description: Choose the outcome. For example, set a stored status or record an approval.
+    source: [docs/02-baseline/ai-qualification.md, ../Project_Intent.md, semantic-layer/access-semantics.yaml]
+  - id: agency.execute
+    name: execute
+    description: Carry out a change on a live device or circuit.
+    source: [docs/02-baseline/ai-qualification.md, ../Project_Intent.md]
+
+# ---------------------------------------------------------------------------
+# The four pick words. The pick key on each AI use holds one of these names.
+# Meanings copied from ai-qualification.md line 20.
+# ---------------------------------------------------------------------------
+picks:
+  - id: pick.rules
+    name: rules
+    description: >-
+      A fixed check reads a stored value and gives the answer. The same stored input always gives the same result.
+      No model is called. Example: order qualification reads the word in qualification_status.
+    source: [docs/02-baseline/ai-qualification.md]
+  - id: pick.deterministic_code
+    name: deterministic_code
+    description: >-
+      Ordinary program code reads stored fields and works out the answer. The same stored input always gives the
+      same result. No model is called. Example: alarm dedupe groups alarms whose dedupe_key text is equal.
+    source: [docs/02-baseline/ai-qualification.md]
+  - id: pick.workflow_automation
+    name: workflow_automation
+    description: >-
+      A machine runs a fixed list of steps in order. The same stored input always gives the same result. No model
+      is called. Example: remediation execution runs a policy allow, a human approval id, an audit row, then the change.
+    source: [docs/02-baseline/ai-qualification.md]
+  - id: pick.genai
+    name: genai
+    description: A language model writes new text from a prompt.
+    source: [docs/02-baseline/ai-qualification.md]
 
 # ---------------------------------------------------------------------------
 # The eleven AI uses from ai-qualification.md. Pick, agency, outcome, and approval point copied from that file.
@@ -365,12 +415,12 @@ ai_uses:
     pick: genai
     agency: recommend
     outcome: outcome.recommend_only
-    approval_point: The noc_operator reads the account when it is shown. The system leaves the incident row unchanged. Desk job PROPOSED. Owner Mangesh (FDE). Stage S04-09 confirms.
+    approval_point: The noc_operator reads the account when it is shown. The system leaves the incident row unchanged. Desk job PROPOSED. Owner Team-Force. Stage S04-09 confirms.
     approver: persona.noc_operator
     reads: [field.device.device_id, field.incident.incident_id, field.alarm.alarm_id]
     description: A language model writes a short account a person can read. The live stub POST /ai/summarize/{record_id} prints one fixed pattern. Product name Network Incident Copilot is an Inference.
     proposed: true
-    owner: Mangesh (FDE)
+    owner: Team-Force
     source: [docs/02-baseline/ai-qualification.md, apps/api/services/ai_gateway.py]
   - id: ai_use.next_action_recommendation
     name: next-action recommendation
@@ -378,12 +428,12 @@ ai_uses:
     agency: recommend
     outcome: outcome.hold_for_review
     block_conditions: [failmode.missing_id, failmode.stale_topology_true]
-    approval_point: The noc_operator accepts or rejects the sentence before any change ticket exists. Desk job PROPOSED. Owner Mangesh (FDE). Stage S04-09 confirms. The later decision route is POST /approvals/{id}.
+    approval_point: The noc_operator accepts or rejects the sentence before any change ticket exists. Desk job PROPOSED. Owner Team-Force. Stage S04-09 confirms. The later decision route is POST /approvals/{id}.
     approver: persona.noc_operator
     reads: [field.device.device_id, field.device.stale_topology_flag, field.incident.incident_id]
     description: A language model writes a next-action sentence that follows the fields of the case. A rule runs first. A missing id or a true stale flag is BLOCK. The live stub returns one fixed sentence.
     proposed: true
-    owner: Mangesh (FDE)
+    owner: Team-Force
     source: [docs/02-baseline/ai-qualification.md, apps/api/services/ai_gateway.py, docs/00-contract/operating-contract.md]
   - id: ai_use.configuration_suggestion
     name: configuration suggestion
@@ -391,12 +441,12 @@ ai_uses:
     agency: recommend
     outcome: outcome.hold_for_review
     block_conditions: [failmode.missing_id, failmode.stale_topology_true]
-    approval_point: The network_engineer accepts or rejects the suggestion before it can enter a change plan. Desk job PROPOSED. Owner Mangesh (FDE). Stage S04-09 confirms.
+    approval_point: The network_engineer accepts or rejects the suggestion before it can enter a change plan. Desk job PROPOSED. Owner Team-Force. Stage S04-09 confirms.
     approver: persona.network_engineer
     reads: [field.device.device_id, field.device.vendor, field.device.firmware, field.alarm.alarm_id]
     description: A language model writes a suggested change in words for one device. The model does not push the change. Not implemented. Product name Configuration Assistant is an Inference.
     proposed: true
-    owner: Mangesh (FDE)
+    owner: Team-Force
     source: [docs/02-baseline/ai-qualification.md, docs/architecture/known-gaps.md]
   - id: ai_use.capacity_forecast
     name: capacity forecast
@@ -413,13 +463,13 @@ ai_uses:
     pick: workflow_automation
     agency: execute
     outcome: outcome.execute
-    approval_point: A named human approves before the change. The system stores an approval id. The approval sits after the policy allow and before the change. The model does not approve. Desk job PROPOSED network_engineer. Owner Mangesh (FDE). PROVISIONAL until stage S04-09.
+    approval_point: A named human approves before the change. The system stores an approval id. The approval sits after the policy allow and before the change. The model does not approve. Desk job PROPOSED network_engineer. Owner Team-Force. PROVISIONAL until stage S04-09.
     approver: persona.network_engineer
     executor: persona.automation_service
     reads: []
     description: Policy allow, stored human approval id, audit row, then the change. No execute route exists in this packet. The model stops at the recommendation rows.
     proposed: true
-    owner: Mangesh (FDE)
+    owner: Team-Force
     source: [docs/02-baseline/ai-qualification.md, docs/00-contract/operating-contract.md, ../Project_Intent.md]
   - id: ai_use.remediation_validation
     name: remediation validation

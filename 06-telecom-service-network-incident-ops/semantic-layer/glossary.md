@@ -15,7 +15,7 @@
 
 Each row has a term, its id, and its meaning in everyday words. The term is the exact `name` or `word` in the YAML. The id is the exact `id` in the YAML. The test fails when either differs.
 
-Claim labels. A meaning is a **Verified Fact** from the named files unless the row says **Inference**, **Assumption**, or **Unknown**. "PROPOSED" means the YAML item has `proposed: true` and an owner.
+Claim labels. Status-word meanings are **Inference**, because the repo defines none of them. Other meanings are a **Verified Fact** from the named files unless the row says otherwise. "PROPOSED" means the YAML item has `proposed: true` and an owner.
 
 ## Entities
 
@@ -128,6 +128,8 @@ Five words. They fill `mgmt_ip` on devices and `a_end` and `z_end` on circuits. 
 
 ### Network zone words
 
+A network zone is a named part of the network that a device belongs to. The repo does not say whether zones follow place or function.
+
 | Term | Id | Meaning |
 |---|---|---|
 | `north-1` | `status.word.north_1` | A network zone name on devices. The zone is not described. |
@@ -191,12 +193,12 @@ Measures computed from stored fields. No metric has a target.
 | Term | Id | Meaning |
 |---|---|---|
 | `tokens per invocation` | `metric.tokens_per_invocation` | How many tokens one model call used. From `token_count` in the CSV, or `token_estimate` on the live body. |
-| `cost per correlated incident` | `metric.cost_per_correlated_incident` | What the model calls for one incident cost. Cannot be computed today. The alarm-to-incident join and the price are Unknown. |
+| `cost per correlated incident` | `metric.cost_per_correlated_incident` | The total cost of the model calls made for one incident. This works only after the alarms are tied to that incident. The repo does not say how to tie them, and the price is Unknown. |
 | `quarantine rate` | `metric.quarantine_rate` | The share of batch rows held aside as bad. Today 0 of 354, while 1 row is known bad. |
 | `retry count` | `metric.retry_count` | How many times an order build was tried again. 32 to 4995 in the data. The maximum is Unknown. |
 | `audit completeness` | `metric.audit_completeness` | How much of a full decision record an audit row holds. The required-field list is PROPOSED. |
 | `recommendation latency` | `metric.recommendation_latency` | How long a model call takes in milliseconds. No live call records it today. |
-| `SLA breach risk` | `metric.sla_breach_risk` | A stored score on each incident. 352 values between 0 and 1. One is 1.42. The range is PROPOSED, owner Unknown. |
+| `SLA breach risk` | `metric.sla_breach_risk` | A stored score on each incident. 352 values between 0 and 1. One is 1.42. The range is PROPOSED. Owner: Team-Force. |
 | `alarm storm size` | `metric.alarm_storm_size` | How many alarms share one storm batch. The largest in the file is 2. What counts as a storm is Unknown. |
 | `AI outcome count` | `metric.ai_outcome_count` | How many calls ended in each of the four outcomes. 0 for all four today. PROPOSED. |
 
@@ -226,7 +228,7 @@ Measures computed from stored fields. No metric has a target.
 | `event` | `resource.event` | An event log line. |
 | `audit log` | `resource.audit_log` | The file `logs/audit.log` and its rows. |
 | `approval` | `resource.approval` | A stored approval id and its yes or no. |
-| `sensitive device fields` | `resource.sensitive_device_fields` | `mgmt_ip` and `credential_profile`. Which personas may read them is Unknown. Today every allowed role reads them. |
+| `sensitive device fields` | `resource.sensitive_device_fields` | `mgmt_ip` and `credential_profile`. `mgmt_ip` is the column meant to hold the address used to log in to and manage a device. `credential_profile` names the login details the device uses. Which personas may read them is Unknown. Today every allowed role reads them. |
 
 ### Purposes
 
@@ -316,6 +318,62 @@ What happens when a model call cannot give a safe answer. Each hands the case to
 | `stale topology flag is true` | `failmode.stale_topology_true` | `stale_topology_flag` is `true`. The call stops before the model runs. |
 | `stale topology flag is blank` | `failmode.stale_topology_blank` | The flag is empty. What to do is Unknown. Until an owner decides, the case goes to the person. PROPOSED. |
 | `forbidden field in prompt` | `failmode.forbidden_field_in_prompt` | The prompt builder found `mgmt_ip`, `credential_profile`, or a credential name. The call stops. |
+
+## Agency words
+
+An agency word says how far one step may go. The `agency` key on each AI use, each outcome, and each access action holds one of these four words. The four stay separate. From `docs/02-baseline/ai-qualification.md` lines 18 and 19.
+
+| Term | Id | Meaning |
+|---|---|---|
+| `analyse` | `agency.analyse` | Read stored fields and show them. Nothing changes. |
+| `recommend` | `agency.recommend` | Show text that a person can accept or reject. Nothing changes until that person acts. |
+| `decide` | `agency.decide` | Choose the outcome. For example, set a stored status or record an approval. |
+| `execute` | `agency.execute` | Carry out a change on a live device or circuit. In this layer only workflow automation has this word. A model never has it. |
+
+## Pick words
+
+A pick word says what kind of tool does one step. The `pick` key on each AI use holds one of these four words. From `docs/02-baseline/ai-qualification.md` line 20.
+
+| Term | Id | Meaning |
+|---|---|---|
+| `rules` | `pick.rules` | A fixed check reads a stored value and gives the answer. The same stored input always gives the same result. No model is called. Example: order qualification reads the word in `qualification_status`. |
+| `deterministic_code` | `pick.deterministic_code` | Ordinary program code reads stored fields and works out the answer. The same stored input always gives the same result. No model is called. Example: alarm dedupe groups alarms whose `dedupe_key` text is equal. The repo does not say where a rule ends and code begins. |
+| `workflow_automation` | `pick.workflow_automation` | A machine runs a fixed list of steps in order. The same stored input always gives the same result. No model is called. Example: remediation execution runs a policy allow, a human approval id, an audit row, and then the change. |
+| `genai` | `pick.genai` | A language model writes new text from a prompt. Three AI uses have this pick. All three stop at text for a person. |
+
+## AI uses
+
+The eleven capabilities from `docs/02-baseline/ai-qualification.md`. Each row names the pick and the agency. Eight of the eleven call no model.
+
+| Term | Id | Meaning |
+|---|---|---|
+| `order qualification` | `ai_use.order_qualification` | Show the stored word in `qualification_status` for a customer order. Pick `rules`, agency `analyse`. Not built today. |
+| `provisioning retry and rollback` | `ai_use.provisioning_retry_and_rollback` | Show how many times an order build was tried again, and the word for whether it was undone. Pick `deterministic_code`, agency `analyse`. Not built today. |
+| `alarm dedupe` | `ai_use.alarm_dedupe` | Group alarms that share the same `dedupe_key` and the same `storm_batch_id`, so a person sees one group. The rows stay on disk. Pick `deterministic_code`, agency `analyse`. Not built today. |
+| `alarm-to-incident correlation` | `ai_use.alarm_to_incident_correlation` | List the ids that a set of alarms and an incident share, and flag an alarm whose last-seen time is before its first-seen time. The `noc_operator` opens or merges the incident. Pick `deterministic_code`, agency `analyse`. Which columns join the two is Unknown. |
+| `topology lookup` | `ai_use.topology_lookup` | Return the one device row whose `device_id` matches the request. A missing id must come back as missing. Pick `deterministic_code`, agency `analyse`. Today a missing id returns `REC-0001` (defect F01). |
+| `incident summary` | `ai_use.incident_summary` | A language model writes a short account of a case for the `noc_operator` to read. Stored rows stay as they are. Pick `genai`, agency `recommend`, outcome `RECOMMEND_ONLY`. PROPOSED. |
+| `next-action recommendation` | `ai_use.next_action_recommendation` | A language model writes one next-step sentence. The `noc_operator` accepts or rejects it before any change ticket exists. A missing id or a true stale topology flag stops the call first. Pick `genai`, agency `recommend`, outcome `HOLD_FOR_REVIEW`. PROPOSED. |
+| `configuration suggestion` | `ai_use.configuration_suggestion` | A language model writes a suggested device change in words. The `network_engineer` accepts or rejects it. The model does not push the change. Pick `genai`, agency `recommend`, outcome `HOLD_FOR_REVIEW`. PROPOSED. |
+| `capacity forecast` | `ai_use.capacity_forecast` | Show the stored bandwidth numbers for circuits and orders. No file holds a history of use, so nothing is forecast. Pick `deterministic_code`, agency `analyse`. |
+| `remediation execution` | `ai_use.remediation_execution` | A machine account makes a change on a live device or circuit. It runs only after a policy allow, a named human's stored approval id, and an audit row. Pick `workflow_automation`, agency `execute`. No model takes part. No route does this today. PROPOSED. |
+| `remediation validation` | `ai_use.remediation_validation` | Compare the state after a change with the state the approval named, and report match or mismatch. Pick `deterministic_code`, agency `analyse`. The expected state is not defined in the repo. |
+
+## Provenance fields
+
+Provenance means where an answer came from. These nine fields travel on each model answer and on its audit row. Most are missing from the live call today.
+
+| Term | Id | Meaning |
+|---|---|---|
+| `model` | `provenance.model` | The name of the model that answered. Today it is `local-sim-v1` on the answer and the audit row. |
+| `model_version` | `provenance.model_version` | The version of that model. Missing today. The string `local-sim-v1` serves as both name and version. |
+| `prompt_hash` | `provenance.prompt_hash` | A short fixed-length code computed from the exact prompt text. A reviewer can prove which prompt was sent without storing the text. Missing today. |
+| `tokens` | `provenance.tokens` | How many tokens the call used. A token is a small piece of text that a model counts and charges by. Today the answer carries `token_estimate`. The audit row does not. |
+| `latency_ms` | `provenance.latency_ms` | How many milliseconds the call took. Missing from the live call. `events.jsonl` has it on every line. |
+| `actor` | `provenance.actor` | Who asked for the answer. Missing today, because the summary route takes no role. |
+| `correlation_id` | `provenance.correlation_id` | One id shared by every step of the same request, so the steps can be found together. Missing from the audit row today. |
+| `policy_result` | `provenance.policy_result` | What the access policy said for this call: allow or deny. Missing today, because the route calls no policy. |
+| `approval_id` | `provenance.approval_id` | The stored id of a named person's approval. Missing today. No route writes one. |
 
 ## Lifecycle
 

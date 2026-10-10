@@ -5,9 +5,9 @@
 | Stage | S03 — Semantic layer (Execution Plan Phase 3; product path step 1, D3) |
 | Date / version | 2026-10-10, semantic layer `1.0.0` |
 | Author | Mangesh (FDE), drafted with Cursor |
-| Status | PASS. The schema validates all seven YAML files. 34 tests pass. `generated/` is rebuilt from the YAML by `build.py`. Every item in `Project_Intent.md` 6.2 is ticked below. |
+| Status | S03 PASS. Review S03R round 1 was BLOCKED. Stage S03F round 1 applied its fixes 1 to 9 on 2026-10-10. S03R runs again next. The schema validates all seven YAML files. 35 tests pass. `generated/` is rebuilt from the YAML by `build.py`. Every item in `Project_Intent.md` 6.2 is ticked below. |
 | Evidence sources | `Semantic_Layer_capture.pdf`; `Project_Intent.md` 4.3, 5.1, 6.2, Appendix E; `docs/domain-specific-spec.md`; `docs/01-discovery/` (all six); `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/02-baseline/ai-qualification.md`; `apps/api/main.py`; `apps/api/services/ai_gateway.py`; `apps/api/services/domain_service.py`; `apps/api/services/audit.py`; `policy/opa/access.rego`; `data/synthetic/` (headers and distinct values, read-only, 2026-10-10) |
-| Assumptions | A column whose cells are all drawn from a small word pool is a status column. The persona grants, the purposes, the prompt allow list, and the output schema are PROPOSED with owner Mangesh (FDE). The API role `operator` maps to `noc_operator` and `engineer` maps to `network_engineer`. Both mappings are Inference. |
+| Assumptions | A column whose cells are all drawn from a small word pool is a status column. The persona grants, the purposes, the prompt allow list, and the output schema are PROPOSED with owner Team-Force. The API role `operator` maps to `noc_operator` and `engineer` maps to `network_engineer`. Both mappings are Inference. |
 | Unresolved issues | The repo defines no allowed list for any status column. The alarm-to-incident join key, the storm size, the retry maximum, the `sla_breach_risk` range, the timeout, and the approver's desk job are Unknown or PROPOSED. `jsonschema` is installed in `.venv` only. `requirements.txt` does not list it. |
 | Residual risks | A reader can treat a PROPOSED grant or allow list as approved. A later stage can add a term outside this tree. `status-taxonomy.yaml` is 3500 lines. A reviewer may skim it. The tests check its counts against the CSV files so a skim is safer. |
 
@@ -75,6 +75,7 @@ Stage S05R raises the version when it folds in the terms the control designs int
 | Version | Date | Stage | Change |
 |---|---|---|---|
 | `1.0.0` | 2026-10-10 | S03 | First version. Seven entities, 68 fields, 15 concepts, 15 relationships, 44 status words across 36 status fields, 4 collisions plus 5 other overlaps, 13 rules, 9 metrics, 7 personas with 5 value lists, 11 AI uses, 4 outcomes, 6 fail modes. |
+| `1.0.0` | 2026-10-10 | S03F | S03R fixes applied, round 1. Fixes 1 to 9 from `docs/02-baseline/semantic-layer-review.md`. Added 4 `agency.*` and 4 `pick.*` ids, 28 glossary rows, and one test. Named Team-Force as owner of every PROPOSED item. |
 
 ## How to run
 
@@ -83,7 +84,7 @@ From the repo root `06-telecom-service-network-incident-ops`, with the `.venv` a
 ```text
 python semantic-layer/build.py          # validate the YAML and write generated/
 python semantic-layer/build.py --check  # validate, and fail if generated/ is stale
-pytest semantic-layer/tests -q          # run the 34 tests
+pytest semantic-layer/tests -q          # run the 35 tests
 ```
 
 `build.py` and the tests need `PyYAML` and `jsonschema`. `requirements.txt` pins `PyYAML` and not `jsonschema`. This stage installed `jsonschema` 4.26.0 into `.venv` only, the same way S00 installed `httpx`. Adding it to `requirements.txt` is a repo change for a later stage to decide.
@@ -114,6 +115,8 @@ Every item has one stable id in dot form. The first word is the kind. The tests 
 | `provenance.` | A field that says where an answer came from | `provenance.prompt_hash` | `ai-context-policy.yaml` |
 | `ai_use.` | One of the eleven capabilities | `ai_use.incident_summary` | `ai-context-policy.yaml` |
 | `failmode.` | A fail-to-person trigger | `failmode.timeout` | `ai-context-policy.yaml` |
+| `agency.` | One of the four words for how far a step may go | `agency.recommend` | `ai-context-policy.yaml` |
+| `pick.` | One of the four words for what kind of tool does a step | `pick.deterministic_code` | `ai-context-policy.yaml` |
 
 A hyphen in a data value becomes an underscore in the id. `east-4` is `status.word.east_4`. The `value` or `word` key keeps the original text.
 
@@ -121,7 +124,7 @@ A hyphen in a data value becomes an underscore in the id. `east-4` is `status.wo
 
 - Every item carries a `source:` list. Each path is relative to the repo root. `../Project_Intent.md` points one level up. The tests check that every path exists.
 - Every item the repo does not contain carries `proposed: true` and `owner:`. The schema rejects `proposed: true` without an owner.
-- No YAML item sets a severity cutoff, an SLA threshold, a retry maximum, a timeout number, or a target. Where the baseline proposed a bound, the YAML records it as a note with owner Unknown.
+- No YAML item sets a severity cutoff, an SLA threshold, a retry maximum, a timeout number, or a target. Where the baseline proposed a bound, the YAML records it as a note with Owner: Team-Force.
 - No password, key, or token value is in this tree. The test reads the secret values from `.env.example` and `legacy/reconcile_legacy.py` at run time and fails if any of them appears here.
 
 ## Harvest
@@ -176,13 +179,14 @@ Five more overlaps are listed under `other_overlaps` in `status-taxonomy.yaml`. 
 
 ## What the tests check
 
-`tests/test_semantic_layer.py` has 34 tests. They fail when:
+`tests/test_semantic_layer.py` has 35 tests. They fail when:
 
 - a file in the fixed tree is missing or an extra file appears
 - a YAML file does not carry `version: "1.0.0"`, or this README does not repeat it
 - the schema rejects any YAML file, or the schema accepts a known-bad document (three negative tests)
 - a required entity, persona, status word, rule, metric, outcome, collision, or API role is missing
 - a GenAI use has an agency other than recommend, or any use other than workflow automation reaches EXECUTE
+- an `agency` or `pick` value anywhere in the YAML has no matching `agency.*` or `pick.*` item
 - a forbidden prompt field is also on the allow list, or a `never_in_prompt` field is not forbidden
 - `api_reads_today` is true on any field outside `entity.device`, or false on any device field
 - an id is not in dot form, uses an unknown prefix, or is defined twice
@@ -206,7 +210,7 @@ Run on 2026-10-10. **Verified Fact.**
 ## Checklist from `Project_Intent.md` 6.2
 
 - [x] The folder matches `Semantic_Layer_capture.pdf`. The eleven entries are present. `build.py` and `generated/` are the two stated additions. `test_tree_is_exactly_the_capture_layout_plus_generated_and_build` locks the tree.
-- [x] `glossary.md` explains terms in everyday words. 153 rows. One row per entity, concept, status word, collision, rule, metric, action, resource, purpose, scope, risk, API role, persona, outcome, and fail mode.
+- [x] `glossary.md` explains terms in everyday words. 181 rows. One row per entity, concept, status word, collision, rule, metric, action, resource, purpose, scope, risk, API role, persona, outcome, fail mode, agency word, pick word, AI use, and provenance field.
 - [x] YAML defines entities, relationships, statuses, rules, metrics, access, and AI context. Seven files. Each carries `version`, `file`, `description`, and `source`.
 - [x] Status words used in code, docs, and CSV are listed. Collisions such as `gold` used as incident severity are named. 44 words, 36 status fields, 8 code words, 4 collisions, 5 other overlaps.
 - [x] JSON Schema validates the YAML. One schema, seven branches picked by the `file` key. `build.py` refuses to write on a validation error.
@@ -219,22 +223,22 @@ These are Unknown in the repo. The YAML records each one where it sits. A later 
 
 | Question | Where it sits | Stage that decides |
 |---|---|---|
-| Which severity words are allowed, and in what order | `status.incident.severity`, `status.alarm.severity` | S05R, owner Unknown |
+| Which severity words are allowed, and in what order | `status.incident.severity`, `status.alarm.severity` | S05R, owner Team-Force |
 | Which columns join an alarm to an incident | `relationship.alarm_to_incident` | S04-11 |
-| How many alarms make a storm | `metric.alarm_storm_size` | S04-11, owner Unknown |
-| The legal maximum for `retry_count` | `metric.retry_count` | Owner Unknown |
-| The legal range for `sla_breach_risk` | `metric.sla_breach_risk` | Owner Unknown |
+| How many alarms make a storm | `metric.alarm_storm_size` | S04-11, owner Team-Force |
+| The legal maximum for `retry_count` | `metric.retry_count` | Owner: Team-Force |
+| The legal range for `sla_breach_risk` | `metric.sla_breach_risk` | Owner: Team-Force |
 | The timeout for a model call | `policy.fail_to_person` | S04-09 |
 | What a blank `stale_topology_flag` should do | `failmode.stale_topology_blank` | S04-09 |
 | The desk job of the human who approves a live change | `ai_use.remediation_execution` | S04-09 |
 | Which personas may read `mgmt_ip` and `credential_profile` | `resource.sensitive_device_fields` | S04-03 |
 | Whether `automation_service` is the shared user `app_shared` | `persona.automation_service` | S04-04 |
 | Whether `engineer` stays on the API role list | `role.engineer` | S04-03 |
-| Which order built which circuit | `relationship.order_to_circuit` | Owner Unknown |
+| Which order built which circuit | `relationship.order_to_circuit` | owner Team-Force |
 
 ## Last build
 
-Run on 2026-10-10 from the repo root with `.venv\Scripts\python.exe`. **Verified Fact.**
+Run on 2026-10-10 by stage S03F round 1, from the repo root with `.venv\Scripts\python.exe`, after deleting `generated/`. `PYTHONDONTWRITEBYTECODE=1` was set so the run left the committed `tests/__pycache__/` file unchanged. **Verified Fact.**
 
 ```text
 > python semantic-layer/build.py
@@ -247,16 +251,19 @@ Validated 7 YAML files against semantic-layer.schema.json. Version 1.0.0.
   wrote generated/access-semantics.json
   wrote generated/ai-context-policy.json
   wrote generated/manifest.json
+exit=0
 
 > python semantic-layer/build.py --check
 generated/ matches the YAML. 7 files validated. Version 1.0.0.
+exit=0
 
-> pytest semantic-layer/tests -q
-..................................                                       [100%]
-34 passed in 0.95s
+> pytest semantic-layer/tests -q -p no:cacheprovider
+...................................                                      [100%]
+35 passed in 1.12s
+exit=0
 ```
 
-The inherited suite was run after this build to confirm nothing outside this folder changed: `pytest -q` from the repo root printed `8 passed, 5 warnings`. That run appends `record.read` and `ai.summary` lines to `logs/audit.log`, as it did in S00 and S02.
+S03F did not run the inherited suite. No file under `apps/`, `policy/`, `data/`, `etl/`, or `legacy/` changed. The S03 run of `pytest -q` from the repo root printed `8 passed, 5 warnings`.
 
 ## Lifecycle
 

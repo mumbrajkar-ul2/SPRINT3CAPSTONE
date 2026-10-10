@@ -52,7 +52,7 @@ R15. Plain speech: pick three glossary entries at random and state whether a rea
 - Each artifact starts with a header table: Stage, Date / version, Author, Status, Evidence sources, Assumptions, Unresolved issues, Residual risks.
 
 ## Required artifacts
-1. `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md` — the review table, the test and build output, and a "Fixes required" list for every FAIL. Number each fix. Each fix names the check ids it clears, the files and lines or ids to change, and the change. When a fix offers options or needs an owner name, mark it "Choice needed" and list the options. Stage S03F reads this list as written.
+1. `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md` — the review table, the test and build output, and a "Fixes required" list for every FAIL. Number each fix. Each fix names the check ids it clears, the files and lines or ids to change, and the change. A fix that changes an owner or a name also covers every comment and text in the same file that states it. A fix that adds a required item also covers its test and the README counts. When a fix offers options or needs an owner name, mark it "Choice needed" and list the options. Stage S03F reads this list as written.
 
 ## Completion gate
 PASS when no row is FAIL. CONDITIONAL PASS when every FAIL is in R12 or R15 only and each has a one-line fix. BLOCKED when any of R1, R5, R7, R8, R10, R11, R13 is FAIL.

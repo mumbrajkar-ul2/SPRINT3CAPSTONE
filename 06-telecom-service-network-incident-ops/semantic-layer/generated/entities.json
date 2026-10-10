@@ -591,7 +591,7 @@
           "name": "sla_breach_risk",
           "type": "number",
           "references": "concept.sla",
-          "description": "A score for how likely the service promise will be broken. 352 values sit between 0 and 1. INC-00019 on file line 355 holds 1.42. The legal range is PROPOSED 0 to 1. Owner Unknown.",
+          "description": "A score for how likely the service promise will be broken. 352 values sit between 0 and 1. INC-00019 on file line 355 holds 1.42. The legal range is PROPOSED 0 to 1. Owner: Team-Force.",
           "api_reads_today": false,
           "source": [
             "data/synthetic/incidents.csv",
@@ -693,7 +693,7 @@
           "id": "field.service_order.retry_count",
           "name": "retry_count",
           "type": "number",
-          "description": "How many times the build was tried again. Values run from 32 to 4995. 294 rows are at or above 1000. The legal maximum is Unknown. The 1000 bound in the baseline is PROPOSED with owner Unknown.",
+          "description": "How many times the build was tried again. Values run from 32 to 4995. 294 rows are at or above 1000. The legal maximum is Unknown. The 1000 bound in the baseline is PROPOSED. Owner: Team-Force.",
           "api_reads_today": false,
           "source": [
             "data/synthetic/service_orders.csv",

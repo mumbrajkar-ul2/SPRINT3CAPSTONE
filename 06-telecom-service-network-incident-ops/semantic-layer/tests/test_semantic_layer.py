@@ -52,12 +52,13 @@ ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$")
 ID_PREFIXES = (
     "entity.", "field.", "concept.", "relationship.", "valueset.", "status.", "collision.", "rule.", "metric.",
     "persona.", "role.", "policy.", "action.", "resource.", "purpose.", "scope.", "risk.", "outcome.",
-    "provenance.", "ai_use.", "failmode.",
+    "provenance.", "ai_use.", "failmode.", "agency.", "pick.",
 )
 # Items with these prefixes must each have a glossary row.
 GLOSSARY_PREFIXES = (
     "entity.", "concept.", "persona.", "status.word.", "outcome.", "metric.", "rule.", "action.", "resource.",
-    "purpose.", "scope.", "risk.", "role.", "failmode.", "collision.",
+    "purpose.", "scope.", "risk.", "role.", "failmode.", "collision.", "agency.", "pick.", "ai_use.",
+    "provenance.",
 )
 
 # ---------------------------------------------------------------------------
@@ -272,6 +273,25 @@ def test_four_outcomes_present_and_model_never_executes(docs):
         assert not (use["pick"] == "genai" and use["outcome"] == "outcome.execute")
     execute_uses = [u for u in pol["ai_uses"] if u["outcome"] == "outcome.execute"]
     assert len(execute_uses) == 1 and execute_uses[0]["pick"] == "workflow_automation"
+
+
+def test_every_agency_and_pick_word_is_defined(docs):
+    pol = docs["ai-context-policy.yaml"]
+    agency_words = {a["name"] for a in pol["agency_levels"]}
+    pick_words = {p["name"] for p in pol["picks"]}
+    assert agency_words == {"analyse", "recommend", "decide", "execute"}
+    assert {a["id"] for a in pol["agency_levels"]} == {"agency." + w for w in agency_words}
+    assert {p["id"] for p in pol["picks"]} == {"pick." + w for w in pick_words}
+    undefined = []
+    for name, doc in docs.items():
+        for path, node in walk(doc):
+            if not isinstance(node, dict):
+                continue
+            if "agency" in node and node["agency"] not in agency_words:
+                undefined.append((name, "/".join(str(p) for p in path), "agency", node["agency"]))
+            if "pick" in node and node["pick"] not in pick_words:
+                undefined.append((name, "/".join(str(p) for p in path), "pick", node["pick"]))
+    assert not undefined, sorted(undefined)
 
 
 def test_eleven_ai_uses_copied_from_qualification(docs):
