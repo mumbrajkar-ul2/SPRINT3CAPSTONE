@@ -337,7 +337,7 @@ personas:
     name: network_engineer
     description: >-
       A person who designs and changes the network. Reads the configuration suggestion and accepts or rejects it.
-      PROPOSED as the named human who approves a live network change.
+      Confirmed on 2026-10-10 as the named human who approves a live network change. The persona grants stay PROPOSED.
     event_count: 440
     api_role_today: role.engineer
     proposed: true
@@ -359,7 +359,7 @@ personas:
         purpose: purpose.network_change_planning
         scope: scope.all_records
         risk: risk.decision
-        note: The approval of a live network change. The desk job is PROPOSED and PROVISIONAL until stage S04-09.
+        note: The approval of a live network change. The desk job is network_engineer, confirmed on 2026-10-10. Stage S04-09 uses this title.
     denied: [action.execute]
     source: [docs/domain-specific-spec.md, docs/02-baseline/ai-qualification.md, docs/00-contract/operating-contract.md]
 

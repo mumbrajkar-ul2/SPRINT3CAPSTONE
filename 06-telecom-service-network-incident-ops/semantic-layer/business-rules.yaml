@@ -129,7 +129,7 @@ rules:
     defect_refs: [F11, F12, F16]
     enforced_today: false
     enforcement_stage: S04-09
-    stage_note: Operating contract rows 2 and 9 and Project_Intent.md Appendix C name the four gates. The approver desk job is PROPOSED network_engineer with owner Team-Force until S04-09 confirms it.
+    stage_note: Operating contract rows 2 and 9 and Project_Intent.md Appendix C name the four gates. The approver desk job is network_engineer, confirmed by Mangesh (FDE) on 2026-10-10. Stage S04-09 uses this title.
     source: [docs/00-contract/operating-contract.md, docs/02-baseline/ai-qualification.md, docs/02-baseline/defect-list.md, ../Project_Intent.md]
 
   - id: rule.forbidden_fields_never_enter_prompt

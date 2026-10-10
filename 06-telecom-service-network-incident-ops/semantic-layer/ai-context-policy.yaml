@@ -463,7 +463,7 @@ ai_uses:
     pick: workflow_automation
     agency: execute
     outcome: outcome.execute
-    approval_point: A named human approves before the change. The system stores an approval id. The approval sits after the policy allow and before the change. The model does not approve. Desk job PROPOSED network_engineer. Owner Team-Force. PROVISIONAL until stage S04-09.
+    approval_point: A named human approves before the change. The system stores an approval id. The approval sits after the policy allow and before the change. The model does not approve. Desk job network_engineer. Mangesh (FDE) confirmed this on 2026-10-10. Stage S04-09 uses this title.
     approver: persona.network_engineer
     executor: persona.automation_service
     reads: []

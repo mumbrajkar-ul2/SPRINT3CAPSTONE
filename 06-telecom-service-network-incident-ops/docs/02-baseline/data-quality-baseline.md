@@ -8,7 +8,7 @@
 | Status | CONDITIONAL PASS. The profile ran. Five labels in `data/quality_issues.json` are marked Not found. The other 19 labels are marked Confirmed. |
 | Evidence sources | `python docs/02-baseline/profile_data.py` on 2026-10-10; `docs/02-baseline/profile-output.json`; `data/manifest.json`; `data/quality_issues.json`; `data/synthetic/`; `docs/00-setup/replay-log.md`; `docs/01-discovery/data-and-integration-map.md` |
 | Assumptions | A blank cell is the seeded "blank mandatory fields" item. The repo does not name which columns are mandatory. A timestamp whose year is 1900 is impossible in these files because the other parsed values in that column are year 2026. |
-| Unresolved issues | The owner of the retry bound is Unknown. The owner of the `sla_breach_risk` range is Unknown. `service_orders.csv` and `ai_invocations.csv` have no date-time column. `devices.csv`, `circuits.csv`, and `alarms.csv` have no score column that this profile flagged. |
+| Unresolved issues | The retry bound and the `sla_breach_risk` range are PROPOSED. Owner: Team-Force. Neither is approved. `service_orders.csv` and `ai_invocations.csv` have no date-time column. `devices.csv`, `circuits.csv`, and `alarms.csv` have no score column that this profile flagged. |
 | Residual risks | A later reader can treat the PROPOSED bounds as an approved rule. They are not approved. Owner: Team-Force. |
 
 ## What this file is
@@ -211,4 +211,4 @@ The first device row stores status words in other columns: `hostname` `legacy`, 
 
 ## Lifecycle
 
-This file cites `docs/00-setup/replay-log.md` and `docs/01-discovery/data-and-integration-map.md`. Stage S03 harvests the status words in the section above. Stage S04 Half A cites `defect-list.md` for what to fix. The PROPOSED bounds stay proposals until an owner is named.
+This file cites `docs/00-setup/replay-log.md` and `docs/01-discovery/data-and-integration-map.md`. Stage S03 harvests the status words in the section above. Stage S04 Half A cites `defect-list.md` for what to fix. The PROPOSED bounds stay proposals until Team-Force approves them.

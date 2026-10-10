@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Stage | S03F — Semantic layer fixes (applies the S03R "Fixes required" list) |
-| Date / version | 2026-10-10, round 1. Semantic layer version `1.0.0`, unchanged. |
-| Author | Mangesh (FDE), drafted with Cursor (Claude Opus 5.5) |
-| Status | PASS for round 1. All nine fixes are applied. `build.py`, `build.py --check`, and the 35 tests pass after a clean rebuild. The done test failed and then passed as expected. Every changed file is named by a fix. S03R runs again next, in a fresh chat. |
-| Evidence sources | `docs/02-baseline/semantic-layer-review.md` (the fix source); every file under `semantic-layer/`; `docs/02-baseline/ai-qualification.md`; `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/00-contract/operating-contract.md` row 10; `playbook/S03-semantic-layer.md`; `playbook/S03F-semantic-layer-fixes.md`; `git diff` and `git status` on 2026-10-10 |
-| Assumptions | Fix 1 says "add a value list". This round adds two lists, `agency_levels` and `picks`, because the ids have two prefixes. The meanings of `rules`, `deterministic_code`, and `workflow_automation` share one sentence in `ai-qualification.md` line 20. Each row adds an example from the eleven AI uses so a reader can tell them apart. |
-| Unresolved issues | Three edits went past the literal fix text. They are listed under "Points for the S03R reviewer" below. Team-Force accepted all three on 2026-10-10. The schema still allows the pick words `classical_ml` and `agentic_ai`, and no item defines them. No AI use has either pick, so no YAML value is undefined today. |
-| Residual risks | Naming Team-Force as owner does not approve any number. The retry bound of 1000 and the `sla_breach_risk` range of 0 to 1 stay PROPOSED. The "Open questions" columns in `ai-qualification.md` line 110 and `defect-list.md` lines 58 and 59 still say "Who sets the legal maximum is Unknown." No fix names those cells, so they are unchanged. A reader can see Team-Force as owner in one cell and "Unknown" in the next. |
+| Date / version | 2026-10-10, round 2. Semantic layer version `1.0.0`, unchanged. Round 1 stays in the section below. |
+| Author | Mangesh (FDE), drafted with Cursor. Round 1 used Claude Opus 5.5. Round 2 used Grok 4.7. |
+| Status | PASS for round 2. Fixes 1 to 3 and advisory A7 are applied. `build.py`, `build.py --check`, and the 35 tests pass after a clean rebuild. The done test failed and then passed as expected. Every changed file inside the packet is named by a fix, by A7, or by steps 6 and 7. S03R runs again next, in a fresh chat. S04 waits for that review. |
+| Evidence sources | `docs/02-baseline/semantic-layer-review.md` (review v2.0, the fix source for round 2); every file under `semantic-layer/`; `docs/02-baseline/ai-qualification.md`; `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/00-contract/operating-contract.md` row 10; `playbook/S03-semantic-layer.md`; `playbook/S03F-semantic-layer-fixes.md`; `git diff` and `git status` on 2026-10-10 |
+| Assumptions | Round 1's list-shape choice is recorded in the Round 1 section. For advisory A7, this round names the README "Done test" block as the S03 run. The advisory also allows a pointer to this file instead. The Decisions block said to apply A7 and did not pick between those two phrasings. |
+| Unresolved issues | Advisories A1, A2, A3, A4, A5, A6, and A8 stay as the review wrote them. The Decisions block applied A7 only. The schema still allows the pick words `classical_ml` and `agentic_ai`, and no item defines them. No AI use has either pick. |
+| Residual risks | Naming Team-Force as owner does not approve any number. The retry bound of 1000 and the `sla_breach_risk` range of 0 to 1 stay PROPOSED. Fix 3 option B leaves who will fix each defect as Unknown. The tree tests still cannot see the baseline docs. |
 
 Claim labels: **Verified Fact** (I ran it or read it, with a pointer), **Inference**, **Assumption**, **Unknown**.
 
@@ -324,6 +324,200 @@ This map says which edits address each row. It does not mark any row PASS. The n
 | R15 | 6, 7 | A sentence above the network zone table says what a network zone is. The cost row now reads as a total cost of model calls, tied to one incident. |
 
 Fixes 8 and 9 address no FAIL row. They apply the owner decision in `docs/00-contract/operating-contract.md` row 10.
+
+## Round 2, 2026-10-10
+
+### Fix source
+
+| Item | Value |
+|---|---|
+| Path | `docs/02-baseline/semantic-layer-review.md` |
+| Why this file | A file search on 2026-10-10 found no `docs/02-baseline/semantic-layer-revision.md`. The review is the only fix source. **Verified Fact.** |
+| Header date and version | 2026-10-10, review v2.0 of semantic layer `1.0.0`. This file replaces the round 1 review (v1.0). |
+| Stage status | BLOCKED for S04. Every check on the `semantic-layer/` tree passes. One row fails: R14.7. |
+| Version check | `SL/README.md` line 6 states version `1.0.0`. A file search on 2026-10-10 found no `docs/prd/prd.md`. No later stage has written that version into a PRD, so this stage may run. **Verified Fact.** |
+
+### Fixes required, copied word for word from the review
+
+1. **R14.7. Make the data-quality baseline name one owner for the two bounds.** In `docs/02-baseline/data-quality-baseline.md`:
+   - Line 11, Unresolved issues. Replace "The owner of the retry bound is Unknown. The owner of the `sla_breach_risk` range is Unknown." with "The retry bound and the `sla_breach_risk` range are PROPOSED. Owner: Team-Force. Neither is approved." Keep the rest of the cell.
+   - Line 214, Lifecycle. Replace "The PROPOSED bounds stay proposals until an owner is named." with "The PROPOSED bounds stay proposals until Team-Force approves them."
+   - Lines 12, 85, 192, and 193 already say "Owner: Team-Force". No other text in this file states the owner of either bound. **Verified Fact:** search for "owner" in the file on 2026-10-10.
+   - No test, id, or README count changes. This fix adds no required item.
+2. **Owner decision of 2026-10-10 (`operating-contract.md` row 10, v1.1). Name Team-Force in four more places.** This fix comes from the owner decision, not from a failed row. Row 10 names "the order of the severity words" and "a legal value" as decisions Team-Force owns. The edits are:
+   - `SL/status-taxonomy.yaml` line 3404, `collision.gold_bronze_as_severity` `resolution`. Replace "Open. The owner of the severity list is Unknown." with "Open. The severity list and its order are not set. Owner: Team-Force." Keep "This file records the words. It does not pick a cutoff." The value is a folded block (`>-`), so the colon needs no quotes. `SL/README.md` line 226 already gives this owner. No other text in `status-taxonomy.yaml` states an owner. Rebuild `generated/`. `status-taxonomy.json` and `manifest.json` will change.
+   - `docs/02-baseline/ai-qualification.md` line 110, Open questions cell of the provisioning retry row. Replace "Who sets the legal maximum is Unknown." with "The legal maximum is not set. Owner: Team-Force." The same row already says "Owner: Team-Force" for the 1000 bound. R7 is not affected, because this cell is not an approval point.
+   - `docs/02-baseline/defect-list.md` line 58, F18 Open questions cell. Replace "Who sets the legal maximum is Unknown." with "The legal maximum is not set. Owner: Team-Force." The same row already says "Owner: Team-Force".
+   - `docs/02-baseline/defect-list.md` line 59, F19 Open questions cell. Replace "Who sets the legal range is Unknown." with "The legal range is not set. Owner: Team-Force." The same row already says "Owner: Team-Force".
+3. **Choice needed. `docs/02-baseline/defect-list.md` line 11, Unresolved issues, "Owners are Unknown."** This line is in the same file as the fix 2 edit and states an owner, so fix 2 must cover it. The line does not say which owners it means. Options:
+   - (a) It means the owner of each PROPOSED item. Replace it with "The owner of every PROPOSED item, including the bounds in F18 and F19, is Team-Force (`docs/00-contract/operating-contract.md` row 10)."
+   - (b) It means who will fix each defect. Replace it with "Who fixes each defect is Unknown. The owner of the PROPOSED bounds in F18 and F19 is Team-Force."
+   - (c) Leave it as it is. Record in the S03F file why it stays.
+
+The review has one FAIL row, R14.7. Fix 1 matches that row. No FAIL row is missing a fix.
+
+### Advisory A7, copied word for word from the review
+
+The Decisions block says to apply this advisory. The other advisories stay as written.
+
+- **A7, new.** Two texts still give the S03 picture. The test module's opening comment (`SL/tests/test_semantic_layer.py` lines 6–18) lists what the tests fail on and leaves out the agency and pick check. `SL/README.md` lines 203–208 ("Done test") report "34 passed" with no stage name. That run was the S03 done test. Name it as the S03 run, or point to the S03F done test in `semantic-layer-fixes.md`.
+
+### Decisions block, as pasted
+
+```text
+Fix 3: Option B.
+Apply advisory A7 from semantic-layer-review.md.
+```
+
+### Decision per fix
+
+| Fix | Decision | Reason |
+|---|---|---|
+| 1 | apply | The fix names both sentences and both lines. It offers no options. The owner is Team-Force, PROPOSED, from `docs/00-contract/operating-contract.md` row 10. Naming the owner does not approve the 1000 bound or the 0-to-1 range. |
+| 2 | apply | The fix names the four places and the owner, Team-Force. It offers no options. The numbers and the severity list stay unset. |
+| 3 | apply, option B | The Decisions block says `Fix 3: Option B.` The new sentence is "Who fixes each defect is Unknown. The owner of the PROPOSED bounds in F18 and F19 is Team-Force." |
+| A7 | apply | The Decisions block says to apply it. This round names the README "Done test" block as the S03 run. It leaves the recorded result "34 passed" as the S03 result. It adds the agency and pick check to the test module's opening comment. |
+
+No fix is waiting for a decision. No fix is marked cannot apply.
+
+### Edit list
+
+Line numbers are the line in the file after the edit, except where the note says "before". **Verified Fact:** the files on disk on 2026-10-10, and `git diff --stat`.
+
+#### Fix 1
+
+| File | Line or id | Old text | New text |
+|---|---|---|---|
+| `docs/02-baseline/data-quality-baseline.md` | line 11, Unresolved issues | "The owner of the retry bound is Unknown. The owner of the `sla_breach_risk` range is Unknown." | "The retry bound and the `sla_breach_risk` range are PROPOSED. Owner: Team-Force. Neither is approved." The rest of the cell is unchanged. |
+| `docs/02-baseline/data-quality-baseline.md` | line 214, Lifecycle | "The PROPOSED bounds stay proposals until an owner is named." | "The PROPOSED bounds stay proposals until Team-Force approves them." |
+
+Lines 12, 85, 192, and 193 already said "Owner: Team-Force". This round did not edit them. **Verified Fact:** `git diff --stat` shows 4 changed lines in this file, which is these two replacements.
+
+#### Fix 2
+
+| File | Line or id | Old text | New text |
+|---|---|---|---|
+| `SL/status-taxonomy.yaml` | line 3404, `collision.gold_bronze_as_severity` `resolution` | "Open. The owner of the severity list is Unknown. This file records the words. It does not pick a cutoff." | "Open. The severity list and its order are not set. Owner: Team-Force. This file records the words. It does not pick a cutoff." The value stays a folded block (`>-`). The colon has no quotes. `build.py` accepted the file. |
+| `docs/02-baseline/ai-qualification.md` | line 110, provisioning retry Open questions cell | "Who sets the legal maximum is Unknown." | "The legal maximum is not set. Owner: Team-Force." The same row still says "Owner: Team-Force" for the 1000 bound. |
+| `docs/02-baseline/defect-list.md` | line 58, F18 Open questions cell | "Who sets the legal maximum is Unknown." | "The legal maximum is not set. Owner: Team-Force." |
+| `docs/02-baseline/defect-list.md` | line 59, F19 Open questions cell | "Who sets the legal range is Unknown." | "The legal range is not set. Owner: Team-Force." |
+
+`SL/README.md` already said "S05R, owner Team-Force" for the severity-word order. This round did not edit that cell. The new change-log row moved it from line 226 to line 227. **Verified Fact:** line 227.
+
+`build.py` rewrote `SL/generated/status-taxonomy.json` and `SL/generated/manifest.json`. The resolution string in the JSON is the new sentence. **Verified Fact:** `status-taxonomy.json` line 4743. `git status` lists those two generated files and no other file under `generated/`.
+
+#### Fix 3
+
+| File | Line or id | Old text | New text |
+|---|---|---|---|
+| `docs/02-baseline/defect-list.md` | line 11, Unresolved issues | "Owners are Unknown." | "Who fixes each defect is Unknown. The owner of the PROPOSED bounds in F18 and F19 is Team-Force." The rest of the cell is unchanged. |
+
+#### Advisory A7
+
+| File | Line or id | Old text | New text |
+|---|---|---|---|
+| `SL/tests/test_semantic_layer.py` | new line 11, opening comment | (none) | "- an agency or pick value anywhere in the YAML has no matching agency or pick item" |
+| `SL/README.md` | line 206, Done test (was line 205 before the change-log row) | "Run on 2026-10-10. **Verified Fact.**" | "This is the S03 done test. Run on 2026-10-10. **Verified Fact.**" The two numbered steps below it are unchanged, including "34 passed". |
+
+#### Step 6: change log and header
+
+| File | Line | Old text | New text |
+|---|---|---|---|
+| `SL/README.md` | line 8, header Status | "S03 PASS. Review S03R round 1 was BLOCKED. Stage S03F round 1 applied its fixes 1 to 9 on 2026-10-10. S03R runs again next. ..." | "S03 PASS. Review S03R round 2 was BLOCKED on R14.7. Stage S03F round 2 applied fixes 1 to 3 and advisory A7 on 2026-10-10. S03R runs again next. ..." The version, the 35 tests, and the 6.2 ticks stay. |
+| `SL/README.md` | new line 79, change log | (none) | `1.0.0` · 2026-10-10 · S03F · "S03R fixes applied, round 2. Fixes 1 to 3 and advisory A7 from `docs/02-baseline/semantic-layer-review.md`. ..." |
+
+Every YAML file still carries version `1.0.0`. **Verified Fact:** `build.py` prints "Version 1.0.0", and a search of the seven YAML files shows `version: "1.0.0"` or `version: 1.0.0`.
+
+#### Step 7: Last build
+
+| File | Line | Old text | New text |
+|---|---|---|---|
+| `SL/README.md` | lines 240–265, Last build | The round 1 output, "35 passed in 1.12s" | The round 2 output pasted below, "35 passed in 1.04s" |
+
+### Citation check
+
+No id was renamed or removed. No id was added. The only id whose text changed is `collision.gold_bronze_as_severity`. The change is the `resolution` sentence. **Verified Fact:** search for that id on 2026-10-10 over `semantic-layer/`, `docs/`, `policy/`, `tests/`, and `apps/`. `generated/` copies are left out of the list.
+
+| Id | Files that cite it |
+|---|---|
+| `collision.gold_bronze_as_severity` | `SL/status-taxonomy.yaml`, `SL/glossary.md`, `SL/README.md`, `SL/tests/test_semantic_layer.py`, `docs/02-baseline/semantic-layer-review.md` |
+
+`policy/`, `tests/`, and `apps/` do not cite it. The id string is unchanged in every file that cites it.
+
+No AI use changed. `SL/ai-context-policy.yaml` is absent from `git status`. The pick, agency, outcome, and approval point of each AI use still match `docs/02-baseline/ai-qualification.md`. `ai_use.remediation_execution` is still the only `agency: execute` item, and its pick is still `workflow_automation`. **Verified Fact:** `git status` and test `test_four_outcomes_present_and_model_never_executes`, which passed in the 35.
+
+### Build, check, and test output
+
+Run on 2026-10-10 from `06-telecom-service-network-incident-ops` with `.venv\Scripts\python.exe`, after `Remove-Item -Recurse semantic-layer\generated`. `PYTHONDONTWRITEBYTECODE=1` was set. **Verified Fact.**
+
+```text
+> python semantic-layer/build.py
+Validated 7 YAML files against semantic-layer.schema.json. Version 1.0.0.
+  wrote generated/entities.json
+  wrote generated/relationships.json
+  wrote generated/status-taxonomy.json
+  wrote generated/business-rules.json
+  wrote generated/metrics.json
+  wrote generated/access-semantics.json
+  wrote generated/ai-context-policy.json
+  wrote generated/manifest.json
+exit=0
+
+> python semantic-layer/build.py --check
+generated/ matches the YAML. 7 files validated. Version 1.0.0.
+exit=0
+
+> pytest semantic-layer/tests -q -p no:cacheprovider
+...................................                                      [100%]
+35 passed in 1.04s
+exit=0
+```
+
+### Done test output
+
+Changed the glossary Term `silver` to `silverd` on the `status.word.silver` row, and nothing else. Ran the tests. Restored the word. Ran the tests again. **Verified Fact.**
+
+```text
+--- changed silver to silverd
+E       AssertionError: glossary term differs from YAML name or word: [('silverd', 'status.word.silver', 'silver')]
+FAILED semantic-layer/tests/test_semantic_layer.py::test_glossary_and_yaml_agree_on_every_term
+1 failed, 34 passed in 1.29s
+--- restored
+...................................                                      [100%]
+35 passed in 0.91s
+```
+
+After the restore, `glossary.md` line 71 reads `` | `silver` | `status.word.silver` | ... ``. `git status` does not list `glossary.md`.
+
+### Files changed this round
+
+**Verified Fact:** `git status --short` on 2026-10-10.
+
+| File | Named by |
+|---|---|
+| `docs/02-baseline/data-quality-baseline.md` | Fix 1 |
+| `SL/status-taxonomy.yaml` | Fix 2 |
+| `SL/generated/status-taxonomy.json` | Written by `build.py` after fix 2 |
+| `SL/generated/manifest.json` | Written by `build.py` after fix 2 |
+| `docs/02-baseline/ai-qualification.md` | Fix 2 |
+| `docs/02-baseline/defect-list.md` | Fixes 2 and 3 |
+| `SL/tests/test_semantic_layer.py` | Advisory A7 |
+| `SL/README.md` | Advisory A7; steps 6 and 7 |
+| `docs/02-baseline/semantic-layer-fixes.md` | This file (S03F required artifact) |
+
+No file changed under `apps/`, `policy/`, `data/`, `etl/`, or `legacy/`. The review file is unchanged. No file was added under `semantic-layer/`. `glossary.md` is unchanged after the done-test restore. The tracked cache file `SL/tests/__pycache__/test_semantic_layer.cpython-313-pytest-8.3.2.pyc` is absent from `git status`.
+
+`transcript/chat_transcript.md` is the project chat log. It sits outside the packet. This round appends one turn there.
+
+### Map from FAIL rows to fixes
+
+This map says which edits address each row. It does not mark any row PASS. The next S03R decides that.
+
+| FAIL row | Fixes | Edits that address it |
+|---|---|---|
+| R14.7 | 1 | `docs/02-baseline/data-quality-baseline.md` line 11 now says the retry bound and the `sla_breach_risk` range are PROPOSED, with Owner: Team-Force, and that neither is approved. Line 214 now says the bounds stay proposals until Team-Force approves them. Lines 12, 85, 192, and 193 already said Owner: Team-Force. |
+
+Fixes 2 and 3 address no FAIL row. They apply the owner decision in `docs/00-contract/operating-contract.md` row 10 to four more cells, and they apply option B on the defect-list header. Advisory A7 addresses no FAIL row. It names the S03 done test and adds the agency and pick check to the test comment.
 
 ## Lifecycle
 

@@ -8,6 +8,7 @@ What these tests fail on:
 - a file in the fixed tree is missing, or an extra file appears
 - the schema rejects any YAML file
 - a required entity, persona, status word, rule, metric, outcome, or collision is missing
+- an agency or pick value anywhere in the YAML has no matching agency or pick item
 - glossary.md and the YAML disagree on a term or an id
 - a file under generated/ differs from its YAML
 - any id is referenced but never defined, or defined twice

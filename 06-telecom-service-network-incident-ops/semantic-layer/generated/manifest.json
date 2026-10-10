@@ -17,14 +17,14 @@
     {
       "yaml": "status-taxonomy.yaml",
       "json": "generated/status-taxonomy.json",
-      "yaml_sha256": "b84c58bfc60a71d5d1753e38ba7243c1d5d4648e445eed4acbffaa8e19f16c0a",
-      "json_sha256": "c533a8d13e75dc37a4d0e70c6daeba40d4b7e0c9e304e59b338d015f1a0c0ea7"
+      "yaml_sha256": "44520172aa060b5c357469802fc1ea2b42646e5d3b0d84c81d01c2f374a70e44",
+      "json_sha256": "911adfda57b5c7232a8c0f331ebea754770ca3860d1f5a65d8572365045a6eab"
     },
     {
       "yaml": "business-rules.yaml",
       "json": "generated/business-rules.json",
-      "yaml_sha256": "1b52609be65fe6b43e78eb7b6fb6e32d25f3eea14021ed17f16f005ad5d81f5f",
-      "json_sha256": "9482a702aac7c2195dcf376b53fdee2cb17e2490c06e469595746de11db6998a"
+      "yaml_sha256": "98ced139cf617d9316b3c27edf5f108cf8cd7d29769c2b7618df23b5649d3672",
+      "json_sha256": "8ab302f735d28b4e896e739b4f41706b9b679870655e52826c5833fa0718df59"
     },
     {
       "yaml": "metrics.yaml",
@@ -35,14 +35,14 @@
     {
       "yaml": "access-semantics.yaml",
       "json": "generated/access-semantics.json",
-      "yaml_sha256": "50f5e4ed42d66cc3ebd64992bf47bb540ea276f2628884da9ff7dc4d2723fa0a",
-      "json_sha256": "1271defd2bc632d39963b746f86f90717c97151abfb364441e2e111d96986e20"
+      "yaml_sha256": "f8a42c5db542e2970c5224ad77f83f74412b19f428c213db160ff4d5012c2f1d",
+      "json_sha256": "7f1a0a85248d0cf1e5c21a016c68804989dd5b8d748462633348a17995b227dd"
     },
     {
       "yaml": "ai-context-policy.yaml",
       "json": "generated/ai-context-policy.json",
-      "yaml_sha256": "7563bcdb83b1ef14049644efca043d49fe6e3b43b457e1aeb9651d47d64fa11b",
-      "json_sha256": "3218fd6a474911166e243843ca31191ddcaac33ce51aee71e62ebc3609d5f45b"
+      "yaml_sha256": "5ff53d394bb9803cae60bc03474a72d82483dadf20b68987b55f8cb794d46f09",
+      "json_sha256": "0db345f01dc563d87f2aaef3c1c144d80a2f1c14114a4535d823b8cd78d5adea"
     }
   ]
 }

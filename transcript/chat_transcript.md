@@ -2052,3 +2052,460 @@ Apply advisory A7 from semantic-layer-review.md.
 ```
 
 `playbook/STATUS.md` notes that A7 joins round 2 and that the other advisories wait. I did not commit anything. If you want a clean round 2 diff, commit before you paste the S03F prompt. After round 2, set the Decisions block back to `None`.
+
+## 2026-10-10 11:46
+
+**Model:** Claude Opus 5.5
+
+### User
+
+what attachments go with S03F Round 2?
+
+### Assistant
+
+Attach ten items for S03F round 2. That is the S03F input list plus the files the round 2 fixes name.
+
+**From the S03F input list**
+
+1. `@playbook/S03-semantic-layer.md`: the rules the tree must keep.
+2. `@playbook/S03R-semantic-layer-review.md`: the fifteen checks.
+3. `@playbook/README.md`: the failure list.
+4. `@06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md`: the fix source for this round.
+5. `@06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-fixes.md`: round 1 is in it, and round 2 gets added below it.
+6. `@06-telecom-service-network-incident-ops/semantic-layer`: the whole tree.
+7. `@06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md`
+8. `@06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`: row 10 names Team-Force.
+
+**Named by this round's fixes ("every other file the fix list names")**
+
+9. `@06-telecom-service-network-incident-ops/docs/02-baseline/data-quality-baseline.md`: fix 1 edits lines 11 and 214.
+10. `@06-telecom-service-network-incident-ops/docs/02-baseline/defect-list.md`: fix 2 edits lines 58 and 59, and fix 3 edits line 11.
+
+Fix 2 also edits `ai-qualification.md` line 110, which is already item 7. The other files the fixes touch are inside the tree you attach in item 6:
+
+- `status-taxonomy.yaml` (fix 2)
+- the test file and `README.md` (advisory A7)
+
+**Leave these out**
+
+- `semantic-layer-revision.md`: it does not exist yet, because S05R has not run.
+- `Semantic_Layer_capture.pdf` and `Project_Intent.md`: S03F does not review the tree, so it does not need them.
+- `playbook/STATUS.md`: S03F does not read it. You update it yourself after the run.
+
+Then paste the prompt from `playbook/S03F-semantic-layer-fixes.md`. Its Decisions block already says `Fix 3: Option B.` and `Apply advisory A7 from semantic-layer-review.md.`
+
+## 2026-10-10 11:53
+
+**Model:** Claude Opus 5.5
+
+### User
+
+should line 10 "| Assumptions | This workspace is the only system under change. The data on disk is local and synthetic. Mangesh (FDE) is the person who accepts each stage of this assignment. |" say "| Assumptions | This workspace is the only system under change. The data on disk is local and synthetic. Team-Force accepts each stage of this assignment. |" in `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`?
+
+### Assistant
+
+No, I recommend keeping line 10 as it is. Row 10 of the same contract deliberately gives the team and the person different jobs:
+
+- **Team-Force owns the PROPOSED items.** These are the open business numbers and the design proposals. Row 10 limits Team-Force's ownership to those items.
+- **Mangesh (FDE) accepts the work.** Row 10 says: "Mangesh (FDE) acts for Team-Force. He writes each stage, reviews each diff (row 7), and confirms rows 1 to 9." Accepting a stage is that same job.
+
+Changing line 10 to "Team-Force accepts each stage" would cause three problems:
+
+1. **It would contradict rows 1 to 9.** Each of those rows names "Mangesh (FDE)" in its "Owner who must confirm" column. Row 7 says Mangesh reviews each diff and accepts it. Row 8 says Mangesh stops the work.
+2. **It would weaken the rule that a named person signs off.** Row 10 ends with "A team name is not an approver." That sentence is about live network changes, but the same idea fits stage acceptance. Someone has to be able to say "I accepted this", and the other members of Team-Force are Unknown.
+3. **It would change the contract itself.** The contract would need a new version (v1.2) and a note in `STATUS.md`. Later stages also check stage acceptance against this file: S09 reads it and lists any change that crossed a Prohibited or PROVISIONAL row.
+
+If you want line 10 to show how Mangesh and Team-Force connect, a safer wording keeps Mangesh as the person who accepts and adds the link:
+
+> | Assumptions | This workspace is the only system under change. The data on disk is local and synthetic. Mangesh (FDE) accepts each stage of this assignment. He acts for Team-Force, the owner of every PROPOSED item (row 10). |
+
+That wording agrees with every row in the table. I have not changed the file. Tell me if you want this wording applied, and whether you want the version raised to v1.2 for it. A wording change that keeps the meaning could stay at v1.1.
+
+## 2026-10-10 12:05
+
+**Model:** Grok 4.7
+
+### User
+
+# Stage S03F — Semantic layer fixes
+
+## Decisions for this round
+Fix 3: Option B.
+Apply advisory A7 from semantic-layer-review.md.
+
+The same stage prompt was pasted twice. This log keeps one copy. Attachments named `playbook/S03-semantic-layer.md`, `playbook/S03R-semantic-layer-review.md`, `playbook/README(the failure list).md`, `docs/02-baseline/semantic-layer-review.md`, `docs/02-baseline/semantic-layer-fixes.md`, `semantic-layer/`, `docs/02-baseline/ai-qualification.md`, `docs/00-contract/operating-contract.md`, `docs/02-baseline/data-quality-baseline.md`, and `docs/02-baseline/defect-list.md`.
+
+## Objective
+Apply the "Fixes required" list from the newest semantic-layer review to `semantic-layer/` and to the other files the list names. Change nothing else. Keep the version. Rebuild and retest. Record each edit so the next S03R reviewer can check it. Do not review the tree. S03R does that in a fresh chat.
+
+## Scope
+Include: every file under `semantic-layer/`; any file outside it that a fix names by path; the "Decisions for this round" block above.
+Exclude: any item the review passed, unless a fix names it; any file no fix names; advisories, unless the Decisions block says to apply one; application code; `policy/`; `data/`; the review file itself.
+
+The rest of the pasted prompt is the S03F text in `playbook/S03F-semantic-layer-fixes.md`: required analysis steps 1 to 9, the evidence rules, the constraints, the locked facts, the required artifacts, the completion gate, the lifecycle linkage, and the seven-item final response.
+
+### Assistant
+
+Round 2 of the semantic-layer fixes is applied. The version stays `1.0.0`. The source is `docs/02-baseline/semantic-layer-review.md`, review v2.0, status BLOCKED for S04 on row R14.7. A file search found no `semantic-layer-revision.md` and no `docs/prd/prd.md`, so this stage was allowed to run.
+
+Fix 1 names Team-Force on the two bounds in `data-quality-baseline.md` lines 11 and 214. The bounds stay PROPOSED. Fix 2 names Team-Force on the severity-list resolution and on the three legal-value cells. Fix 3 uses option B: who will fix each defect stays Unknown, and Team-Force owns the bounds in F18 and F19. Advisory A7 adds the agency and pick check to the test comment and names the README done-test block as the S03 run.
+
+The clean rebuild, `build.py --check`, and 35 tests passed. The done test failed on `test_glossary_and_yaml_agree_on_every_term` after `silver` was changed to `silverd`, then passed again after the word was restored.
+
+1. Stage status: PASS. Every fix in the round 2 list is applied, advisory A7 is applied, the rebuild and the 35 tests pass, and the done test failed and then passed.
+
+2. Key findings.
+- R14.7 is the only FAIL row. Fix 1 addresses it in `data-quality-baseline.md` lines 11 and 214.
+- Fixes 2 and 3, and advisory A7, address no FAIL row. They name Team-Force in the places the review listed, and they update the test comment and the S03 done-test label.
+- The version string is still `1.0.0` in the README and in every YAML file.
+- `build.py` wrote eight files. `build.py --check` passed. Pytest printed `35 passed in 1.04s`.
+- The done test failed as `test_glossary_and_yaml_agree_on_every_term`, then printed `35 passed in 0.91s` after the glossary word was restored.
+- Naming Team-Force does not approve the retry bound of 1000 or the `sla_breach_risk` range of 0 to 1.
+
+3. Major risks.
+- A reader can treat those two PROPOSED numbers as approved rules. They stay proposals until Team-Force approves them in writing.
+- A baseline file can disagree with the tree, and the 35 tests can still pass. The tests read the YAML.
+- Advisories A1, A2, A3, A4, A5, A6, and A8 are still open. This round applied A7 only.
+
+4. Assumptions and unknowns.
+- Assumption: advisory A7's two phrasings are two ways to label the same S03 run. This round names that run in the README. It leaves the recorded "34 passed" as the S03 result.
+- Unknown: who will fix each defect. Fix 3 option B keeps that Unknown.
+- Unknown: the other members of Team-Force. The owner name comes from `operating-contract.md` row 10.
+- Verified Fact: a file search on 2026-10-10 found no `docs/prd/prd.md` and no `docs/02-baseline/semantic-layer-revision.md`.
+
+5. Artifacts created, with paths.
+- `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-fixes.md` (round 2 section added; header date and status updated)
+- `06-telecom-service-network-incident-ops/docs/02-baseline/data-quality-baseline.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/defect-list.md`
+- `06-telecom-service-network-incident-ops/semantic-layer/status-taxonomy.yaml`
+- `06-telecom-service-network-incident-ops/semantic-layer/README.md`
+- `06-telecom-service-network-incident-ops/semantic-layer/tests/test_semantic_layer.py`
+- `06-telecom-service-network-incident-ops/semantic-layer/generated/status-taxonomy.json` and `manifest.json` (written by `build.py`)
+
+6. Blocking issues.
+- None for this stage. S04 still waits. The next S03R has to read the fixed tree and decide the rows. This round does not mark R14.7 as PASS.
+
+7. Recommended next action.
+- Open a fresh chat and run S03R against the fixed tree. S04 starts only after that review reads PASS, or CONDITIONAL PASS with the fixes applied.
+
+## 2026-10-10 12:16
+
+**Model:** Grok 4.7
+
+### User
+
+"Naming Team-Force does not approve the retry...." what does that sentence mean anyway. Tell me in plain-speak. I have no capacity to decipher indirect suggestions. Do you want me to take a decision or fix an issue?
+
+### Assistant
+
+No. Nothing is waiting on you. Do not take a decision. Do not fix an issue.
+
+The sentence means this. Two numbers in the files are suggestions. One suggestion is 1000, the highest retry count a service order may have. The other is 0 to 1, the allowed range for `sla_breach_risk`. The files now name Team-Force as the owner of those two suggestions. Team-Force has not said yes to either number. `docs/00-contract/operating-contract.md` row 10 says the name goes on the suggestion, and the suggestion stays a suggestion until Team-Force writes an acceptance later.
+
+This round only wrote the name, because the review said the owner was missing. That work is finished.
+
+Your next step is a fresh chat that runs S03R. That chat reviews the tree. It does not need you to accept 1000 or 0 to 1.
+
+## 2026-10-10 12:19
+
+**Model:** Grok 4.7
+
+### User
+
+Have we created a document on the list of decisions that we have accumulated so far that need to be taken by Team-Force?
+
+### Assistant
+
+No. This project has no file whose job is the list of decisions waiting for Team-Force.
+
+Three files hold pieces of that list.
+
+`06-telecom-service-network-incident-ops/semantic-layer/README.md`, section "Open questions for later stages", has 12 open questions. Five of those rows name Team-Force: the order of the severity words, how many alarms make a storm, the legal maximum for `retry_count`, the legal range for `sla_breach_risk`, and which order built which circuit. The other seven rows name a later stage and do not write Team-Force in that cell.
+
+`06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md` row 10 is the rule. It says Team-Force owns every open business number and every design proposal. It gives examples. It is not a running list.
+
+`playbook/STATUS.md` records decisions Team-Force has already made. Those rows say DONE. They are not the waiting list.
+
+I have not made the missing file. Say if you want one.
+
+## 2026-10-10 12:25
+
+**Model:** Grok 4.7
+
+### User
+
+what does PROVISIONAL mean for the status shown in @06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md  in the table with "The Tem Answers"
+
+### Assistant
+
+PROVISIONAL means the assignment has not given a final answer for that row. The text in the Working rule column is the rule we follow for now. The person named in "Owner who must confirm" still has to say that this rule is the one we keep.
+
+The same column uses two other words. Allowed means the assignment has said yes, inside the limits written in that row. Prohibited means the assignment has said no. Do not do that thing.
+
+Line 22 of `operating-contract.md` is the source of this meaning. The heading above the table is "The ten answers."
+
+Four rows in that table have the status PROVISIONAL.
+
+- Row 1. Leave the six CSV column sets as they are, until Mangesh (FDE) confirms a change.
+- Row 5. Read and describe the Angular scaffold. Wire it only if stage S07 still has time and Mangesh confirms the wiring in writing first.
+- Row 7. Mangesh reviews each code change. He still has to confirm that one reviewer is enough.
+- Row 10. Team-Force owns every open suggestion. Mangesh set that working rule on 2026-10-10. A business owner named by the packet or the trainer takes the business numbers from Team-Force.
+
+The file header names rows 1, 5, and 7. The table also marks row 10 as PROVISIONAL. I am not asking you to change the header.
+
+## 2026-10-10 12:27
+
+**Model:** Grok 4.7
+
+### User
+
+by which stage would it be ideal to make a final decision (Allowed vs Prohibited) on the PROVISIONAL status items?
+
+### Assistant
+
+The contract does not name one stage for all four rows. Each row has its own moment. Stage S09 is too late for the decision. S09 only checks the finished work against the contract and lists any change that crossed a PROVISIONAL row.
+
+Confirming a row means the named person writes that the working rule is the one we keep. The file does not require the status word to change to Allowed or Prohibited on that day.
+
+- Row 1, CSV columns. The table names no stage. The working rule is: leave the six column sets as they are until Mangesh confirms a change. Inference: write that confirmation before S04. S04 is the first stage that may change code.
+- Row 5, the Angular scaffold. The table names stage S07. Decide then, before anyone wires the page. The choice is to wire it, or to leave it as a scaffold that we only read and describe.
+- Row 7, who reviews a code change. The table names S03R before any S04 code change, and S06R before S07 builds routes. The open point is whether one reviewer is enough. Inference: write that confirmation at the next S03R, before S04 starts.
+- Row 10, who owns an open suggestion. The table names no stage that turns this row into Allowed or Prohibited. The working rule stays. A business owner named by the packet or the trainer can take the business numbers from Team-Force. Each number, such as the retry maximum of 1000, is accepted in writing when a later stage needs that number. S09 records the risk that the team that writes the suggestion also owns it.
+
+Row 9 is already Prohibited. Only the approver's job title is still open. The table says Mangesh confirms that job title at stage S04-09. That confirmation leaves the row Prohibited.
+
+## 2026-10-10 12:36
+
+**Model:** Grok 4.7
+
+### User
+
+As a senior Solution Architect and Telecommunication Domain SME+Thought Leader with 30 years of Telecommunication Domain experience in charge of modernizing this telecommunication application in @06-telecom-service-network-incident-ops , review these 10 items and decide the best way forward for the PROVISIONAL status items and confirm if its Allowed or Prohibited.
+
+### Assistant
+
+I recommend Prohibited for rows 1 and 5. I recommend Allowed for rows 7 and 10. I recommend leaving the other six rows as they are. These are my recommendations only. The contract says Mangesh (FDE) confirms each row in writing, so I have not changed the file.
+
+Row 1, CSV columns: Prohibited. Keep the six CSV column sets fixed for the whole assignment. Row 6 already says no one writes to those files. The baseline counts and the semantic layer were built on today's columns, and one semantic-layer test fails when an entity's fields differ from the CSV header. The bad data does not need new columns. In a real telecom shop, you check each row as it arrives. Bad rows go into a holding table for review, and the report says how many. New information, such as approval ids and model call details, goes into new stores.
+
+Row 5, the Angular scaffold: Prohibited for wiring. Reading and describing it stays in scope. The page does not open in a browser today, its fetch paths start with `/api`, and its column names differ from the device columns (risk register R23). The demo page served with the API already shows the flow. The value is in the controls behind the API. S07 time should go to the approvals route. To reopen this row later, raise the contract to a new version.
+
+Row 7, who approves a code change: Allowed, with Mangesh (FDE) as the only code reviewer. The work is local and synthetic, and rows 8 and 9 stop any live network change. Three checks back up one reviewer: fresh-chat review stages, the tests, and the S09 contract check. A live network change still needs the named human approver in row 9.
+
+Row 10, who owns a PROPOSED item: Allowed, with Team-Force as owner. In a real telecom company, service operations managers would own the business numbers. This assignment names no such person. Keep the clause that lets a business owner named by the packet or the trainer take over. Keep the risk on record for S09. Each number stays PROPOSED until Team-Force accepts it in writing.
+
+I agree with rows 2, 3, 4, 6, 8, and 9 as they stand. Row 9 has one open point: the job title of the live-change approver. The proposal is `network_engineer`, and S04-09 decides it. In most telecom operators, a change manager or a change approval board approves a network change. The engineer on shift carries out an approved change. Check that when S04-09 runs.
+
+If you accept these four decisions, I will raise the contract to v1.2, set the four status words, record Mangesh (FDE) as the person who confirmed them with today's date, update the header, and add one line to `playbook/STATUS.md`. Tell me which rows to apply.
+
+## 2026-10-10 12:41
+
+**Model:** Grok 4.7
+
+### User
+
+let us go ahead with above decisions.
+
+### Assistant
+
+The contract now records all four decisions as v1.2. Rows 1 and 5 are Prohibited. Rows 7 and 10 are Allowed. Mangesh (FDE) is recorded as the person who confirmed them on 2026-10-10.
+
+What changed in `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`:
+
+- The header version reads v1.2. The Status says every row is now Allowed or Prohibited. It names one open point: the desk job of the live-change approver in row 9. Stage S04-09 confirms that job title.
+- Row 1 is Prohibited. The six CSV column sets stay as they are. Code checks a bad value when it reads the row, and then reports the row or holds it for review. New data goes into a new store, such as the audit log or the approvals record.
+- Row 5 is Prohibited for wiring. Reading and describing the scaffold stay in scope. To reopen the row, raise the contract to a new version first.
+- Row 7 is Allowed. One reviewer is enough. The row names the three other checks: fresh-chat reviews, the tests, and the S09 contract check. The row also says it covers code changes only.
+- Row 10 is Allowed. Team-Force owns every PROPOSED item. Each number still stays PROPOSED until Team-Force accepts it in writing.
+- Unresolved issues lost the three lines these decisions settled. Residual risks gained one line for S09: one person reviews every code change.
+
+`playbook/STATUS.md` has one new Owner decision row.
+
+One conflict is still open. `playbook/S07-application-and-demo.md` says to wire the Angular scaffold "unless time allows". Its gate gives CONDITIONAL PASS when the scaffold stays unwired. Under row 5, wiring is not allowed. I have not edited S07. Tell me if you want S07 changed so that an unwired scaffold can still reach PASS.
+
+`STATUS.md` also has no row for S03F round 2. You record that row yourself, so I left it out.
+
+## 2026-10-10 12:46
+
+**Model:** Grok 4.7
+
+### User
+
+how is it possible to modernize the application without allowing wiring of the scaffold? what if application feature needs to be enhanced in terms of user navigation?
+
+### Assistant
+
+Row 5 does not stop UI work. It stops one thing: turning the Angular folder in `apps/web/` into a working app. The user screens still get built, as a page that the API serves.
+
+Where the user screens come from today. Stage S07 builds one page at `/`, served by the API as static HTML or FastAPI templates. Item 3 of `playbook/S07-application-and-demo.md` says the page lets a person pick a `storm_batch_id`, see the dedupe result, ask for a recommendation for one device or incident, see the outcome and the model details, approve or reject, and view the audit chain. That page is where user navigation lives in this plan.
+
+The Angular folder is not an app yet. It holds a few TypeScript files, a `package.json` that lists Playwright only, and no Angular runtime libraries (`Project_Intent.md` line 214). Its fetch paths start with `/api`, and the real routes do not. Wiring it means installing Angular, adding build settings, and fixing those paths before any feature works.
+
+Where your concern is right. One served page is enough for the S07 demo flow. It gets hard to grow when the product needs more: several screens with a menu, one link per incident that a person can bookmark and share, or different views for a network operations centre operator and a network engineer. Those needs call for a real front-end framework. In a real telecom modernization, I would plan the Angular portal as the target UI. The folder's own README says the portal is left unwired on purpose so participants can modernize it.
+
+My Prohibited decision on row 5 was about the time in this assignment. It can block a valid feature need. That is a real gap in the decision.
+
+A better rule for row 5. The PRD should decide which screens the product needs. Stage S06 writes the PRD. The contract would then follow the PRD, with this wording: "Allowed when the PRD names a screen or navigation need that the served page cannot meet. Wiring starts only after S07 meets its PASS gate on the served page. The portal calls only routes the PRD names. It shows only fields the API returns after masking."
+
+This keeps the S07 demo safe and on time. It also lets the product grow when the PRD asks for more.
+
+I then asked whether to keep row 5 as Prohibited or change it to that conditional Allowed rule as contract v1.3.
+
+The user picked the conditional Allowed rule.
+
+Row 5 now reads Allowed, under four conditions, in contract v1.3.
+
+The user screens start as the page the API serves. The Angular portal may be wired later when all four of these are true:
+
+1. The PRD names a screen or a navigation need that the served page cannot meet. Examples are several screens with a menu, one link per incident that a person can share, or a different view per persona.
+2. Stage S07 has already met its PASS gate on the served page.
+3. The portal calls only routes the PRD names.
+4. The portal shows only fields the API returns after masking.
+
+Files changed:
+
+- `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`: row 5, the header version line, and the header Status now say v1.3.
+- `playbook/STATUS.md`: one new Owner decision row.
+
+One conflict is still open. `playbook/S07-application-and-demo.md` gives CONDITIONAL PASS when the scaffold stays unwired. Under the new rule, an unwired scaffold is the normal path until the PRD asks for more screens. As written, S07 can never reach PASS without the Angular portal. I have not edited S07. The fix is to drop that CONDITIONAL PASS line and change the Exclude line to point at contract row 5. Tell me if you want that edit.
+
+## 2026-10-10 12:52
+
+**Model:** Grok 4.7
+
+### User
+
+go ahead
+
+### Assistant
+
+The two S07 edits were started in this turn and confirmed in the next one.
+
+## 2026-10-10 12:53
+
+**Model:** Grok 4.7
+
+### User
+
+did you complete the two S07 edits: the Exclude line and the gate line?
+
+### Assistant
+
+Yes. Both edits are in `playbook/S07-application-and-demo.md`.
+
+The Exclude line is line 28. It now says wiring the Angular scaffold is out of scope unless all four conditions in `docs/00-contract/operating-contract.md` row 5 are met, and that the scaffold stays documented as a scaffold until then.
+
+The gate line is line 77. The served page alone can reach PASS. An unwired Angular scaffold does not lower the result. If the PRD names a screen or navigation need that the served page cannot meet, that wiring step is written under "Recommended next action" after this PASS. The old CONDITIONAL PASS sentence for an unwired scaffold is gone.
+
+`Execution Plan.md` lines 425 and 434 still say "unless time allows." I have not changed that file.
+
+## 2026-10-10 12:55
+
+**Model:** Grok 4.7
+
+### User
+
+update @playbook/STATUS.md as needed
+
+### Assistant
+
+Two rows were missing. Both are now in `playbook/STATUS.md`.
+
+- S03F round 2, PASS. It sits after the Option B owner decision and before the contract v1.2 decision. Fixes 1 to 3 and advisory A7 are applied. The version stays 1.0.0. The next step in that row is S03R in a fresh chat.
+- Playbook change, DONE. It records the two edits in `S07-application-and-demo.md`: the Exclude line and the gate line now follow operating-contract.md row 5.
+
+The v1.2 row still says row 5 is Prohibited. That was true on that day. The v1.3 row below it records the later change to Allowed under four conditions.
+
+`Execution Plan.md` still says "unless time allows." That file was not changed, so it has no new STATUS row.
+
+## 2026-10-10 12:55
+
+**Model:** Grok 4.7
+
+### User
+
+are there any other pending decisions?
+
+### Assistant
+
+No decision is waiting on you before the next stage.
+
+The next stage is S03R, in a fresh chat. That chat reviews the semantic layer. It does not need a new choice from you.
+
+These items stay open, and each one already has a stage:
+
+- The desk job of the person who approves a live network change. The contract leaves that for stage S04-09. The current proposal is `network_engineer`.
+- Twelve open questions in `semantic-layer/README.md`, section "Open questions for later stages." They cover the severity-word order, the alarm-to-incident join, the storm size, the retry maximum of 1000, the `sla_breach_risk` range of 0 to 1, the model timeout, a blank stale-topology flag, who may read `mgmt_ip` and `credential_profile`, whether `automation_service` is the shared user, whether `engineer` stays on the API role list, and which order built which circuit. The stage for each row is written in that table.
+- Each of those numbers stays a suggestion until Team-Force writes an acceptance. That writing happens when the named stage needs the number.
+
+`Execution Plan.md` lines 425 and 434 still say the Angular scaffold is wired "unless time allows." The decision is already made in contract row 5. That file is out of date. Updating it is a copy edit, not a new decision. I have not changed it.
+
+## 2026-10-10 12:59
+
+**Model:** Grok 4.7
+
+### User
+
+lets go with  the current proposal of network_engineer for the first item above.
+
+### Assistant
+
+The live-change approver's desk job is now `network_engineer`. Mangesh (FDE) confirmed it on 2026-10-10. The contract is v1.4. Row 9 stays Prohibited. A live network change still needs the stored approval id. Stage S04-09 uses this title when it writes the approval steps.
+
+The same sentence is now in these files:
+
+- `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md` (the remediation execution row only)
+- `06-telecom-service-network-incident-ops/semantic-layer/ai-context-policy.yaml` (`ai_use.remediation_execution`)
+- `06-telecom-service-network-incident-ops/semantic-layer/access-semantics.yaml` (`persona.network_engineer`)
+- `06-telecom-service-network-incident-ops/semantic-layer/business-rules.yaml`
+- `06-telecom-service-network-incident-ops/semantic-layer/glossary.md`
+- `06-telecom-service-network-incident-ops/semantic-layer/README.md`
+- `playbook/STATUS.md`
+
+The persona grants for `network_engineer` stay PROPOSED. The desk jobs for the incident summary, the next-action sentence, and the configuration suggestion stay PROPOSED. This decision covers only the person who approves a live network change.
+
+The semantic-layer version stays `1.0.0`. After the YAML edits, `build.py`, `build.py --check`, and the 35 tests passed (`35 passed in 1.22s`).
+
+## 2026-10-10 13:03
+
+**Model:** Grok 4.7
+
+### User
+
+what is the next step to run and what are the inputs
+
+### Assistant
+
+The next step is S03R, the semantic-layer review. Open a new chat. Attach the files below. Paste the prompt from `playbook/S03R-semantic-layer-review.md`. That chat reviews the tree. It does not fix it. S04 waits until that review reads PASS, or CONDITIONAL PASS with the fixes applied.
+
+Attach these files. They are the Inputs list in that stage file.
+
+- `Semantic_Layer_capture.pdf`
+- `Project_Intent.md` (section 6.2)
+- `06-telecom-service-network-incident-ops/semantic-layer/` (the whole tree)
+- `06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/data-quality-baseline.md`
+- `playbook/README.md` (the failure list)
+
+Also attach these four. The last review failed on text outside the tree, and this chat confirmed the approver's desk job. The stage file does not name them. The reviewer needs them to check those edits.
+
+- `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-fixes.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/defect-list.md`
+- `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`
+- `playbook/STATUS.md`
+
+## 2026-10-10 13:05
+
+**Model:** Grok 4.7
+
+### User
+
+which stage did we complete and is it a logical time to commit?
+
+### Assistant
+
+The finished stage is S03F round 2. Its status is PASS. The semantic-layer version stays `1.0.0`. After that, this chat also recorded three owner decisions: contract v1.2, v1.3, and v1.4. S03R has not run again. The last commit is `8ad7335`, message "After S03R Round 2".
+
+Yes. This is a logical time to commit. The next chat is a fresh S03R review, and it should read a saved tree. Twenty files are changed and none of them are committed. I have not made the commit. Say if you want me to.

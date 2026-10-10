@@ -25,7 +25,7 @@ Build the governed application the PRD describes inside apps/api/, serve a small
 
 ## Scope
 Include: the routes the PRD lists; a small served page (static HTML or FastAPI templates); data/contracts/openapi-fragment.yaml; docs/demo/.
-Exclude: any route the PRD does not name; any EXECUTE path before the four gates exist; wiring the Angular scaffold (document it as a scaffold unless time allows); any new term not in the YAML.
+Exclude: any route the PRD does not name; any EXECUTE path before the four gates exist; wiring the Angular scaffold, unless all four conditions in docs/00-contract/operating-contract.md row 5 are met (document it as a scaffold until then); any new term not in the YAML.
 
 ## Required work
 1. Routes, each with tests under tests/app/:
@@ -74,7 +74,7 @@ Exclude: any route the PRD does not name; any EXECUTE path before the four gates
 6. `06-telecom-service-network-incident-ops/docs/demo/evidence.md` (full pytest output, the demo run's audit rows, redacted)
 
 ## Completion gate
-PASS when the demo completes one flow to a human decision, the audit-before-state-change test passes, the AI-timeout variant returns HOLD_FOR_REVIEW with no summary, and every page number has a label. CONDITIONAL PASS when the Angular scaffold stays unwired and that is documented. BLOCKED when any route returns a recommendation without a policy outcome, or any state change happens before its audit row.
+PASS when the demo completes one flow to a human decision, the audit-before-state-change test passes, the AI-timeout variant returns HOLD_FOR_REVIEW with no summary, and every page number has a label. The served page alone can reach PASS. An unwired Angular scaffold does not lower the result. If the PRD names a screen or navigation need that the served page cannot meet, write it under "Recommended next action" as the Angular wiring step that operating-contract.md row 5 allows after this PASS. BLOCKED when any route returns a recommendation without a policy outcome, or any state change happens before its audit row.
 
 ## Lifecycle linkage
 Cite prd.md requirement ids, semantic-layer ids, and the Phase 4 Half B tests. Stage S08 runs the same tests against the second model's app. Stage S09 cites the demo evidence. Stage S10 answers defence questions 1, 2, 3, 7 from here.

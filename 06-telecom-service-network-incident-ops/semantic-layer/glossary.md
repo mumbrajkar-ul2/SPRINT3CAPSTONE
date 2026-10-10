@@ -288,7 +288,7 @@ The seven telecom personas from `docs/domain-specific-spec.md`. Their grants are
 | Term | Id | Meaning |
 |---|---|---|
 | `noc_operator` | `persona.noc_operator` | A person in the network operations centre. Watches alarms, handles incidents, reads the model's summary, and accepts or rejects its next-action sentence. 435 events. |
-| `network_engineer` | `persona.network_engineer` | A person who designs and changes the network. Reads the configuration suggestion. PROPOSED as the human who approves a live network change. 440 events. |
+| `network_engineer` | `persona.network_engineer` | A person who designs and changes the network. Reads the configuration suggestion. Confirmed on 2026-10-10 as the human who approves a live network change. The persona grants stay PROPOSED. 440 events. |
 | `field_engineer` | `persona.field_engineer` | A person who goes to a site and works on the equipment there. 422 events. |
 | `customer_support` | `persona.customer_support` | A person who answers a customer. Sees that customer's circuits, orders, and incidents. 420 events. |
 | `automation_service` | `persona.automation_service` | A machine account that runs planned steps. May execute only after a human approval id exists. Whether it is the shared user `app_shared` is Unknown. 444 events. |

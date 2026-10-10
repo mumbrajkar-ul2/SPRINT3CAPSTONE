@@ -5,10 +5,10 @@
 | Stage | S03 — Semantic layer (Execution Plan Phase 3; product path step 1, D3) |
 | Date / version | 2026-10-10, semantic layer `1.0.0` |
 | Author | Mangesh (FDE), drafted with Cursor |
-| Status | S03 PASS. Review S03R round 1 was BLOCKED. Stage S03F round 1 applied its fixes 1 to 9 on 2026-10-10. S03R runs again next. The schema validates all seven YAML files. 35 tests pass. `generated/` is rebuilt from the YAML by `build.py`. Every item in `Project_Intent.md` 6.2 is ticked below. |
+| Status | S03 PASS. Review S03R round 2 was BLOCKED on R14.7. Stage S03F round 2 applied fixes 1 to 3 and advisory A7 on 2026-10-10. S03R runs again next. The schema validates all seven YAML files. 35 tests pass. `generated/` is rebuilt from the YAML by `build.py`. Every item in `Project_Intent.md` 6.2 is ticked below. |
 | Evidence sources | `Semantic_Layer_capture.pdf`; `Project_Intent.md` 4.3, 5.1, 6.2, Appendix E; `docs/domain-specific-spec.md`; `docs/01-discovery/` (all six); `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/02-baseline/ai-qualification.md`; `apps/api/main.py`; `apps/api/services/ai_gateway.py`; `apps/api/services/domain_service.py`; `apps/api/services/audit.py`; `policy/opa/access.rego`; `data/synthetic/` (headers and distinct values, read-only, 2026-10-10) |
 | Assumptions | A column whose cells are all drawn from a small word pool is a status column. The persona grants, the purposes, the prompt allow list, and the output schema are PROPOSED with owner Team-Force. The API role `operator` maps to `noc_operator` and `engineer` maps to `network_engineer`. Both mappings are Inference. |
-| Unresolved issues | The repo defines no allowed list for any status column. The alarm-to-incident join key, the storm size, the retry maximum, the `sla_breach_risk` range, the timeout, and the approver's desk job are Unknown or PROPOSED. `jsonschema` is installed in `.venv` only. `requirements.txt` does not list it. |
+| Unresolved issues | The repo defines no allowed list for any status column. The alarm-to-incident join key, the storm size, the retry maximum, the `sla_breach_risk` range, and the timeout are Unknown or PROPOSED. The live-change approver's desk job is `network_engineer`, confirmed on 2026-10-10. `jsonschema` is installed in `.venv` only. `requirements.txt` does not list it. |
 | Residual risks | A reader can treat a PROPOSED grant or allow list as approved. A later stage can add a term outside this tree. `status-taxonomy.yaml` is 3500 lines. A reviewer may skim it. The tests check its counts against the CSV files so a skim is safer. |
 
 ## What this folder is
@@ -76,6 +76,8 @@ Stage S05R raises the version when it folds in the terms the control designs int
 |---|---|---|---|
 | `1.0.0` | 2026-10-10 | S03 | First version. Seven entities, 68 fields, 15 concepts, 15 relationships, 44 status words across 36 status fields, 4 collisions plus 5 other overlaps, 13 rules, 9 metrics, 7 personas with 5 value lists, 11 AI uses, 4 outcomes, 6 fail modes. |
 | `1.0.0` | 2026-10-10 | S03F | S03R fixes applied, round 1. Fixes 1 to 9 from `docs/02-baseline/semantic-layer-review.md`. Added 4 `agency.*` and 4 `pick.*` ids, 28 glossary rows, and one test. Named Team-Force as owner of every PROPOSED item. |
+| `1.0.0` | 2026-10-10 | S03F | S03R fixes applied, round 2. Fixes 1 to 3 and advisory A7 from `docs/02-baseline/semantic-layer-review.md`. Named Team-Force on the two bounds in the data-quality baseline, on the severity-list resolution, and on the legal-maximum cells. |
+| `1.0.0` | 2026-10-10 | Owner decision | The live-change approver's desk job is `network_engineer`. Mangesh (FDE) confirmed it. Stage S04-09 uses this title. The semantic-layer version stays `1.0.0`. |
 
 ## How to run
 
@@ -202,7 +204,7 @@ Five more overlaps are listed under `other_overlaps` in `status-taxonomy.yaml`. 
 
 ### Done test
 
-Run on 2026-10-10. **Verified Fact.**
+This is the S03 done test. Run on 2026-10-10. **Verified Fact.**
 
 1. Deleted `generated/`. Ran `build.py`. It wrote eight files. Ran the tests. 34 passed.
 2. Changed the glossary Term `gold` to `golden` and nothing else. Ran the tests. `test_glossary_and_yaml_agree_on_every_term` failed with `glossary term differs from YAML name or word: [('golden', 'status.word.gold', 'gold')]`. Restored the word.
@@ -230,7 +232,7 @@ These are Unknown in the repo. The YAML records each one where it sits. A later 
 | The legal range for `sla_breach_risk` | `metric.sla_breach_risk` | Owner: Team-Force |
 | The timeout for a model call | `policy.fail_to_person` | S04-09 |
 | What a blank `stale_topology_flag` should do | `failmode.stale_topology_blank` | S04-09 |
-| The desk job of the human who approves a live change | `ai_use.remediation_execution` | S04-09 |
+| The desk job of the human who approves a live change | `ai_use.remediation_execution` | Confirmed 2026-10-10 as `network_engineer`. S04-09 uses this title. |
 | Which personas may read `mgmt_ip` and `credential_profile` | `resource.sensitive_device_fields` | S04-03 |
 | Whether `automation_service` is the shared user `app_shared` | `persona.automation_service` | S04-04 |
 | Whether `engineer` stays on the API role list | `role.engineer` | S04-03 |
@@ -238,7 +240,7 @@ These are Unknown in the repo. The YAML records each one where it sits. A later 
 
 ## Last build
 
-Run on 2026-10-10 by stage S03F round 1, from the repo root with `.venv\Scripts\python.exe`, after deleting `generated/`. `PYTHONDONTWRITEBYTECODE=1` was set so the run left the committed `tests/__pycache__/` file unchanged. **Verified Fact.**
+Run on 2026-10-10 after the live-change approver desk job was confirmed as `network_engineer`, from the repo root with `.venv\Scripts\python.exe`, after deleting `generated/`. `PYTHONDONTWRITEBYTECODE=1` was set so the run left the committed `tests/__pycache__/` file unchanged. The S03F round 2 output is in `docs/02-baseline/semantic-layer-fixes.md`. **Verified Fact.**
 
 ```text
 > python semantic-layer/build.py
@@ -259,7 +261,7 @@ exit=0
 
 > pytest semantic-layer/tests -q -p no:cacheprovider
 ...................................                                      [100%]
-35 passed in 1.12s
+35 passed in 1.22s
 exit=0
 ```
 

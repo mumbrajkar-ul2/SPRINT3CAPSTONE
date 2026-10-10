@@ -4740,7 +4740,7 @@
       "defect_refs": [
         "F09"
       ],
-      "resolution": "Open. The owner of the severity list is Unknown. This file records the words. It does not pick a cutoff.",
+      "resolution": "Open. The severity list and its order are not set. Owner: Team-Force. This file records the words. It does not pick a cutoff.",
       "source": [
         "data/synthetic/incidents.csv",
         "data/synthetic/alarms.csv",
