@@ -48,7 +48,7 @@ STOP after Half A. Return the seven-item final response for Half A. Wait for "Ha
 
 ## Constraints and guardrails
 - Plain speech.
-- Use YAML ids from access-semantics.yaml. Do not invent a persona or a resource name. If one is missing, write it as an open question for S03, not in this design.
+- Use YAML ids from access-semantics.yaml. Do not invent a persona, a resource name, or a scope value. If one is missing, write one line that starts with "Open question for S03:" and names the term and what this design needs it for. Stage S05R collects those lines and folds them into the YAML.
 - Redact secrets.
 - Each artifact starts with a header table: Stage, Date / version, Author, Status, Evidence sources, Assumptions, Unresolved issues, Residual risks.
 

@@ -6,7 +6,8 @@ This stage has three parts. Part 1 writes the brief (first model). Part 2 is run
 
 ## Inputs
 
-- `06-telecom-service-network-incident-ops/semantic-layer/` (whole tree, unchanged)
+- `06-telecom-service-network-incident-ops/semantic-layer/` (whole tree, unchanged since S05R)
+- `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-revision.md` (the version string to confirm)
 - `06-telecom-service-network-incident-ops/docs/prd/prd.md`
 - `06-telecom-service-network-incident-ops/docs/prd/traceability.md`
 - `06-telecom-service-network-incident-ops/tests/` (semantic-layer, policy, guardrail, app tests)
@@ -25,7 +26,7 @@ Include: file list to attach; the build task; the tests the result must pass; th
 Exclude: any definition of a term; any route or behaviour not in the PRD; any mention of how the first app solved something.
 
 ## Required work
-1. Record the SHA-256 of every file under semantic-layer/ and of prd.md in docs/model-comparison/yaml-hashes-before.md.
+1. Record the SHA-256 of every file under semantic-layer/ and of prd.md in docs/model-comparison/yaml-hashes-before.md. Record the `version:` string from semantic-layer/README.md on the same page. It must equal the version in docs/02-baseline/semantic-layer-revision.md and in the prd.md header. If it does not, stop; the tree changed after S05R without an ADR.
 2. Write docs/model-comparison/second-model-brief.md with: the model name to use (fill in); the files to attach; the task ("build the application the PRD describes, under apps/api_model_b/, using only the terms and ids in semantic-layer/"); the tests it must pass (list file paths); the rule that it may not edit semantic-layer/ or prd.md; the required final response (the seven items).
 
 ## Constraints and guardrails

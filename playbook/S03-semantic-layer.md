@@ -33,7 +33,7 @@ Exclude: application code; any second meaning file outside `semantic-layer/`; an
 2. Ids: give every entity, status, rule, metric, role, persona, and policy a stable id in dot form, for example `entity.device`, `status.incident.severity.gold`, `rule.missing_id_not_other_device`, `metric.tokens_per_invocation`, `persona.noc_operator`.
 3. Collisions: in `status-taxonomy.yaml` write a `collisions` block for: `gold` and `bronze` used as incident severity; status words appearing inside `hostname` and `vendor`; `REC-0001` as the first key in six tables; `clinician` as an API role in a telecom system.
 4. Rules: `business-rules.yaml` holds at least: a missing id must not return another device; AI output cannot execute; alarm `last_seen_at` cannot precede `first_seen_at`; a shared admin account is not least privilege; duplicate `dedupe_key` within a `storm_batch_id` is one alarm; an AI recommendation needs policy result, approval id, and audit row before any state change.
-5. Access: `access-semantics.yaml` maps the seven personas to actions, resources, purpose, and risk. List `clinician` under `removed_roles` with the reason.
+5. Access: `access-semantics.yaml` maps the seven personas to actions, resources, purpose, scope, and risk. Scope is the set of records a persona may touch, for example one site, one customer, or every device. Give each of the five fields its own value list with ids, because S04-03 writes the policy input model from those five and S04-06 reads them in Rego. List `clinician` under `removed_roles` with the reason.
 6. AI: `ai-context-policy.yaml` names fields allowed into a prompt; fields never allowed (`mgmt_ip`, `credential_profile`, credentials of any kind); the required output schema; model provenance fields (model, model_version, prompt_hash, tokens, latency_ms); the four outcomes RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK, EXECUTE; fail-to-person on timeout or schema failure; and for each AI use the agency and approval point copied from `ai-qualification.md`.
 7. Metrics: `metrics.yaml` defines at least tokens per invocation, cost per correlated incident, quarantine rate, retry count, audit completeness, recommendation latency. Each metric names its source fields. No target value unless PROPOSED with an owner.
 8. Mark on each entity field whether the API reads it today.
@@ -48,6 +48,7 @@ Exclude: application code; any second meaning file outside `semantic-layer/`; an
 - `schemas/semantic-layer.schema.json` validates every YAML file.
 - `tests/test_semantic_layer.py` fails when a required entity, status, rule, or persona is missing; when the glossary and YAML disagree on a term; when a generated JSON file differs from its YAML; when any id is referenced but not defined.
 - `build.py` reads YAML and writes `generated/*.json`. No hand edits in generated/.
+- Every YAML file carries a top-level `version:` string, and `README.md` repeats it. This stage writes `1.0.0`. Stage S05R raises it when it folds in the terms the control designs introduce.
 - `glossary.md` explains each term in everyday words. One idea per sentence.
 - Plain speech in Markdown and in YAML `description:` fields.
 - No invented severity cutoff, SLA threshold, or target number.
@@ -73,7 +74,7 @@ The full tree under `06-telecom-service-network-incident-ops/semantic-layer/` as
 PASS when the schema validates every YAML file, every test passes, `generated/` is reproduced by `build.py`, and every item in `Project_Intent.md` 6.2 is ticked in README.md. CONDITIONAL PASS when one 6.2 item is ticked with a stated gap. BLOCKED when any YAML file is missing or a test fails.
 
 ## Lifecycle linkage
-Cite `docs/01-discovery/`, `docs/02-baseline/data-quality-baseline.md`, `docs/02-baseline/defect-list.md`, and `docs/02-baseline/ai-qualification.md`. Stage S03R reviews this tree before any Phase 4 work. Stages S04-03, S04-06, S04-09, S04-12 reuse ids from here. Stage S06 cites ids per requirement. Stage S08 gives this tree, unchanged, to the second model.
+Cite `docs/01-discovery/`, `docs/02-baseline/data-quality-baseline.md`, `docs/02-baseline/defect-list.md`, and `docs/02-baseline/ai-qualification.md`. Stage S03R reviews this tree before any Phase 4 work. Stages S04-03, S04-06, S04-09, S04-12 reuse ids from here. A Phase 4 or 5 design that needs a term this tree lacks writes an "Open question for S03" line. Stage S05R folds those terms into this tree and raises the version. Stage S06 cites ids at that version. Stage S08 gives that version, unchanged, to the second model.
 
 ## Required final response
 End with exactly these seven items:
@@ -90,14 +91,14 @@ End with exactly these seven items:
 
 | File | Must contain |
 |---|---|
-| `semantic-layer/README.md` | Header. The five format rules. Why `generated/` and `build.py` exist. Checklist 6.2 ticked. "Last build" output. |
+| `semantic-layer/README.md` | Header. The five format rules. Why `generated/` and `build.py` exist. Checklist 6.2 ticked. Version `1.0.0` and a change log with one row. "Last build" output. |
 | `semantic-layer/glossary.md` | Header. One entry per term. Everyday words. |
 | `entities.yaml` | Seven entities. Fields with type, source, and `api_reads_today`. |
 | `relationships.yaml` | Links between entities with cardinality and key fields. |
 | `status-taxonomy.yaml` | Allowed values per status field. `collisions` block with four entries. |
 | `business-rules.yaml` | At least six rules with ids and sources. |
 | `metrics.yaml` | At least six metrics with source fields. |
-| `access-semantics.yaml` | Seven personas by action, resource, purpose, risk. `removed_roles` with `clinician`. |
+| `access-semantics.yaml` | Seven personas by action, resource, purpose, scope, risk. A value list with ids for each of the five fields. `removed_roles` with `clinician`. |
 | `ai-context-policy.yaml` | Allowed and forbidden prompt fields. Output schema. Provenance fields. Four outcomes. Fail-to-person. Per-use agency and approval point. |
 | `schemas/semantic-layer.schema.json` | Validates all seven YAML files. |
 | `tests/test_semantic_layer.py` | Passing tests for presence, glossary match, generated match, id references. |

@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | Method layer. Written after `Project_Intent.md`, before any repo work. |
-| Date / version | 2026-10-08, v1.0 |
+| Date / version | 2026-10-10, v1.1. First issue 2026-10-08, v1.0. Change log in section 10. |
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | ACTIVE |
 | Evidence sources | `Project_Intent.md`; `AI-FDE_Brownfield_Repo_Transformation_Challenge_Guide.pdf`; `Semantic_Layer_capture.pdf`; `Assignment Material/Prompt_Anatomy.pdf`; `Assignment Material/Prompt Template.pdf`; `Assignment Material/Guidance on how to apply Prompt Anatomy to the 42 step Production Spine v2.docx`; the inherited repo `06-telecom-service-network-incident-ops` |
@@ -71,10 +71,11 @@ flowchart TD
   P0B --> P1[Phase 1 Discovery dossier C1]
   P1 --> P2[Phase 2 Behavioural baseline C2]
   P2 --> P2Q[Phase 2Q AI versus no AI per capability]
-  P2Q --> P3[Phase 3 Semantic layer, then S03R review]
+  P2Q --> P3[Phase 3 Semantic layer, then S03R review, with S03F fixes and S03R again until it passes]
   P3 --> P4[Phase 4 Controls C3 to C12, Half A then Half B]
   P4 --> P5[Phase 5 Security validation and audit chain C13 C14]
-  P5 --> P6[Phase 6 PRD, then S06R review]
+  P5 --> P5R[Phase 5R Semantic layer revision]
+  P5R --> P6[Phase 6 PRD, then S06R review]
   P6 --> P7[Phase 7 Application and demo]
   P7 --> P8[Phase 8 Second model and app comparison]
   P8 --> P9[Phase 9 Readiness gate and evidence pack C15 C16]
@@ -87,10 +88,11 @@ Some later phases read outputs from more than one earlier phase. Those reads are
 | Later phase | Reads these earlier outputs | Why |
 |---|---|---|
 | Phase 3 Semantic layer | Phase 1 dossier, Phase 2 data-quality baseline and defect list, Phase 2Q table | Entities, status words, rules, and the per-use AI agency come from them. |
-| Phase 4 Controls | Phase 1, Phase 2, Phase 2Q, Phase 3 YAML ids | Each design cites the evidence and uses YAML ids. |
-| Phase 6 PRD | Phase 2Q table, Phase 3 YAML, Phase 4 designs, Phase 5 provenance model | The PRD quotes the AI picks, cites YAML ids, and requires controls that already have a design. |
-| Phase 7 Application | Phase 6 PRD, Phase 3 YAML, Phase 4 Half B tests | Build only what the PRD names. |
-| Phase 8 Second model | Phase 3 YAML, Phase 6 PRD, Phase 7 tests | Same inputs to both apps. |
+| Phase 4 Controls | Phase 1, Phase 2, Phase 2Q, Phase 3 YAML ids | Each design cites the evidence and uses YAML ids. A design that needs a term the YAML lacks writes an "Open question for S03" line. |
+| Phase 5R Semantic layer revision | Phase 3 YAML, the S03R review, every Phase 4 and 5 Half A design, ids cited in `policy/` and `tests/` | The open questions are folded into the YAML with source lists. The version is raised. The S03R rows are rerun. |
+| Phase 6 PRD | Phase 2Q table, Phase 5R YAML, Phase 4 designs, Phase 5 provenance model | The PRD quotes the AI picks, cites YAML ids at the Phase 5R version, and requires controls that already have a design. |
+| Phase 7 Application | Phase 6 PRD, Phase 5R YAML, Phase 4 Half B tests | Build only what the PRD names. |
+| Phase 8 Second model | Phase 5R YAML, Phase 6 PRD, Phase 7 tests | Same inputs to both apps. The YAML hashes are checked before and after. |
 | Phase 9 Readiness | Every earlier completion gate, Phase 0B contract, Phase 5 compliance mapping | The pack points at all of it. |
 
 Why this order:
@@ -98,7 +100,8 @@ Why this order:
 - Phase 0B comes before discovery. The trainer guidance says to write down what may change before anything is read in depth.
 - Phase 2Q comes before the semantic layer. The guidance says the AI-versus-no-AI decision comes before any architecture, and `ai-context-policy.yaml` copies its agency and approval points from the Phase 2Q table.
 - Phase 3 comes before Phase 4. The access matrix, the policy inputs, the AI context policy, and the metrics all reuse YAML ids.
-- Phase 4 and Phase 5 come before Phase 6. The PRD can then require controls that already have a design and a provenance model.
+- Phase 5R comes after Phase 5 and before Phase 6. The control designs introduce terms the Phase 3 YAML did not have: scope values, log fields, provenance groups, the remediation policy rule, retry and cost metrics. The trainer's rule is that the semantic layer is the fallback a new model builds from if the first model is lost. Phase 8 attaches the YAML and the PRD, not the design folders. So the meanings the designs introduced must be in the YAML before the PRD cites them. Phase 5R folds them in, raises the version, and reruns the S03R rows.
+- Phase 4, Phase 5, and Phase 5R come before Phase 6. The PRD can then require controls that already have a design and a provenance model, and every term it uses resolves in the YAML.
 - Phase 6 comes before Phase 7. The app is built only from the PRD.
 - Phase 7 comes before Phase 8. The second model's app runs the same tests as the first.
 - Phase 9 comes last before the defence. The pack can only point at files that exist.
@@ -110,7 +113,7 @@ Location: `playbook/` at the project root.
 Files:
 
 - `playbook/README.md`. How to use the playbook: open a new Cursor chat per stage, attach the files the prompt lists, paste the prompt whole, check the output against the expected-output list, record the stage status, then move on. It also holds the final hand-back checklist.
-- One file per stage, named `playbook/SNN-<short-name>.md`. The stages are: S00 setup and replay; S0B operating contract and cost envelope; S01 discovery; S02 baseline; S2Q AI qualification; S03 semantic layer; S03R semantic-layer review; S04-03 to S04-12, one file per Phase 4 challenge; S05-13 security validation; S05-14 audit chain; S06 PRD; S06R PRD review; S07 application and demo; S08 second-model brief and comparison; S09 readiness and evidence pack; S10 defence.
+- One file per stage, named `playbook/SNN-<short-name>.md`. The stages are: S00 setup and replay; S0B operating contract and cost envelope; S01 discovery; S02 baseline; S2Q AI qualification; S03 semantic layer; S03R semantic-layer review; S03F semantic-layer fixes, which runs only when a review has a FAIL row; S04-03 to S04-12, one file per Phase 4 challenge; S05-13 security validation; S05-14 audit chain; S05R semantic-layer revision; S06 PRD; S06R PRD review; S07 application and demo; S08 second-model brief and comparison; S09 readiness and evidence pack; S10 defence.
 
 Each stage file has the same parts, in this order:
 
@@ -120,7 +123,9 @@ Each stage file has the same parts, in this order:
 - Expected output list: file name and what it must contain.
 - Done test.
 
-The two review prompts (S03R and S06R) read a generated draft against a short failure list. The reviewer writes one row per item: PASS, FAIL, or NOT APPLICABLE, with a file citation. The failure list comes from the trainer guidance: code before analysis; architecture before AI qualification; AI used because it is an AI project; output without evidence; missing artifact; skipped gate; invented cutoff; a second meaning outside the YAML.
+The two review prompts (S03R and S06R) read a generated draft against a short failure list. The revision prompt (S05R) edits the YAML and then reruns the S03R rows on the result. The reviewer writes one row per item: PASS, FAIL, or NOT APPLICABLE, with a file citation. The failure list comes from the trainer guidance: code before analysis; architecture before AI qualification; AI used because it is an AI project; output without evidence; missing artifact; skipped gate; invented cutoff; a second meaning outside the YAML.
+
+The fix prompt (S03F) runs when S03R, or the S03R rows in S05R, has a FAIL row. It reads the numbered "Fixes required" list from the newest review file. It applies those fixes and nothing else and keeps the version. Then it rebuilds and retests and records the round in `docs/02-baseline/semantic-layer-fixes.md`. Then S03R runs again in a fresh chat. S03F does not run after Phase 6 has cited the version. From then on, a YAML change goes through Phase 5R with an ADR.
 
 Done test for the playbook: each stage file has all eight anatomy parts; each Required Artifacts path matches a path in this file; no prompt asks for code before its analysis gate.
 
@@ -241,7 +246,7 @@ Scope: Phase 1 and 2 outputs, the Phase 2Q table, `docs/domain-specific-spec.md`
 
 Analysis dimensions: entities, relationships, status vocabulary and collisions, business rules, metrics, access semantics, AI context and limits.
 
-Lifecycle linkage: cites Phases 1, 2, and 2Q. Feeds Phases 4, 6, 7, and 8. Reviewed by playbook stage S03R before Phase 4 starts.
+Lifecycle linkage: cites Phases 1, 2, and 2Q. Feeds Phases 4, 6, 7, and 8. Reviewed by playbook stage S03R before Phase 4 starts. If the review has a FAIL row, playbook stage S03F applies its fix list and S03R runs again. Revised by Phase 5R after the control designs, before the PRD.
 
 Steps:
 
@@ -249,7 +254,8 @@ Steps:
 - Write the YAML files. Each entity, status, rule, metric, role, and policy gets a stable id (for example `rule.missing_id_not_other_device`). Mark which fields the API reads today.
 - `status-taxonomy.yaml` lists allowed values and a `collisions` block: `gold` and `bronze` used as incident severity; status words in `hostname` and `vendor`; `REC-0001` as the first key in six tables.
 - `business-rules.yaml` holds at least: a missing id must not return another device; AI output cannot execute; alarm `last_seen_at` cannot precede `first_seen_at`; a shared admin account is not least privilege; duplicate `dedupe_key` is one alarm.
-- `access-semantics.yaml` maps the seven domain personas to actions, resources, purpose, and risk. `clinician` is not a telecom role and is listed under removed roles.
+- `access-semantics.yaml` maps the seven domain personas to actions, resources, purpose, scope, and risk, with a value list and ids for each of the five fields. Scope is the set of records a persona may touch. Phase 4 Challenge 3 writes the policy input model from those five fields. `clinician` is not a telecom role and is listed under removed roles.
+- Every YAML file carries a `version:` string, `1.0.0` at this phase. Phase 5R raises it.
 - `ai-context-policy.yaml` names fields allowed into a prompt, fields never allowed (`mgmt_ip`, `credential_profile`), the required output schema, model provenance fields, the four outcomes RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK, EXECUTE, and fail-to-person on timeout or schema failure.
 - `glossary.md` explains each term in everyday words. `README.md` says Markdown explains, YAML defines, JSON Schema validates, tests protect, generated JSON serves.
 - `schemas/semantic-layer.schema.json` validates every YAML file.
@@ -258,7 +264,7 @@ Steps:
 
 Outputs: the full tree from `Semantic_Layer_capture.pdf` plus `generated/` and `build.py`.
 
-Completion gate: schema tests pass; every item in `Project_Intent.md` 6.2 is ticked; `generated/` is reproduced by running `build.py`; the S03R review has no open FAIL.
+Completion gate: schema tests pass; every item in `Project_Intent.md` 6.2 is ticked; `generated/` is reproduced by running `build.py`; the S03R review has no open FAIL; each S03F round, if any, is recorded in `docs/02-baseline/semantic-layer-fixes.md`.
 
 ### Phase 4. Controls (Challenges 3 to 12, D4)
 
@@ -267,7 +273,9 @@ Each challenge runs in two gated halves. Analysis and evidence come before code.
 - Half A, analyse and design. Produce the challenge's expected deliverables as documents under `docs/NN-<challenge>/`. Cite the Phase 1 and 2 evidence. End with the stage status. No code change in this half.
 - Half B, implement and prove. Only after Half A is PASS or CONDITIONAL PASS. Make the code change named in the design, add its test, and record the before-and-after evidence. Code changes stay small and reviewable. A characterization test that locks a defect is replaced in the same commit that fixes the defect.
 
-The analysis dimensions for every challenge are the ones in its challenge-guide execution focus. The lifecycle linkage for every challenge is: cite Phase 1, Phase 2, Phase 2Q, and the semantic-layer ids it uses; feed Phase 5, Phase 6, and Phase 9.
+The analysis dimensions for every challenge are the ones in its challenge-guide execution focus. The lifecycle linkage for every challenge is: cite Phase 1, Phase 2, Phase 2Q, and the semantic-layer ids it uses; feed Phase 5, Phase 5R, Phase 6, and Phase 9.
+
+A design that needs a term, id, status word, persona, resource, scope value, metric, or field the YAML lacks does not define it. It writes one line that starts with "Open question for S03:" and names the term and what the design needs it for. Phase 5R collects those lines.
 
 #### Challenge 3. Identity and least privilege
 
@@ -363,15 +371,40 @@ Lifecycle linkage: cites Phase 2 (before) and Phase 4 (after). Feeds Phase 9 and
 - Outputs in `docs/14-audit/`.
 - Completion gate: the chain shows what happened, who or what influenced it, and the unproven items.
 
+### Phase 5R. Semantic layer revision
+
+Action: fold every meaning the Phase 4 and 5 designs introduced into `semantic-layer/`, raise the version, rebuild, retest, and rerun the S03R rows. After this phase the YAML holds every meaning the modernization introduced. No later phase changes it without an ADR.
+
+Scope: every file under `semantic-layer/`; every Half A design under `docs/03-identity/` through `docs/14-audit/`; the S03R review; ids cited in `policy/` comments and in `tests/`. Exclude: application code; Rego text; CI YAML; Terraform; test code; any term no design, policy, or test asks for; any change to the meaning of an existing id.
+
+Analysis dimensions: open questions collected, decision per item (add, alias, reject, defer), source lists, existing ids protected, version, build and tests, S03R rows, diff.
+
+Lifecycle linkage: cites Phase 3, the S03R review, and every Phase 4 and 5 Half A design. Feeds Phase 6 (the PRD cites ids at this version), Phase 7, Phase 8 (the hashes are taken at this version), and Phase 9.
+
+Steps:
+
+- Collect every "Open question for S03" line, every term a design uses that does not resolve in the YAML, and every S03R "Fixes required" row still open. One table: source file and line, the term, what the design needs, the YAML file it belongs in, the decision, the reason.
+- Fold each add or alias into its YAML file: stable dot-form id, plain-speech description, `source:` list naming the design file and the repo file or test, `proposed: true` with `owner:` when the term is not in the inherited repo. Add the glossary entry, the schema rule, and the test row.
+- Keep every id that `apps/`, `policy/`, `tests/`, or `docs/` cite. A changed id stays with `deprecated: true` and `replaced_by:`.
+- Raise `version:` in every YAML file and in `README.md` to one new value. Add a change-log row to the README.
+- Delete `generated/`, run `build.py`, run the tests, paste the output.
+- Rerun S03R rows R1 to R15 and failure-list rows 1 to 8. Write a numbered "Fixes required" list for every FAIL.
+- Record the diff per file.
+- If a rerun row is FAIL, run playbook stage S03F with `semantic-layer-revision.md` as the fix source. S03F keeps this version. Then run S03R again in a fresh chat. Phase 6 starts when that review reads PASS, or CONDITIONAL PASS with fixes applied.
+
+Outputs: the revised `semantic-layer/`; `docs/02-baseline/semantic-layer-revision.md`.
+
+Completion gate: every collected row has a decision; every add is in the YAML with a source list and a glossary entry; build and tests pass; every S03R row is PASS; no cited id lost its meaning; one version string is in every YAML file and the README. BLOCKED when a test fails, a cited id was removed, or any AI use has execute agency.
+
 ### Phase 6. PRD (product path step 2, D5)
 
 Action: write the product requirements that both the first app and the second model will build from.
 
-Scope: the semantic layer, the Phase 2Q table, Phase 4 and 5 designs. Exclude: code; any term that is not in the YAML.
+Scope: the semantic layer at the Phase 5R version, the Phase 2Q table, Phase 4 and 5 designs. Exclude: code; any term that is not in the YAML.
 
 Analysis dimensions: users, workflows, AI limits, data, risk, non-functional needs, acceptance checks, success metrics.
 
-Lifecycle linkage: cites Phases 2Q, 3, 4, 5. Feeds Phases 7 and 8. Reviewed by playbook stage S06R before Phase 7 starts.
+Lifecycle linkage: cites Phases 2Q, 3, 4, 5, and 5R. The PRD header records the Phase 5R version string. Feeds Phases 7 and 8. Reviewed by playbook stage S06R before Phase 7 starts.
 
 Steps:
 
@@ -471,12 +504,12 @@ Only if time remains. Candidates that reuse Phase 4 and 5 work: Decision Provena
 
 ## 8. Coverage check
 
-- Challenge guide: each of the 16 challenges has a phase, the exact deliverable names, and the acceptance standard as the completion gate. The six product-path steps are Phases 3, 6, 7, 8. The final standard is Phase 9's completion gate.
+- Challenge guide: each of the 16 challenges has a phase, the exact deliverable names, and the acceptance standard as the completion gate. The six product-path steps are Phases 3, 5R, 6, 7, 8. Phase 5R completes the semantic layer before the PRD, so the layer a new model receives in Phase 8 holds every meaning the transformation introduced. The final standard is Phase 9's completion gate.
 - Semantic-layer PDF: all eleven files in the tree, plus `generated/` and `build.py` for the fifth rule.
 - Project Intent: D0 exists; D1 to D8 map to Phases 1 to 9; checklists 6.1, 6.2, 6.3 are the phase completion gates; the ten defence questions are Phase 10.
 - Prompt Anatomy: every phase states action, scope with exclusions, constraints, analysis dimensions, evidence rules, artifacts, completion gate, and lifecycle linkage. Every playbook prompt has the same eight parts.
 - Prompt Template: artifact header, four evidence labels, six-part finding format, stage status PASS / CONDITIONAL PASS / BLOCKED, and the seven-item final response are in section 4 and in every playbook prompt.
-- Trainer guidance: one prompt per stage (the playbook); read-only orientation (Phases 0 to 2); operating contract and cost envelope (Phase 0B); AI-versus-no-AI before architecture (Phase 2Q); analysis gate before code (Phase 4 halves); human review points (S03R, S06R, the approvals route); traceability (the crosswalk and `docs/prd/traceability.md`).
+- Trainer guidance: one prompt per stage (the playbook); read-only orientation (Phases 0 to 2); operating contract and cost envelope (Phase 0B); AI-versus-no-AI before architecture (Phase 2Q); analysis gate before code (Phase 4 halves); human review points (S03R, S05R, S06R, the approvals route); the semantic layer as the fallback a new model builds from (Phase 5R, then Phase 8); traceability (the crosswalk and `docs/prd/traceability.md`).
 
 ## 9. Order of work
 
@@ -484,3 +517,10 @@ Only if time remains. Candidates that reuse Phase 4 and 5 work: Decision Provena
 2. Write `playbook/` (README plus the stage files).
 3. Run the stages in order through the playbook, one Cursor chat per stage, recording the stage status each time.
 4. Keep `transcript/chat_transcript.md` current.
+
+## 10. Change log
+
+| Date | Version | Change |
+|---|---|---|
+| 2026-10-08 | v1.0 | First issue. |
+| 2026-10-10 | v1.1 | Added Phase 5R, the semantic-layer revision, between Phase 5 and Phase 6, with playbook stage `S05R-semantic-layer-revision.md`. Phase 3 now gives `access-semantics.yaml` five fields: role, resource, purpose, scope, risk. Every YAML file carries a `version:` string. Phase 4 and 5 designs write "Open question for S03" lines for missing terms. Phases 6, 7, and 8 cite the Phase 5R version. Reason: the trainer's rule that the semantic layer is the fallback a new model builds from; meanings the control designs introduce must reach the YAML before the PRD and the second model. |

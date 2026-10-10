@@ -1,0 +1,1122 @@
+{
+  "version": "1.0.0",
+  "file": "entities",
+  "description": "The seven entities of this system. Six are CSV tables named in docs/domain-specific-spec.md. The seventh is the event log events.jsonl. Each field says what the cells hold today and whether the running API reads it. The API reads devices.csv only. It returns the whole device row.",
+  "source": [
+    "docs/domain-specific-spec.md",
+    "data/synthetic/devices.csv",
+    "data/synthetic/circuits.csv",
+    "data/synthetic/alarms.csv",
+    "data/synthetic/incidents.csv",
+    "data/synthetic/service_orders.csv",
+    "data/synthetic/ai_invocations.csv",
+    "data/synthetic/events.jsonl",
+    "docs/01-discovery/data-and-integration-map.md",
+    "apps/api/services/domain_service.py",
+    "apps/api/main.py"
+  ],
+  "field_types": [
+    "identifier",
+    "word",
+    "timestamp",
+    "number",
+    "boolean_word",
+    "text"
+  ],
+  "entities": [
+    {
+      "id": "entity.device",
+      "name": "device",
+      "table": "data/synthetic/devices.csv",
+      "key_field": "field.device.device_id",
+      "row_count": 354,
+      "distinct_keys": 351,
+      "duplicate_keys": [
+        "DEV-00004",
+        "DEV-00013",
+        "DEV-00019"
+      ],
+      "blank_row_key": "DEV-BAD1",
+      "description": "A piece of network equipment, such as a router or a switch. One row per device. This is the only table the running API reads. GET /records/{record_id} returns a whole device row.",
+      "api_reads_today": true,
+      "api_read_note": "domain_service.load_record matches the requested id against every cell of every row and returns the whole row. So the API reads all twelve columns. A missing id returns the first row (defect F01).",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/devices.csv",
+        "apps/api/services/domain_service.py",
+        "docs/02-baseline/data-quality-baseline.md"
+      ],
+      "fields": [
+        {
+          "id": "field.device.device_id",
+          "name": "device_id",
+          "type": "identifier",
+          "key": true,
+          "id_form": "DEV-00002 (first row is REC-0001)",
+          "description": "The key of the device row. The first row uses REC-0001 instead of a DEV- id.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/01-discovery/data-and-integration-map.md"
+          ]
+        },
+        {
+          "id": "field.device.hostname",
+          "name": "hostname",
+          "type": "word",
+          "status_field": "status.device.hostname",
+          "description": "The name a person calls the device. In this data the cells hold status words such as legacy. That is a collision.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/02-baseline/defect-list.md"
+          ]
+        },
+        {
+          "id": "field.device.vendor",
+          "name": "vendor",
+          "type": "word",
+          "status_field": "status.device.vendor",
+          "description": "The maker of the device. In this data the cells hold status words such as requires_review. That is a collision.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/02-baseline/defect-list.md"
+          ]
+        },
+        {
+          "id": "field.device.device_type",
+          "name": "device_type",
+          "type": "word",
+          "status_field": "status.device.device_type",
+          "description": "The kind of device. In this data the cells hold the generic status words.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv"
+          ]
+        },
+        {
+          "id": "field.device.site_id",
+          "name": "site_id",
+          "type": "identifier",
+          "id_form": "SIT-00001",
+          "references": "concept.site",
+          "description": "The site where the device sits. There is no site table. The id is the only site information.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv"
+          ]
+        },
+        {
+          "id": "field.device.network_zone",
+          "name": "network_zone",
+          "type": "word",
+          "status_field": "status.device.network_zone",
+          "description": "The network area the device belongs to. Six zone names.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv"
+          ]
+        },
+        {
+          "id": "field.device.mgmt_ip",
+          "name": "mgmt_ip",
+          "type": "word",
+          "status_field": "status.device.mgmt_ip",
+          "sensitive": true,
+          "never_in_prompt": true,
+          "description": "The management address of the device. In this data the cells hold the words alpha, beta, gamma, legacy, or modernized, not addresses. The column is treated as sensitive whatever it holds. Today it leaves the API on every allowed read and enters the prompt (defects F10, F12).",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/02-baseline/defect-list.md",
+            "docs/00-contract/operating-contract.md"
+          ]
+        },
+        {
+          "id": "field.device.firmware",
+          "name": "firmware",
+          "type": "word",
+          "status_field": "status.device.firmware",
+          "description": "The software version on the device. In this data the cells hold the generic status words.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv"
+          ]
+        },
+        {
+          "id": "field.device.owner_team",
+          "name": "owner_team",
+          "type": "word",
+          "status_field": "status.device.owner_team",
+          "description": "The team that owns the device. In this data the cells hold the generic status words. No team name is in the repo.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/01-discovery/component-inventory.md"
+          ]
+        },
+        {
+          "id": "field.device.credential_profile",
+          "name": "credential_profile",
+          "type": "word",
+          "status_field": "status.device.credential_profile",
+          "sensitive": true,
+          "never_in_prompt": true,
+          "description": "Which set of login details the device uses. The cell is a label, not a password. It is still treated as sensitive. Today it leaves the API on every allowed read and enters the prompt (defects F10, F12).",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/02-baseline/defect-list.md",
+            "docs/00-contract/operating-contract.md"
+          ]
+        },
+        {
+          "id": "field.device.last_seen_at",
+          "name": "last_seen_at",
+          "type": "timestamp",
+          "description": "When the device was last heard from. One row, DEV-00013 on file line 354, holds 1900-01-01T00:00:00.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.device.stale_topology_flag",
+          "name": "stale_topology_flag",
+          "type": "boolean_word",
+          "status_field": "status.device.stale_topology_flag",
+          "description": "true means the stored picture of this device may be out of date. 192 rows are true, 161 false, 1 blank. The API returns the flag inside the row. No code branches on it.",
+          "api_reads_today": true,
+          "source": [
+            "data/synthetic/devices.csv",
+            "docs/01-discovery/business-flow-reconstruction.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entity.circuit",
+      "name": "circuit",
+      "table": "data/synthetic/circuits.csv",
+      "key_field": "field.circuit.circuit_id",
+      "row_count": 354,
+      "distinct_keys": 351,
+      "duplicate_keys": [
+        "CIR-00004",
+        "CIR-00013",
+        "CIR-00019"
+      ],
+      "blank_row_key": "CIR-BAD1",
+      "description": "A connection sold to a customer between two ends of the network. One row per circuit. No running code reads this table. scripts/sanity_check.py counts its rows.",
+      "api_reads_today": false,
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/circuits.csv",
+        "docs/01-discovery/business-flow-reconstruction.md"
+      ],
+      "fields": [
+        {
+          "id": "field.circuit.circuit_id",
+          "name": "circuit_id",
+          "type": "identifier",
+          "key": true,
+          "id_form": "CIR-00002 (first row is REC-0001)",
+          "description": "The key of the circuit row.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.customer_id",
+          "name": "customer_id",
+          "type": "identifier",
+          "id_form": "CUS-00001",
+          "references": "concept.customer",
+          "description": "The customer who buys the circuit. There is no customer table.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.a_end",
+          "name": "a_end",
+          "type": "word",
+          "status_field": "status.circuit.a_end",
+          "description": "One end of the circuit. In this data the cells hold the words alpha, beta, gamma, legacy, or modernized.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.z_end",
+          "name": "z_end",
+          "type": "word",
+          "status_field": "status.circuit.z_end",
+          "description": "The other end of the circuit. Same five words as a_end.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.bandwidth_mbps",
+          "name": "bandwidth_mbps",
+          "type": "number",
+          "description": "The speed of the circuit in megabits per second. A decimal number such as 1531.08.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.service_class",
+          "name": "service_class",
+          "type": "word",
+          "status_field": "status.circuit.service_class",
+          "description": "The service grade sold on the circuit. The cells hold the seven severity words, including gold, silver, and bronze.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.status",
+          "name": "status",
+          "type": "word",
+          "status_field": "status.circuit.status",
+          "description": "Where the circuit is in its life. The cells hold the eight workflow words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.provisioned_at",
+          "name": "provisioned_at",
+          "type": "timestamp",
+          "description": "When the circuit was set up. One row, CIR-00013 on file line 354, holds 1900-01-01T00:00:00.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.circuit.sla_tier",
+          "name": "sla_tier",
+          "type": "word",
+          "status_field": "status.circuit.sla_tier",
+          "references": "concept.sla",
+          "description": "The service promise level for the circuit. The cells hold the seven severity words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv"
+          ]
+        },
+        {
+          "id": "field.circuit.orphan_flag",
+          "name": "orphan_flag",
+          "type": "boolean_word",
+          "status_field": "status.circuit.orphan_flag",
+          "description": "true means the circuit has no live owner or order behind it. 186 rows are true, 167 false, 1 blank. The repo does not define the test for orphan.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/circuits.csv",
+            "docs/01-discovery/data-and-integration-map.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entity.alarm",
+      "name": "alarm",
+      "table": "data/synthetic/alarms.csv",
+      "key_field": "field.alarm.alarm_id",
+      "row_count": 354,
+      "distinct_keys": 351,
+      "duplicate_keys": [
+        "ALA-00004",
+        "ALA-00013",
+        "ALA-00019"
+      ],
+      "blank_row_key": "ALA-BAD1",
+      "description": "A warning raised by a device. One row per alarm. No running code reads this table. 166 rows have last_seen_at before first_seen_at.",
+      "api_reads_today": false,
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/alarms.csv",
+        "docs/02-baseline/data-quality-baseline.md"
+      ],
+      "fields": [
+        {
+          "id": "field.alarm.alarm_id",
+          "name": "alarm_id",
+          "type": "identifier",
+          "key": true,
+          "id_form": "ALA-00002 (first row is REC-0001)",
+          "description": "The key of the alarm row.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv"
+          ]
+        },
+        {
+          "id": "field.alarm.device_id",
+          "name": "device_id",
+          "type": "identifier",
+          "id_form": "DEV-00005",
+          "references": "entity.device",
+          "description": "The device that raised the alarm.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv"
+          ]
+        },
+        {
+          "id": "field.alarm.interface",
+          "name": "interface",
+          "type": "word",
+          "status_field": "status.alarm.interface",
+          "description": "The port on the device. In this data the cells hold the generic status words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv"
+          ]
+        },
+        {
+          "id": "field.alarm.severity",
+          "name": "severity",
+          "type": "word",
+          "status_field": "status.alarm.severity",
+          "description": "How bad the alarm is. The cells hold the seven severity words, including gold and bronze.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.alarm.alarm_type",
+          "name": "alarm_type",
+          "type": "word",
+          "status_field": "status.alarm.alarm_type",
+          "description": "What kind of alarm it is. In this data the cells hold the generic status words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv"
+          ]
+        },
+        {
+          "id": "field.alarm.first_seen_at",
+          "name": "first_seen_at",
+          "type": "timestamp",
+          "description": "When the alarm was first raised. One row, ALA-00013 on file line 354, holds 1900-01-01T00:00:00.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.alarm.last_seen_at",
+          "name": "last_seen_at",
+          "type": "timestamp",
+          "description": "When the alarm was last raised. On 166 rows this is earlier than first_seen_at. Example ALA-00002 on file line 3.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.alarm.dedupe_key",
+          "name": "dedupe_key",
+          "type": "identifier",
+          "id_form": "DED-00002",
+          "description": "Alarms that share this key are the same alarm repeated. Three keys appear twice. No code groups them.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv",
+            "docs/02-baseline/ai-qualification.md"
+          ]
+        },
+        {
+          "id": "field.alarm.maintenance_window",
+          "name": "maintenance_window",
+          "type": "word",
+          "status_field": "status.alarm.maintenance_window",
+          "description": "Whether the alarm fell inside planned work time. In this data the cells hold the generic status words, not a time range.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv"
+          ]
+        },
+        {
+          "id": "field.alarm.storm_batch_id",
+          "name": "storm_batch_id",
+          "type": "identifier",
+          "id_form": "STO-00002",
+          "references": "concept.storm",
+          "description": "Alarms that share this id arrived in the same burst. Three ids appear twice. The repo does not say how many alarms make a storm.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/alarms.csv",
+            "docs/01-discovery/business-flow-reconstruction.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entity.incident",
+      "name": "incident",
+      "table": "data/synthetic/incidents.csv",
+      "key_field": "field.incident.incident_id",
+      "row_count": 354,
+      "distinct_keys": 351,
+      "duplicate_keys": [
+        "INC-00004",
+        "INC-00013",
+        "INC-00019"
+      ],
+      "blank_row_key": "INC-BAD1",
+      "description": "A record of a service problem that someone must handle. One row per incident. No running code reads this table. The live summary reads a device row, not an incident row.",
+      "api_reads_today": false,
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/incidents.csv",
+        "docs/02-baseline/ai-qualification.md"
+      ],
+      "fields": [
+        {
+          "id": "field.incident.incident_id",
+          "name": "incident_id",
+          "type": "identifier",
+          "key": true,
+          "id_form": "INC-00002 (first row is REC-0001)",
+          "description": "The key of the incident row.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv"
+          ]
+        },
+        {
+          "id": "field.incident.customer_id",
+          "name": "customer_id",
+          "type": "identifier",
+          "id_form": "CUS-00005",
+          "references": "concept.customer",
+          "description": "The customer affected.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv"
+          ]
+        },
+        {
+          "id": "field.incident.circuit_id",
+          "name": "circuit_id",
+          "type": "identifier",
+          "id_form": "CIR-00005",
+          "references": "entity.circuit",
+          "description": "The circuit affected.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv"
+          ]
+        },
+        {
+          "id": "field.incident.severity",
+          "name": "severity",
+          "type": "word",
+          "status_field": "status.incident.severity",
+          "description": "How bad the incident is. The cells hold the seven severity words. gold 41 rows, bronze 50 rows. INC-00002 is gold.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.incident.status",
+          "name": "status",
+          "type": "word",
+          "status_field": "status.incident.status",
+          "description": "Where the incident is in its life. The cells hold the eight workflow words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv"
+          ]
+        },
+        {
+          "id": "field.incident.opened_at",
+          "name": "opened_at",
+          "type": "timestamp",
+          "description": "When the incident was opened. One row, INC-00013 on file line 354, holds 1900-01-01T00:00:00.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.incident.root_cause",
+          "name": "root_cause",
+          "type": "word",
+          "status_field": "status.incident.root_cause",
+          "description": "What caused the incident. In this data the cells hold the generic status words such as manual and ai_assisted.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv",
+            "docs/02-baseline/ai-qualification.md"
+          ]
+        },
+        {
+          "id": "field.incident.automation_used",
+          "name": "automation_used",
+          "type": "boolean_word",
+          "status_field": "status.incident.automation_used",
+          "description": "true means an automated step ran on this incident. 166 rows true, 187 false, 1 blank. No code writes it.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv",
+            "docs/01-discovery/business-flow-reconstruction.md"
+          ]
+        },
+        {
+          "id": "field.incident.sla_breach_risk",
+          "name": "sla_breach_risk",
+          "type": "number",
+          "references": "concept.sla",
+          "description": "A score for how likely the service promise will be broken. 352 values sit between 0 and 1. INC-00019 on file line 355 holds 1.42. The legal range is PROPOSED 0 to 1. Owner Unknown.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/incidents.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entity.service_order",
+      "name": "service_order",
+      "table": "data/synthetic/service_orders.csv",
+      "key_field": "field.service_order.order_id",
+      "row_count": 354,
+      "distinct_keys": 351,
+      "duplicate_keys": [
+        "ORD-00004",
+        "ORD-00013",
+        "ORD-00019"
+      ],
+      "blank_row_key": "SER-BAD1",
+      "description": "A customer request to set up or change a service. One row per order. No running code reads this table. The table has no date-time column.",
+      "api_reads_today": false,
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/service_orders.csv",
+        "docs/01-discovery/business-flow-reconstruction.md"
+      ],
+      "fields": [
+        {
+          "id": "field.service_order.order_id",
+          "name": "order_id",
+          "type": "identifier",
+          "key": true,
+          "id_form": "ORD-00002 (first row is REC-0001; blank row is SER-BAD1)",
+          "description": "The key of the order row.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv"
+          ]
+        },
+        {
+          "id": "field.service_order.customer_id",
+          "name": "customer_id",
+          "type": "identifier",
+          "id_form": "CUS-00005",
+          "references": "concept.customer",
+          "description": "The customer who placed the order.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv"
+          ]
+        },
+        {
+          "id": "field.service_order.service_type",
+          "name": "service_type",
+          "type": "word",
+          "status_field": "status.service_order.service_type",
+          "description": "What kind of service was ordered. In this data the cells hold the generic status words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv"
+          ]
+        },
+        {
+          "id": "field.service_order.requested_bandwidth",
+          "name": "requested_bandwidth",
+          "type": "number",
+          "description": "The speed the customer asked for. A decimal number.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv"
+          ]
+        },
+        {
+          "id": "field.service_order.qualification_status",
+          "name": "qualification_status",
+          "type": "word",
+          "status_field": "status.service_order.qualification_status",
+          "description": "Whether the order passed the check that it can be built. The cells hold the eight workflow words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv",
+            "docs/02-baseline/ai-qualification.md"
+          ]
+        },
+        {
+          "id": "field.service_order.provisioning_status",
+          "name": "provisioning_status",
+          "type": "word",
+          "status_field": "status.service_order.provisioning_status",
+          "description": "How far the build of the service has gone. The cells hold the eight workflow words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv"
+          ]
+        },
+        {
+          "id": "field.service_order.retry_count",
+          "name": "retry_count",
+          "type": "number",
+          "description": "How many times the build was tried again. Values run from 32 to 4995. 294 rows are at or above 1000. The legal maximum is Unknown. The 1000 bound in the baseline is PROPOSED with owner Unknown.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.service_order.rollback_status",
+          "name": "rollback_status",
+          "type": "word",
+          "status_field": "status.service_order.rollback_status",
+          "description": "Whether an undo of the build was done. The cells hold the eight workflow words.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/service_orders.csv"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entity.ai_invocation",
+      "name": "ai_invocation",
+      "table": "data/synthetic/ai_invocations.csv",
+      "key_field": "field.ai_invocation.ai_call_id",
+      "row_count": 354,
+      "distinct_keys": 351,
+      "duplicate_keys": [
+        "AI_-00004",
+        "AI_-00013",
+        "AI_-00019"
+      ],
+      "blank_row_key": "AI_-BAD1",
+      "description": "A stored record of one call to a model. One row per call. The live gateway does not write this table. Zero rows use the live model name local-sim-v1. The table has no date-time column.",
+      "api_reads_today": false,
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/ai_invocations.csv",
+        "docs/01-discovery/ai-subsystem-discovery.md"
+      ],
+      "fields": [
+        {
+          "id": "field.ai_invocation.ai_call_id",
+          "name": "ai_call_id",
+          "type": "identifier",
+          "key": true,
+          "id_form": "AI_-00002 (first row is REC-0001). 353 ids start with AI_-.",
+          "description": "The key of the call row. The prefix AI_- with an underscore is the malformed shape named in the baseline.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.incident_id",
+          "name": "incident_id",
+          "type": "identifier",
+          "id_form": "INC-00001",
+          "references": "entity.incident",
+          "description": "The incident the call was about.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.use_case",
+          "name": "use_case",
+          "type": "word",
+          "status_field": "status.ai_invocation.use_case",
+          "description": "What the call was for. In this data the cells hold the generic status words, not the three product names.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv",
+            "docs/01-discovery/ai-subsystem-discovery.md"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.model",
+          "name": "model",
+          "type": "word",
+          "status_field": "status.ai_invocation.model",
+          "description": "Which model answered. In this data the cells hold the generic status words. Zero rows hold local-sim-v1.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv",
+            "docs/01-discovery/data-and-integration-map.md"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.topology_snapshot_id",
+          "name": "topology_snapshot_id",
+          "type": "identifier",
+          "id_form": "TOP-00001",
+          "references": "concept.topology",
+          "description": "Which stored picture of the network the call used. There is no snapshot table.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.alarm_count",
+          "name": "alarm_count",
+          "type": "number",
+          "description": "How many alarms the call looked at. Whole numbers. Whether it may exceed the alarm file size is Unknown.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv",
+            "docs/01-discovery/data-and-integration-map.md"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.token_count",
+          "name": "token_count",
+          "type": "number",
+          "description": "How many tokens the call used. The live body calls the same figure token_estimate.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv",
+            "docs/01-discovery/ai-subsystem-discovery.md"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.recommendation_risk",
+          "name": "recommendation_risk",
+          "type": "word",
+          "status_field": "status.ai_invocation.recommendation_risk",
+          "description": "How risky the model's advice was judged. The cells hold the generic status words. One cell, AI_-00019, holds the number 1.42.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.approval_required",
+          "name": "approval_required",
+          "type": "word",
+          "status_field": "status.ai_invocation.approval_required",
+          "description": "Whether a person had to approve before action. The cells hold the generic status words, not yes or no.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv"
+          ]
+        },
+        {
+          "id": "field.ai_invocation.guardrail_status",
+          "name": "guardrail_status",
+          "type": "word",
+          "status_field": "status.ai_invocation.guardrail_status",
+          "references": "concept.guardrail",
+          "description": "Whether the safety checks ran. The cells hold the generic status words. not_enforced is on 27 rows. The live body always says not_enforced.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/ai_invocations.csv",
+            "apps/api/services/ai_gateway.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entity.event",
+      "name": "event",
+      "table": "data/synthetic/events.jsonl",
+      "key_field": "field.event.event_id",
+      "row_count": 3000,
+      "distinct_keys": 3000,
+      "duplicate_keys": [],
+      "description": "One line in the event log. 3000 lines. Each line names a table, a flow, an actor, a log level, a latency, and a cost. No business code reads the file. scripts/sanity_check.py counts the lines. This entity is not in docs/domain-specific-spec.md. It is the seventh entity locked in Project_Intent.md 4.3.",
+      "api_reads_today": false,
+      "source": [
+        "data/synthetic/events.jsonl",
+        "docs/01-discovery/data-and-integration-map.md",
+        "docs/01-discovery/business-flow-reconstruction.md",
+        "../Project_Intent.md"
+      ],
+      "fields": [
+        {
+          "id": "field.event.event_id",
+          "name": "event_id",
+          "type": "identifier",
+          "key": true,
+          "id_form": "EVT-0000000",
+          "description": "The key of the event line.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl"
+          ]
+        },
+        {
+          "id": "field.event.business_entity",
+          "name": "business_entity",
+          "type": "word",
+          "status_field": "status.event.business_entity",
+          "description": "Which of the six tables the event is about. The event names the table, not the row.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl"
+          ]
+        },
+        {
+          "id": "field.event.event_type",
+          "name": "event_type",
+          "type": "word",
+          "status_field": "status.event.event_type",
+          "description": "Which of the four business flows the event belongs to.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl",
+            "docs/01-discovery/business-flow-reconstruction.md"
+          ]
+        },
+        {
+          "id": "field.event.severity",
+          "name": "severity",
+          "type": "word",
+          "status_field": "status.event.severity",
+          "description": "The log level of the event. debug, info, warn, error, or critical. A different scale from alarm severity.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl"
+          ]
+        },
+        {
+          "id": "field.event.correlation_id",
+          "name": "correlation_id",
+          "type": "identifier",
+          "id_form": "corr-00273",
+          "description": "Ties events from one request chain together. 982 lines hold null. 1010 hold an empty string. 1008 are filled.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl",
+            "docs/02-baseline/data-quality-baseline.md"
+          ]
+        },
+        {
+          "id": "field.event.actor",
+          "name": "actor",
+          "type": "word",
+          "status_field": "status.event.actor",
+          "description": "Which of the seven personas did the step.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl",
+            "docs/domain-specific-spec.md"
+          ]
+        },
+        {
+          "id": "field.event.latency_ms",
+          "name": "latency_ms",
+          "type": "number",
+          "description": "How long the step took in milliseconds.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl"
+          ]
+        },
+        {
+          "id": "field.event.cost_units",
+          "name": "cost_units",
+          "type": "number",
+          "description": "A cost figure for the step. The money unit is Unknown.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl",
+            "docs/00-contract/cost-envelope.md"
+          ]
+        },
+        {
+          "id": "field.event.payload_hash",
+          "name": "payload_hash",
+          "type": "text",
+          "description": "A short hash of the event content.",
+          "api_reads_today": false,
+          "source": [
+            "data/synthetic/events.jsonl"
+          ]
+        }
+      ]
+    }
+  ],
+  "concepts": [
+    {
+      "id": "concept.topology",
+      "name": "topology",
+      "description": "The stored picture of which devices and circuits exist and how they connect. The repo has no topology file. The picture is the device rows plus stale_topology_flag and topology_snapshot_id.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/devices.csv",
+        "data/synthetic/ai_invocations.csv",
+        "docs/architecture/known-gaps.md"
+      ]
+    },
+    {
+      "id": "concept.sla",
+      "name": "SLA",
+      "description": "A service level agreement. The promise made to a customer about how well a circuit works. The repo stores sla_tier on circuits and sla_breach_risk on incidents. It stores no threshold.",
+      "source": [
+        "data/synthetic/circuits.csv",
+        "data/synthetic/incidents.csv",
+        "docs/domain-specific-spec.md"
+      ]
+    },
+    {
+      "id": "concept.remediation",
+      "name": "remediation",
+      "description": "A change made to a live device or circuit to fix a fault. No route in the repo makes such a change. A remediation is the irreversible action that needs a human approval id first.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/00-contract/operating-contract.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "concept.guardrail",
+      "name": "guardrail",
+      "description": "A check that runs before or after a model call and can stop the result. The live gateway returns guardrail_status not_enforced. No check runs today.",
+      "source": [
+        "apps/api/services/ai_gateway.py",
+        "docs/01-discovery/ai-subsystem-discovery.md"
+      ]
+    },
+    {
+      "id": "concept.customer",
+      "name": "customer",
+      "description": "The organisation that buys a circuit or places an order. There is no customer table. customer_id appears on circuits, incidents, and service orders.",
+      "source": [
+        "data/synthetic/circuits.csv",
+        "data/synthetic/incidents.csv",
+        "data/synthetic/service_orders.csv"
+      ]
+    },
+    {
+      "id": "concept.site",
+      "name": "site",
+      "description": "A physical place where devices sit. There is no site table. site_id appears on devices only.",
+      "source": [
+        "data/synthetic/devices.csv"
+      ]
+    },
+    {
+      "id": "concept.storm",
+      "name": "alarm storm",
+      "description": "A burst of many alarms in a short time. Alarms that share storm_batch_id are one storm batch. The repo does not say how many alarms make a storm.",
+      "source": [
+        "data/synthetic/alarms.csv",
+        "docs/architecture/known-gaps.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "concept.approval",
+      "name": "approval",
+      "description": "A named person's recorded yes or no to a recommended change. The system stores an approval id. No route writes that id today. The approval sits after a policy allow and before any change.",
+      "source": [
+        "docs/00-contract/operating-contract.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "concept.audit_row",
+      "name": "audit row",
+      "description": "One JSON line in logs/audit.log. Today it holds ts, action, and details. It has no actor, no correlation id, and no approval id.",
+      "source": [
+        "apps/api/services/audit.py",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "concept.prompt",
+      "name": "prompt",
+      "description": "The text sent to a model. Today the prompt is one fixed sentence plus the whole device row, including mgmt_ip and credential_profile.",
+      "source": [
+        "apps/api/services/ai_gateway.py",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "concept.policy_decision",
+      "name": "policy decision",
+      "description": "The allow or deny answer from the access policy. Today policy/opa/access.rego exists on disk and no Python code calls it. The API checks a Python list instead.",
+      "source": [
+        "policy/opa/access.rego",
+        "apps/api/main.py",
+        "docs/01-discovery/brownfield-risk-register.md"
+      ]
+    },
+    {
+      "id": "concept.flow_customer_order_to_provisioning",
+      "name": "Customer order to provisioning",
+      "description": "The business flow from a customer order to a working circuit. No route runs any step of it today. 741 events carry this name.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/01-discovery/business-flow-reconstruction.md"
+      ]
+    },
+    {
+      "id": "concept.flow_alarm_storm_to_incident_correlation",
+      "name": "Alarm storm to incident correlation",
+      "description": "The business flow from a burst of alarms to one incident. No route runs any step of it today. 706 events carry this name.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/01-discovery/business-flow-reconstruction.md"
+      ]
+    },
+    {
+      "id": "concept.flow_topology_lookup_to_ai_recommendation",
+      "name": "Topology lookup to AI recommendation",
+      "description": "The business flow from a device lookup to a model's advice. Two routes cover the lookup and a local summary. 782 events carry this name.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/01-discovery/business-flow-reconstruction.md"
+      ]
+    },
+    {
+      "id": "concept.flow_approved_remediation_to_validation",
+      "name": "Approved remediation to validation",
+      "description": "The business flow from an approved fix to a check that it worked. No route runs any step of it today. 771 events carry this name.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/01-discovery/business-flow-reconstruction.md"
+      ]
+    }
+  ]
+}

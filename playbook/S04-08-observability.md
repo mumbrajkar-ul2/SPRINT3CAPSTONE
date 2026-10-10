@@ -53,6 +53,7 @@ STOP after Half A. Return the seven-item final response. Wait for "Half A accept
 - No invented SLO number without PROPOSED and an owner.
 - Never log mgmt_ip, credential_profile, or a secret. Cite ai-context-policy.yaml.
 - Each artifact starts with a header table: Stage, Date / version, Author, Status, Evidence sources, Assumptions, Unresolved issues, Residual risks.
+- If this design needs a term, id, status word, persona, resource, scope value, metric, or field the YAML lacks, do not define it here. Write one line that starts with "Open question for S03:" and names the term and what this design needs it for. Stage S05R folds it into the YAML.
 
 ## Locked facts (read, do not re-derive)
 | Item | Value |

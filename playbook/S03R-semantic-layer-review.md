@@ -52,13 +52,13 @@ R15. Plain speech: pick three glossary entries at random and state whether a rea
 - Each artifact starts with a header table: Stage, Date / version, Author, Status, Evidence sources, Assumptions, Unresolved issues, Residual risks.
 
 ## Required artifacts
-1. `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md` — the review table, the test and build output, and a "Fixes required" list for every FAIL.
+1. `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md` — the review table, the test and build output, and a "Fixes required" list for every FAIL. Number each fix. Each fix names the check ids it clears, the files and lines or ids to change, and the change. When a fix offers options or needs an owner name, mark it "Choice needed" and list the options. Stage S03F reads this list as written.
 
 ## Completion gate
 PASS when no row is FAIL. CONDITIONAL PASS when every FAIL is in R12 or R15 only and each has a one-line fix. BLOCKED when any of R1, R5, R7, R8, R10, R11, R13 is FAIL.
 
 ## Lifecycle linkage
-Cite semantic-layer/ files by path and id. Stage S04 (every challenge) may start only when this review is PASS or CONDITIONAL PASS with fixes applied. Stage S08 gives the second model the tree that passed this review.
+Cite semantic-layer/ files by path and id. If any row is FAIL, stage S03F applies the "Fixes required" list and this review runs again in a fresh chat. Stage S04 (every challenge) may start only when this review is PASS or CONDITIONAL PASS with fixes applied. Stage S05R folds the Phase 4 and 5 open questions into the tree and reruns rows R1 to R15. Stage S08 gives the second model the tree at the S05R version.
 
 ## Required final response
 End with exactly these seven items:
@@ -75,8 +75,8 @@ End with exactly these seven items:
 
 | File | Must contain |
 |---|---|
-| `docs/02-baseline/semantic-layer-review.md` | Header. Fifteen check rows plus eight failure-list rows. Test and build output pasted. "Fixes required" list. |
+| `docs/02-baseline/semantic-layer-review.md` | Header. Fifteen check rows plus eight failure-list rows. Test and build output pasted. Numbered "Fixes required" list, with "Choice needed" on any fix the owner must decide. |
 
 ## Done test
 
-Every row has a file citation. If any row is FAIL, go back to S03 with the fix list, then re-run S03R. Do not start S04 until this file says PASS or CONDITIONAL PASS with fixes applied.
+Every row has a file citation. If any row is FAIL, run `S03F-semantic-layer-fixes.md` with this review as the fix source, then run S03R again in a fresh chat. Do not start S04 until this file says PASS or CONDITIONAL PASS with fixes applied.

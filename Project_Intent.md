@@ -245,7 +245,7 @@ Worked example for `domain_service.py` plus `devices.csv`: `load_record("DOES-NO
 
 ### 4.3 Constants found in the inherited repo
 
-These values appear in the files. They are current-state values. They are not a new policy you chose. A later cutoff needs a named owner and an Architecture Decision Record.
+These values appear in the files. They are current-state values. They are not a new policy you chose. A later cutoff needs a named owner and an Architecture Decision Record. Until the packet or the trainer names a business owner, that owner is Team-Force, the FDE team Mangesh belongs to (`docs/00-contract/operating-contract.md` row 10).
 
 | Constant | Value in the files | Where it appears |
 |---|---|---|
@@ -335,8 +335,9 @@ A person can be harmed, so keep these four verbs separate.
 | Restate the brief | This Project Intent. | Execution Plan and D1 use the locked answers. |
 | D1 Discovery | Architecture map, inventory, flows, risks. | Baseline and semantic-layer entities come from this map. |
 | D2 Baseline | Test report, data profile, characterization tests. | You change behaviour only after it is named. |
-| D3 Semantic layer | `semantic-layer/` in the capture-PDF layout. | PRD, policy, and both models use these meanings. |
+| D3 Semantic layer | `semantic-layer/` in the capture-PDF layout, version `1.0.0`. | PRD, policy, and both models use these meanings. A D4 design that needs a term this layer lacks writes an "Open question for S03" line. |
 | D4 Spine controls | Identity, secrets, policy, observability, AI gates, reliability, evidence. | The PRD can require controls that already have a design. |
+| D3 revision (stage S05R) | `semantic-layer/` with every term D4 introduced folded in, the version raised, and `docs/02-baseline/semantic-layer-revision.md`. | The PRD and both models cite this version. The layer is the fallback a new model builds from if the first model is lost, so it must hold every meaning D4 introduced. |
 | D5 PRD | Requirements and acceptance checks. | The application is built only from this PRD. |
 | D6 Application and demo | A running flow with a human decision. | The second model and the evidence pack use this app. |
 | D7 Second-model test | Same YAML, new model, written comparison. | Shows the semantic layer is the portable source of truth. |
@@ -374,7 +375,7 @@ Tick a row only if the challenge guide or the semantic-layer PDF asked for it.
 
 - [ ] D1 exists. Inherited-repo meaning is unchanged unless a later ADR says why.
 - [ ] D2 exists. Intended behaviour and defects are in different lists.
-- [ ] D3 exists and passed schema tests.
+- [ ] D3 exists and passed schema tests. Stage S05R folded in the terms D4 introduced, raised the version, and the PRD header cites that version.
 - [ ] D4 exists. At least one high-risk decision has allow and deny policy tests. AI cannot silently execute.
 - [ ] D5 exists. The PRD traces to YAML ids.
 - [ ] D6 exists. The demo completes one flow to a human decision. The audit row is written before any execute-like state change.
@@ -559,7 +560,11 @@ semantic-layer/
 | `status-taxonomy.yaml` | Allowed values for severity, incident status, order status, guardrail status, approval. List collisions found in the CSVs. |
 | `business-rules.yaml` | Missing id must not return another device. AI output cannot execute. Alarm last_seen cannot precede first_seen. Shared admin is not least privilege. |
 | `metrics.yaml` | SLA breach risk, alarm-storm size, token count per invocation, cost per correlated incident, quarantine rate, retry count. |
-| `access-semantics.yaml` | Map domain personas to actions, resources, purpose, and risk. Do not keep `clinician` as a telecom role. |
+| `access-semantics.yaml` | Map domain personas to actions, resources, purpose, scope, and risk. Scope is the set of records a persona may touch. Do not keep `clinician` as a telecom role. |
 | `ai-context-policy.yaml` | Which fields may enter a prompt, required output schema, model provenance, approval gate, and fail-to-person behaviour. |
 
 YAML is the source of truth. If the PRD and the YAML disagree, fix the PRD or record an ADR. Do not keep two meanings.
+
+The control designs (D4) may need a term the YAML lacks. A design does not define it. It writes an "Open question for S03" line. Stage S05R folds those terms into the YAML, raises the version, and reruns the S03R checks before the PRD is written. The PRD and the second model use that revised version. After S05R, a YAML change needs an ADR.
+
+A review of this tree can fail. That review is S03R, or the S03R rows that S05R reruns. Then stage S03F applies the review's fix list, keeps the version, and rebuilds and retests. S03R then runs again in a fresh chat. S03F runs only until the PRD cites the version.

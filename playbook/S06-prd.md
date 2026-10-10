@@ -1,12 +1,13 @@
 # S06 — Product Requirements Document (product path step 2, D5)
 
-Phase 6 in `Execution Plan.md`. The PRD is written from the semantic layer and the Phase 4 and 5 designs. Both the first app and the second model build from it.
+Phase 6 in `Execution Plan.md`. The PRD is written from the semantic layer at the S05R version and the Phase 4 and 5 designs. Both the first app and the second model build from it.
 
 ## Inputs
 
 - `Project_Intent.md` (sections 3.1, 5.2, 5.3, 6.3)
 - `AI-FDE_Brownfield_Repo_Transformation_Challenge_Guide.pdf` (product path)
-- `06-telecom-service-network-incident-ops/semantic-layer/` (whole tree)
+- `06-telecom-service-network-incident-ops/semantic-layer/` (whole tree, at the S05R version)
+- `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-revision.md`
 - `06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md`
 - `06-telecom-service-network-incident-ops/docs/02-baseline/defect-list.md`
 - `06-telecom-service-network-incident-ops/docs/03-identity/target-access-matrix.md`
@@ -52,7 +53,8 @@ For each requirement: id, text, YAML id, test, source design.
 
 ## Constraints and guardrails
 - Plain speech. A new reader must know what to picture after one pass.
-- Do not define a term. Use the glossary. If a needed term is missing, write it as an open question for S03, not in the PRD.
+- Do not define a term. Use the glossary. If a needed term is missing, stop. Write it as an "Open question for S03:" line in the PRD draft, rerun S05R so the term enters the YAML with a source list, then continue. The PRD does not define the term itself.
+- Write the semantic-layer version string from `docs/02-baseline/semantic-layer-revision.md` into the PRD header table under Evidence sources. Every YAML id in the PRD resolves at that version.
 - No invented cutoff or threshold. PROPOSED with owner only.
 - Each artifact starts with a header table: Stage, Date / version, Author, Status, Evidence sources, Assumptions, Unresolved issues, Residual risks.
 
@@ -73,7 +75,7 @@ For each requirement: id, text, YAML id, test, source design.
 PASS when every requirement has a YAML id and a named test, the PRD and the YAML do not disagree on any term, the demo flow is picked with a reason, and the two required "will not implement" sentences are present. CONDITIONAL PASS when one acceptance test is "planned" with the stage that writes it. BLOCKED when any requirement has no YAML id or the PRD defines a term on its own.
 
 ## Lifecycle linkage
-Cite ai-qualification.md, the semantic-layer files by id, and the Phase 4 and 5 design files. Stage S06R reviews this PRD before S07. Stage S07 builds only what this PRD names. Stage S08 gives the same PRD to the second model.
+Cite ai-qualification.md, semantic-layer-revision.md for the version, the semantic-layer files by id, and the Phase 4 and 5 design files. Stage S05R is the last YAML change before this PRD. Stage S06R reviews this PRD before S07. Stage S07 builds only what this PRD names. Stage S08 gives the same PRD and the same YAML version to the second model.
 
 ## Required final response
 1. Stage status: PASS, CONDITIONAL PASS, or BLOCKED, with one sentence why.
@@ -89,7 +91,7 @@ Cite ai-qualification.md, the semantic-layer files by id, and the Phase 4 and 5 
 
 | File | Must contain |
 |---|---|
-| `prd.md` | Header. Eight sections. Demo flow with reason. Routes implemented and not implemented. The order-provisioning sentence and the remediation-validation sentence, each with its reason. POST /ai/summarize kept. Every requirement has an id, a YAML id, and a test. |
+| `prd.md` | Header, with the S05R semantic-layer version under Evidence sources. Eight sections. Demo flow with reason. Routes implemented and not implemented. The order-provisioning sentence and the remediation-validation sentence, each with its reason. POST /ai/summarize kept. Every requirement has an id, a YAML id, and a test. |
 | `traceability.md` | Header. Requirement → YAML id → test → design file. |
 
 ## Done test

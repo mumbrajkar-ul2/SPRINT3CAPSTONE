@@ -547,3 +547,1134 @@ Updated four documents so the demo scope and the two limits match.
 **Telecom Application Modernization.md.** The order row no longer says S02 puts the missing flow on the defect list, no longer tells S2Q to pick rules, and no longer says S04-06 writes a provisioning-status policy. The lookup row says summarize stays and recommend is added. The approved-fix row says the "did the fix work" check stays unimplemented. The worked example points the `ALA-00002` pair at the new timestamp drill.
 
 **Project_Intent.md.** New section 2.7 states what the three live calls and two scripts do, the file evidence for each of the four desk jobs, and what the API does not run. It records the build scope and the two limits. Section 5.2 points at 2.7. The D5 done test now includes those two sentences.
+
+## 2026-10-09 22:51
+
+**Model:** Grok 4.7
+
+### User
+
+review all the files in the project and then start the app
+
+### Assistant
+
+The API is running at http://127.0.0.1:8011. The interactive docs are at http://127.0.0.1:8011/docs.
+
+I read the runnable program under `06-telecom-service-network-incident-ops` and the capstone packet around it, then started the API. The browser page is a scaffold. It does not start.
+
+**What the project holds.** The root has `Project_Intent.md`, `Execution Plan.md`, `Telecom Application Modernization.md`, and `playbook/` (stages S00 through S10). Only S00 has been run. Its status is CONDITIONAL PASS because `httpx` is installed in `.venv` and is not listed in `requirements.txt`. The brownfield program is the folder `06-telecom-service-network-incident-ops`.
+
+**What is running.** The working start command uses a dot in the module name: `python -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8011`. The README command uses a slash (`apps/api.main:app`). That form fails with `No module named apps/api`.
+
+Live checks just now:
+
+- `GET /health` returns 200 and `{"status":"ok"}`.
+- `GET /` returns 404.
+- `GET /records/REC-0001` returns 200 and the device row. The row includes `mgmt_ip` and `credential_profile`.
+- `GET /records/DOES-NOT-EXIST` returns 200 and the first row, `device_id` `REC-0001`.
+- `POST /ai/summarize/REC-0001` returns model `local-sim-v1`, a synthetic summary, the line "Review and approve before action", and `guardrail_status` `not_enforced`.
+
+**What the code does.** `apps/api/main.py` has those three routes. `domain_service.py` reads `data/synthetic/devices.csv` only. A missing id returns the first row. `ai_gateway.py` puts the whole row into a fixed prompt, waits 0.01 seconds, and does not call a hosted model. `audit.py` appends `ts`, `action`, and `details` to `logs/audit.log`. Roles `admin`, `operator`, `clinician`, `engineer`, and `ai_agent` can read a record. A refused role still returns HTTP 200 with `{"error":"forbidden"}`.
+
+**What does not run.** No route reads orders, circuits, alarms, or incidents. `apps/web` has two TypeScript files, empty dependencies, and no `angular.json`, so the portal cannot be built. `etl/run_daily_batch.py` counts blank device fields and does not set those rows aside. `legacy/reconcile_legacy.py` counts device rows and holds a shared database password in the file. The Playwright spec opens `/`, which returns 404.
+
+## 2026-10-09 22:53
+
+**Model:** Grok 4.7
+
+### User
+
+STOP THE APP
+
+### Assistant
+
+The API is stopped. Nothing is listening on port 8011.
+
+## 2026-10-09 22:53
+
+**Model:** Grok 4.7
+
+### User
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+### Assistant
+
+The API process ended because it was stopped. The exit code is from that stop. Port 8011 is free.
+
+## 2026-10-09 22:56
+
+**Model:** Grok 4.7
+
+### User
+
+review the project intent.md, execution plan and all the playbook steps and summarize what the end goals of this project are.
+
+### Assistant
+
+The end state is a system you can explain, run, and defend. The inherited telecom repo stays the starting point. The finished packet proves what changed and says what is still not ready.
+
+The claim the work has to support is this: you understand the system, you know its risks, you improved it under written rules, you can prove what changed, and you can say whether it is production-ready.
+
+**What you hand back**
+
+| Piece | What "done" looks like |
+|---|---|
+| Discovery and baseline | A file-backed map of the repo, plus two lists: behaviour to keep, and defects to fix. |
+| Operating contract | What this work may change, what it may not, and a first cost view with an honesty label on every number. |
+| AI-versus-no-AI table | Each desk step has a pick (rules or a model), a reason, an agency level, and a named human approval point. |
+| Semantic layer | YAML is the shared meaning. Markdown explains it. Schema and tests protect it. Generated JSON comes from the YAML. |
+| Controls | Identity, secrets, a reproducible setup, policy, CI evidence, a trace id, AI guardrails, performance, failure drills, and cost per outcome. |
+| Security and audit | One security test run in CI. One case rebuilt from stored rows: actor, data, model, policy, approval, action, trace id. |
+| PRD | Requirements that cite YAML ids, name the demo flow, and name the flows that stay unimplemented. |
+| Working demo | One flow reaches a human decision. The audit row is written before any state change. |
+| Second model | A second model builds from the same YAML and the same PRD. Differences are written. The YAML is not edited during that test. |
+| Evidence pack and defence | Ready, not ready, and accepted risk, each with an owner. Ten defence answers, each pointing at a file or a test. |
+
+A reviewer should be able to check the pack without a spoken tour.
+
+**The product the demo is meant to be**
+
+Network and service teams must decide whether an alarm, an incident, an order, or an AI recommendation can safely become a live network change. A live change means a config push, an automated fix, a provisioning change, or closing an incident in a way that hides a real outage.
+
+The demo that this packet builds is narrower than those four desk jobs. A person looks up how a device is connected, sees a flood of alarms reduced to one set by `dedupe_key`, asks for a suggested next step, and approves or rejects that suggestion. The suggestion stays one of three results: show only, hold for a person, or block. The page does not push a change to a device.
+
+The routes that demo uses are health, a device read that returns 404 when the id is missing, an alarm-storm read, the existing summarize call (hardened, still present), a new recommend call, an approval call, and an audit rebuild. Each number on the page carries REAL, PRECOMPUTED, SIMULATED, or EDUCATIONAL.
+
+**What stays written down as not built**
+
+When that demo stays the chosen flow, order provisioning stays unimplemented because no route reads `service_orders.csv` or `circuits.csv`. A check that an approved fix worked stays unimplemented because this packet does not apply a live change. The PRD must say both of those sentences. Moonshot extras (a provenance engine, a governance gateway, a self-building evidence pack, a scheduled security suite) come only after the defence, and only if time remains.
+
+**Where the work stands**
+
+Only the setup stage has been run. Its status is CONDITIONAL PASS. The next unstarted stage is the operating contract. The API today still does three things: health, a device-row read that returns the first row when the id is missing, and a synthetic summary with guardrails not enforced.
+
+## 2026-10-09 23:03
+
+**Model:** Grok 4.7
+
+### User
+
+is the product going to significantly improve after going through the playbook stages of transformation and improvement?
+
+### Assistant
+
+Yes. The running program changes in ways a caller can see. The change is large on the unsafe path the code has today. It stays small for the rest of the telecom desk.
+
+**What a caller gets today.** Health works. A device read returns the first row, `REC-0001`, when the id is missing, and the row includes the management address and the credential profile. The summary call has no role check, puts the whole row into the prompt, and returns a synthetic suggestion with guardrails not enforced. The audit line stores a time, an action, and a few details. Orders, alarms, and incidents have files and no routes. The browser page does not open.
+
+**What a caller gets after the playbook, if each stage passes.**
+
+- A missing device id returns 404.
+- A role and a policy decision sit on the read and on the recommendation. The telecom role `clinician` is removed. An automation account cannot apply a change without an approval id.
+- The summary call stays, and it is hardened. The prompt may use only allowed fields. `mgmt_ip` and `credential_profile` stay out. A timeout or a bad model answer returns hold-for-review and stores no fake safe summary. A stale topology flag does the same.
+- A new recommend call returns show-only, hold-for-review, or block. It does not push a change.
+- A person approves or rejects on a page, with a reason. That call writes the audit row and does not change a device.
+- An alarm-storm call groups alarms by `dedupe_key` and returns the raw count and the reduced count.
+- A row like alarm `ALA-00002`, where last seen is before first seen, is flagged and does not become an incident.
+- One id follows the case from the page to the policy result, the model version, the human decision, and the audit rebuild.
+- CI writes test and scan evidence. A secret-pattern test fails if the known password string is committed again.
+
+That is a real product change. Today a wrong id can look like a real device, and a suggestion can be treated as a change ticket. After the stages, that path stops at a person, and the stored row can be rebuilt.
+
+**What stays the same size.** The model is still the local stub `local-sim-v1`. The suggestion text stays a stand-in. The packet does not call a hosted model. Order qualify, provision, retry, and rollback stay unimplemented. A check that a fix worked on the device stays unimplemented, because no stage applies a live change. The Angular portal can stay a scaffold. Severity cutoffs and SLA numbers stay unwritten unless a named owner marks them as proposed. The readiness stage is allowed to say the system is not production-ready.
+
+So the governed demo is much safer and much more explainable than the three calls you have now. It does not become a full provisioning and incident system. The evidence pack is supposed to say that limit out loud.
+
+## 2026-10-09 23:22
+
+**Model:** Grok 4.7
+
+### User
+
+in my opinion, modernization should address these short-comings with real transformation. Shortcomings are :
+1. The packet does not call a hosted model.
+2. Order qualify, provision, retry, and rollback stay unimplemented.
+3. A check that a fix worked on the device stays unimplemented, because no stage applies a live change.
+4. The Angular portal can stay a scaffold. 5. Severity cutoffs and SLA numbers stay unwritten unless a named owner marks them as proposed.
+6. The readiness stage is allowed to say the system is not production-ready.
+
+Let me know if we need to address these 6 items as part of the modernization.
+
+### Assistant
+
+Four of these six stay as written limits. The other two are already covered by stages that build something smaller and safer. None of the six should become new required build work.
+
+**1. A hosted model.** Leave the graded path on `local-sim-v1`. The suggestion stays labelled SIMULATED. Stage S08's "second model" is a second program that builds another app from the same YAML and the same PRD. That is a different job from the API calling Azure or OpenAI on each request. A hosted call can be added later, after the guardrails exist, and only if the operating contract in S0B allows the device row to leave the machine. The key stays out of the repo. Until that contract exists, a hosted call is extra scope.
+
+**2. Order qualify, provision, retry, and rollback.** Leave these unimplemented. The files name the job and hold the rows, including `ORD-00002` with `retry_count` 4052. No route reads `service_orders.csv` or `circuits.csv`. The modernization already records that, plus the rule for what a second retry would duplicate. Building the four actions would require qualification rules the repo does not contain, and it would add the live network change this packet holds for a person. The PRD states the reason. That is the transformation for this flow.
+
+**3. A check that the fix worked.** Leave this unimplemented. The approval route records a named person's decision and leaves the device as it was. A "did it work" check needs a change on the device first. This packet does not apply that change, so there is no result to check. Writing a route that pretends the device changed would be a false result.
+
+**4. The Angular portal.** The demo page in S07 is the UI. A person opens it, sees the reduced alarm set, asks for a suggestion, and approves or rejects. The Angular folder has two TypeScript files, empty dependencies, and no `angular.json`. The README says that scaffold is unfinished on purpose. Rebuilding it does not make the decision safer. S07 already allows a CONDITIONAL PASS when the scaffold stays unwired and that fact is written down.
+
+**5. Severity cutoffs and SLA numbers.** Leave them unwritten. `INC-00002` uses `gold` as severity. On circuits, `gold` is an SLA tier word. The transformation is to name that collision and keep the two lists apart. A sentence such as "gold means 4 hours" would be a number you invented. The playbook fails a stage that does that. A proposed number is allowed only with a named owner. This packet has no such owner.
+
+**6. A readiness result of "not ready."** Keep that outcome available. Stage S09's job is the decision: ready for what, not ready for what, and which risk a named role accepts. After these stages the honest line is: ready to demo one governed flow on synthetic data, and not ready to change a live network. Forcing the word "ready" would hide the stub model and the two flows that stay unimplemented. A pack that claims ready without a test fails that stage.
+
+So the modernization does address these items. It addresses 2, 3, 5, and 6 by writing the limit and the reason. It addresses 4 by serving a page. It addresses 1 by keeping a guarded stub, with a hosted call as an optional later step. I would leave the playbook as it is.
+
+## 2026-10-09 23:26
+
+**Model:** Grok 4.7
+
+### User
+
+instruct me on how to run the playbook in steps
+
+### Assistant
+
+Start at stage S0B in a new Cursor chat. S00 is already done. Its status is CONDITIONAL PASS because `httpx` is in the virtual environment and not in `requirements.txt`. Leave that as it is. Do not rerun S00.
+
+Each stage is one new chat. Stay in this chat only for questions about the method.
+
+**The loop you repeat**
+
+1. Open the next file in `playbook/`. The next one is `playbook/S0B-operating-contract.md`.
+2. Open a new Agent chat. Attach every file listed under **Inputs** in that stage file. For S0B that list is `Project_Intent.md`, the challenge-guide PDF, `How the product spine addresses the 16 challenges - plain speak.md`, `06-telecom-service-network-incident-ops/docs/00-setup/replay-log.md`, `ai_invocations.csv`, `events.jsonl`, and `apps/api/services/ai_gateway.py`.
+3. Copy the prompt inside the fenced block. Copy it whole. Paste it as your message.
+4. Let that chat write the files named under **Required artifacts**. Those paths sit under `06-telecom-service-network-incident-ops/` unless the prompt says the project root.
+5. Check the files against **Expected output** and the **Done test** in the same stage file.
+6. Read the seven-item final response. The first item is the stage status: PASS, CONDITIONAL PASS, or BLOCKED.
+7. Add one row to `playbook/STATUS.md`: date, stage id, status, one-line note.
+8. A BLOCKED status stops you. Fix the named block in that same stage, then run the check again. Move on only after PASS or CONDITIONAL PASS.
+
+**Stage order**
+
+| Order | File | You have it when |
+|---|---|---|
+| Done | `S00-setup-and-replay.md` | Replay log and tool versions exist |
+| 1 | `S0B-operating-contract.md` | Operating contract, cost envelope, crosswalk |
+| 2 | `S01-discovery.md` | Six discovery files |
+| 3 | `S02-baseline.md` | Baseline, defect list, characterization tests |
+| 4 | `S2Q-ai-qualification.md` | One row per capability: pick, reason, agency, human approval point |
+| 5 | `S03-semantic-layer.md` | `semantic-layer/` YAML, schema, tests, generated JSON |
+| 6 | `S03R-semantic-layer-review.md` | Review with no open FAIL |
+| 7–16 | `S04-03` through `S04-12` | One folder per control, design then code |
+| 17 | `S05-13-security-validation.md` | Security tests collected for CI |
+| 18 | `S05-14-audit-chain.md` | One case rebuilt from stored rows |
+| 19 | `S06-prd.md` | PRD and traceability |
+| 20 | `S06R-prd-review.md` | Review with no open FAIL |
+| 21 | `S07-application-and-demo.md` | The demo page and the governed routes |
+| 22 | `S08-second-model.md` | Second app and written comparison |
+| 23 | `S09-readiness-and-evidence-pack.md` | Go or no-go, and the evidence pack |
+| 24 | `S10-defence.md` | Ten answers and the slide outline |
+
+The Depends-on column in `playbook/README.md` is the gate. `S04-06` waits for `S04-03`. `S04-09` waits for `S04-06` and `S04-08`. `S05-13` waits until every S04 stage has a status. The other S04 files can follow `S03R` once that review has no open FAIL. Keep the numbered order above so you do not have to guess.
+
+**Three places the loop changes**
+
+Phase 4 files (`S04-03` through `S04-12`) stop after Half A. Half A is the written design. Read it. If you accept it, send a second message in that same chat: `Half A accepted`. Half B is the code and the tests. Record one status row after Half B.
+
+`S03R` and `S06R` are reviews. A FAIL row blocks the next stage. Fix the cited file, then run that review again.
+
+`S08` has three parts. Part 1 writes the brief in the first model's chat. Part 2 is a new chat with the second model: attach the unchanged `semantic-layer/` tree, the PRD, and the brief. Part 3 is back in a first-model chat for the comparison. Do not edit the YAML during that test.
+
+After S10, tick the checklist at the bottom of `playbook/README.md`. That checklist is the hand-back.
+
+## 2026-10-09 23:30
+
+**Model:** Grok 4.7
+
+### User
+
+can i simply copy all the content of @playbook/S0B-operating-contract.md into a new Cursor chat and run it?
+
+### Assistant
+
+Yes. Paste the whole file into a new Agent chat. That includes the instruction and the checklist the chat should meet.
+
+Also attach the seven files under **Inputs**. Pasting the stage file only names those files. The chat still needs the files themselves:
+
+- `Project_Intent.md`
+- `AI-FDE_Brownfield_Repo_Transformation_Challenge_Guide.pdf`
+- `How the product spine addresses the 16 challenges - plain speak.md`
+- `06-telecom-service-network-incident-ops/docs/00-setup/replay-log.md`
+- `06-telecom-service-network-incident-ops/data/synthetic/ai_invocations.csv`
+- `06-telecom-service-network-incident-ops/data/synthetic/events.jsonl`
+- `06-telecom-service-network-incident-ops/apps/api/services/ai_gateway.py`
+
+Use Agent mode so the chat can write the three files under `06-telecom-service-network-incident-ops/docs/00-contract/`. When it finishes, check those files against the Expected output table and the Done test at the bottom of `playbook/S0B-operating-contract.md`, then add the status row to `playbook/STATUS.md`.
+
+
+## 2026-10-09 23:35
+
+**Model:** Grok 4.7
+
+### User
+
+# S0B — Operating contract, cost envelope, and crosswalk
+
+Phase 0B in `Execution Plan.md`. Spine stages 0B and 0C. This stage writes down what the work may change before anything is read in depth. It also writes the first cost view and the challenge-to-spine crosswalk.
+
+The user attached `Project_Intent.md`, the challenge guide PDF, the plain-speak spine note, the replay log, `ai_invocations.csv`, `events.jsonl`, and `ai_gateway.py`, and pasted the stage prompt from `playbook/S0B-operating-contract.md`.
+
+### Assistant
+
+The operating contract, the first cost view, and the challenge-to-spine crosswalk are written. No code or test file was changed.
+
+1. Stage status: PASS. Every write boundary is Allowed, Prohibited, or PROVISIONAL with Mangesh (FDE) named as the owner, and every number in the cost envelope has an honesty label. The live-network action and the human approval point are written.
+
+2. Key findings.
+- `apps/api/services/ai_gateway.py` may change from stage S04-09 onward, after S2Q. Mangesh (FDE) accepts that change. This stage left the file as it is. Today it is the stub `local-sim-v1`, a 0.01 second wait, and `guardrail_status` `not_enforced`.
+- A live network change stays prohibited until a named human stores an approval id, after a policy allow and before the change. The replay of `POST /ai/summarize/REC-0001` returned recommendation text and an audit row with no approval id.
+- `ai_invocations.csv` has 354 data rows (PRECOMPUTED). 353 integer `token_count` values sum to 845675 (SIMULATED). One row, `AI_-BAD1`, has a blank `token_count` (EDUCATIONAL, a seeded blank). `events.jsonl` has 3000 lines. `cost_units` sums to 6736.4198 across four event types (SIMULATED). The file names no currency. The live call's `token_estimate` 64 is EDUCATIONAL. No price and no hosted-model invoice are in the repo.
+- The crosswalk has 18 rows. Challenge 1 is Match. Challenge 6, policy as code, is None on the spine through stage 42. This packet still requires the allow-and-deny pair in Phase 4. The other rows are Partial.
+
+3. Major risks.
+- A reader can treat 845675 or 6736.4198 as a bill. Both are synthetic stand-ins.
+- A later stage can open a change from the summarize JSON. The replay log has no approval id.
+- The spine has no executable policy file. A reviewer can think this packet dropped that work. The crosswalk says Phase 4 still does it.
+- CSV schema changes, Angular wiring, a second code reviewer, and the approver's job title are still PROVISIONAL.
+
+4. Assumptions and unknowns.
+- Assumption: Mangesh (FDE) is the person who accepts each stage of this assignment.
+- Unknown: the currency of `cost_units`, a price per token, a hosted model name, a cost per case, and a second code reviewer.
+- The desk job of the human who approves a live network change is PROVISIONAL until S04-09.
+
+5. Artifacts created.
+- `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`
+- `06-telecom-service-network-incident-ops/docs/00-contract/cost-envelope.md`
+- `06-telecom-service-network-incident-ops/docs/00-contract/challenge-to-spine-crosswalk.md`
+
+6. Blocking issues.
+None.
+
+7. Recommended next action.
+Start stage S01, the discovery dossier. Cite this contract and the replay log. Leave the cost envelope for stage S2Q to revise.
+
+
+## 2026-10-09 23:49
+
+**Model:** Grok 4.7
+
+### User
+
+explain how to run the next step
+
+### Assistant
+
+The next step is stage S01, the discovery dossier. Run it in a new chat. That chat reads the inherited repo and writes six files. It does not change application code, tests, or data.
+
+Record S0B in `playbook/STATUS.md` before you start. Add one row: date `2026-10-09`, stage `S0B`, status `PASS`, and a short note that the three files under `docs/00-contract/` are written. The status log still ends at S00.
+
+Then do this:
+
+1. Open a new Agent chat. Leave this chat as the S0B record.
+2. Attach the inputs named in `playbook/S01-discovery.md`:
+   - `Project_Intent.md`
+   - the folder `06-telecom-service-network-incident-ops` (that covers every file in section 4.2)
+   - `06-telecom-service-network-incident-ops/docs/00-setup/replay-log.md`
+   - `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`
+3. Open `playbook/S01-discovery.md`. Copy the prompt inside the fence that starts with `# Stage S01 — Discovery dossier (Challenge 1)`. Paste the whole prompt. Keep the objective, the scope, the locked facts, and the seven-item ending.
+4. Send it. The chat should write only these files, all under `06-telecom-service-network-incident-ops/docs/01-discovery/`:
+   - `current-state-architecture.md`
+   - `component-inventory.md`
+   - `business-flow-reconstruction.md`
+   - `data-and-integration-map.md`
+   - `ai-subsystem-discovery.md`
+   - `brownfield-risk-register.md`
+5. When it finishes, open `brownfield-risk-register.md` and pick any row. The evidence cell must name a file, a test, a log, or a replay result. No row should say "should" or "recommend". That is the done test in the stage file.
+6. Read the seven-item ending. If it says PASS or CONDITIONAL PASS, add a row to `playbook/STATUS.md`. If it says BLOCKED, fix the missing file before you open S02.
+
+S01 maps what the repo does today. A fix, a new route, or a target design belongs in a later stage. The operating contract still applies: the synthetic CSV files stay read-only, and a live network change stays stopped.
+
+The stage after S01 is S02, the behavioural baseline. Start that only after the S01 status row is in the log.
+
+
+## 2026-10-09 23:52
+
+**Model:** Grok 4.7
+
+### User
+
+Record S0B in playbook/STATUS.md before you start. Add one row: date 2026-10-09, stage S0B, status PASS, and a short note that the three files under docs/00-contract/ are written. The status log still ends at S00.
+
+### Assistant
+
+S0B is now in `playbook/STATUS.md`. The new row is date 2026-10-09, stage S0B, status PASS. The note says the three files under `docs/00-contract/` are written: the operating contract, the cost envelope, and the challenge-to-spine crosswalk. The log still has the playbook row and the S00 row above it.
+
+The next stage is S01, in a new Agent chat, using the prompt in `playbook/S01-discovery.md`.
+
+## 2026-10-09 23:54
+
+**Model:** Grok 4.7
+
+### User
+
+# S01 — Discovery dossier (Challenge 1, D1)
+
+Phase 1 in `Execution Plan.md`. Spine stages 0A, 5, 7. This stage maps the inherited system. It does not improve it.
+
+The user attached `Project_Intent.md`, the `06-telecom-service-network-incident-ops` folder, `docs/00-setup/replay-log.md`, and `docs/00-contract/operating-contract.md`, and asked for the six Challenge 1 discovery files under `docs/01-discovery/`. Map the inherited system as it is. Do not improve, refactor, or redesign it. Cite files, tests, logs, or the replay. Leave owners Unknown when the repo does not name them. End with stage status, key findings, major risks, assumptions and unknowns, artifact paths, blocking issues, and the next action.
+
+### Assistant
+
+1. Stage status: **CONDITIONAL PASS.** Owner is Unknown on all 55 rows of the component inventory, and that count is written in the inventory header. The six files are present. Each row cites a file, a test, a log, or the S00 replay. No row proposes a change.
+
+2. Key findings:
+- Three code ages sit in one repo. The legacy scripts read `devices.csv` and print counts. The FastAPI app reads that same file and appends `logs/audit.log`. The AI gateway builds a local summary and writes no file.
+- The API reads `devices.csv` only. A missing id returns the first row, `REC-0001`, with HTTP 200. Replay section 2.3 showed that.
+- None of the four named flows runs end to end. The order flow, the alarm-storm flow, and the remediation flow have no route. The topology flow has a record read and a local summary, and it has no stored approval.
+- The summary route checks no role. It returns model `local-sim-v1` and guardrail status `not_enforced`. The live gateway leaves `ai_invocations.csv` unchanged.
+- ADR 0001 is Accepted and was never revisited. The legacy count path and the API audit path follow different rules.
+- The OpenAPI fragment lists `GET /health`. The live app has three routes.
+- The API allow list includes `clinician`. The domain persona list does not include that word.
+
+3. Major risks:
+- A missing id is answered as `REC-0001`, and the summary route inherits that answer. The audit line keeps the id the caller asked for.
+- The prompt is filled with the whole device row, including `mgmt_ip` and `credential_profile`. The guardrail field is `not_enforced`.
+- Audit lines have no actor and no correlation id. A refused role returns HTTP 200 and writes no audit line.
+- The shared database password sits in the legacy script and in `.env.example`. This dossier writes it as `<redacted>`.
+- `REC-0001` is the first key on all six tables.
+- The six names in `known-gaps.md` are in the register, with these behaviours added. Likelihood is Unknown because the repo gives no frequency.
+
+4. Assumptions and unknowns:
+- Assumption: the files on disk, plus the S00 replay, are the system this stage mapped. Row counts were read from the CSVs and were not written back.
+- The owner of every component is Unknown.
+- The gap name `static_ssh_credentials` has no `ssh` string in the Python files or in `devices.csv`. Which file it points at is Unknown.
+- Whether `automation_service` is the same account as `app_shared` is Unknown.
+- The replay names test `test_missing_record_returns_first_row`. The file defines `test_legacy_missing_record_behavior_is_characterized`. That test checks a non-empty dict. When the names diverged is Unknown.
+- Whether CI has ever completed, and whether the Terraform file was applied, are Unknown.
+- Who added audit lines 8 to 13 after the seven replay lines is Unknown.
+- The repo does not say how many alarms make a storm.
+
+5. Artifacts created:
+- `06-telecom-service-network-incident-ops/docs/01-discovery/current-state-architecture.md`
+- `06-telecom-service-network-incident-ops/docs/01-discovery/component-inventory.md`
+- `06-telecom-service-network-incident-ops/docs/01-discovery/business-flow-reconstruction.md`
+- `06-telecom-service-network-incident-ops/docs/01-discovery/data-and-integration-map.md`
+- `06-telecom-service-network-incident-ops/docs/01-discovery/ai-subsystem-discovery.md`
+- `06-telecom-service-network-incident-ops/docs/01-discovery/brownfield-risk-register.md`
+
+6. Blocking issues: None. The conditional result is the Unknown owner column. It is stated in the inventory. It does not remove a required file.
+
+7. Recommended next action: Start stage S02 and snapshot the behaviours this dossier names. Start with the first-row return, the three live routes, and the batch result of 354 processed and 1 malformed.
+
+
+## 2026-10-10 00:10
+
+**Model:** Grok 4.7
+
+### User
+
+explain : snapshot the behaviours this dossier names. Start with the first-row return, the three live routes, and the batch result of 354 processed and 1 malformed.
+
+### Assistant
+
+S02 writes down what the program does today, then adds tests that fail if that behaviour changes. It does not fix anything.
+
+A behaviour snapshot is a short record for one call or one script. It has three parts: the input you send, the output you get back, and the side effect (the extra thing the run changes, such as a new line in `logs/audit.log`). The discovery notes already describe these. S02 turns the important ones into tests under `tests/characterization/` so a later edit cannot change them quietly.
+
+**First-row return.** Ask the API for a device id that is not in `devices.csv`, such as `DOES-NOT-EXIST`. The code returns the first data row. That row's `device_id` is `REC-0001`. The HTTP status is 200. The existing test only checks that the result is a non-empty dict. It does not check that the id is `REC-0001`. S02 adds a new test that does check `REC-0001`, and leaves the old test file alone.
+
+**The three live routes.** The running app has only these:
+
+| Route | Input to record | Output to record | Side effect to record |
+|---|---|---|---|
+| `GET /health` | No role header | HTTP 200, `status` `ok`, and the repo name | No line in `logs/audit.log` |
+| `GET /records/{id}` | An id, and a role header (or none) | HTTP 200 and a device row for an allowed role, including `clinician`. A missing id still returns `REC-0001` | An audit line for an allowed read. A refused role writes no line |
+| `POST /ai/summarize/{id}` | An id, and no role header | HTTP 200, model `local-sim-v1`, guardrail status `not_enforced` | An audit line with the record id and the model name |
+
+**Batch result of 354 processed and 1 malformed.** Run `python etl/run_daily_batch.py --sample`. The script reads `devices.csv`. It prints `processed` 354, because the file has 354 data rows. It prints `malformed` 1, because one row (`DEV-BAD1`) has empty fields. It leaves that row in the file. S02 records that printout and adds a test that still expects 354 and 1.
+
+Those three come first because S02's own list starts there: the missing-id return, the three routes, and the batch count. The same stage also records `clinician` being allowed, the summary route with no role check, and the legacy script holding a password constant. It still does not change the app.
+
+## 2026-10-10 00:13
+
+**Model:** Grok 4.7
+
+### User
+
+if i simply run the content of @playbook/S02-baseline.md in a new chat with these attachements - @S02-baseline.md (6-14) will it be fine?
+
+### Assistant
+
+Yes. A new chat in this project can run S02 from that file. Paste the whole playbook file, including the fenced prompt, the expected-output table, and the done test. Attach the inputs in lines 6–14.
+
+Two things on that list are easy to miss.
+
+The prompt also snapshots `scripts/sanity_check.py`. That script is not in lines 6–14. In this same project the new chat can open it from the repo. Attach it as well if you want it in the chat from the start.
+
+Run pytest with the existing `.venv`. `requirements.txt` does not include `httpx`. A clean install fails while collecting tests, before any test runs. S00 installed `httpx` into `.venv` only.
+
+One more check when the chat finishes. The tests append lines to `logs/audit.log`. This repo also already has untracked files from S00, S0B, and S01. `git status` will show those. The pass check that matters is narrower: no edits under `apps/`, `etl/`, `legacy/`, `data/`, or the two existing test files. New files belong only under `docs/02-baseline/` and `tests/characterization/`.
+
+The operating contract is not on the S02 input list. The prompt already forbids fixes, so you do not need to attach it for this stage.
+
+## 2026-10-10 00:33
+
+**Model:** Grok 4.7
+
+### User
+
+# S02 — Behavioural baseline (Challenge 2, D2)
+
+Phase 2 in `Execution Plan.md`. Spine stage 7. This stage records current behaviour and locks it with tests. It fixes nothing.
+
+The user supplied the S02 playbook prompt, the locked facts from Project Intent sections 4.2, 4.3, and Appendix D, and the inherited tests, data files, ETL, legacy script, API, replay log, and discovery dossier. The required outputs are the baseline test report, behaviour snapshot, characterization tests, data profile, data-quality baseline, and a Keep/Fix defect list.
+
+### Assistant
+
+Stage status: **CONDITIONAL PASS**. The eight tests passed and the data profile ran. Five of the 24 labels in `data/quality_issues.json` are marked Not found, because those files do not contain that defect.
+
+**Key findings.**
+
+- The inherited suite has three tests, and all three passed before any new test existed: `test_health_contract`, `test_ai_summary_has_minimum_contract`, and `test_legacy_missing_record_behavior_is_characterized`. The replay log names a different third test, `test_missing_record_returns_first_row`. The file on disk uses the longer name. This stage left that file as it is.
+- Five new tests under `tests/characterization/` also passed. `pytest -q` then reported 8 passed. Each new test locks current behaviour and is marked to be replaced when the defect is fixed.
+- A missing id returns the first device row, `REC-0001`, with HTTP 200. That is Fix row F01. A call for `REC-0001` itself returns that same row. That is Keep row K02.
+- `clinician` is accepted on `GET /records/{id}`. `admin`, `operator`, `engineer`, and `ai_agent` are accepted for a known id. A missing role header on the record route is treated as `operator`. `POST /ai/summarize/{id}` accepts a call with no role header. `guardrail_status` is `not_enforced`.
+- `python etl/run_daily_batch.py --sample` printed `processed` 354, `malformed` 1, `sample` True. The blank device row stays in `devices.csv`. The count print is Keep. The missing quarantine file is Fix.
+- `python legacy/reconcile_legacy.py` printed `legacy reconciled 354`. The script also assigns `SHARED_DB_PASSWORD`. The value is redacted. The count is Keep. The password constant is Fix.
+- `python scripts/sanity_check.py` exited 0: 6 CSV files, 3000 events.
+- Profile numbers are REAL, from `python docs/02-baseline/profile_data.py`. Every CSV has 354 rows. `events.jsonl` has 3000 lines. Each CSV has 3 duplicated keys and one blank row on line 353. 166 alarms have `last_seen_at` before `first_seen_at`. Incident severity includes `gold` (41) and `bronze` (50). Alarm severity includes them too. 353 `ai_call_id` values start with `AI_-`. 1992 events have a null or blank `correlation_id` (982 null, 1010 blank, 1008 filled).
+- `retry_count` is at or above 1000 on 294 orders. That bound is PROPOSED. Owner: Unknown. Minimum 32, maximum 4995. `sla_breach_risk` `1.42` is on `INC-00019`. `recommendation_risk` `1.42` is on `AI_-00019`. The sla range 0 to 1 is PROPOSED. Owner: Unknown.
+- Not found: an out-of-range score on devices, circuits, and alarms; an impossible timestamp on service orders and AI invocations. Those two files have no date-time column.
+
+**Major risks.**
+
+- A caller can treat a missing device as `REC-0001`. The audit line stores the id the caller sent.
+- The shared database password sits in `legacy/reconcile_legacy.py`.
+- A refused role returns HTTP 200 and writes no audit line.
+- An allowed read returns `mgmt_ip` and `credential_profile`. The summary prompt receives the whole row.
+- The PROPOSED retry bound and sla range are not approved rules.
+
+**Assumptions and unknowns.**
+
+- Blank cells are treated as the seeded "blank mandatory fields" item. The repo does not name the mandatory columns.
+- A year-1900 timestamp is the impossible date in these files because the other parsed dates in that column are year 2026.
+- Owners of the retry maximum and the sla range are Unknown.
+- This run used Python 3.13.5. CI names Python 3.11. A clean install without `httpx` was not repeated. The replay already recorded that collection error.
+- Four audit lines timestamped `2026-10-10T05:51` were already in `logs/audit.log` before this stage. Who wrote them is Unknown. This stage's own calls at `07:38` were restored out of the file. The quoted lines live in the behaviour snapshot.
+
+**Artifacts created.**
+
+- `06-telecom-service-network-incident-ops/docs/02-baseline/baseline-test-report.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/behaviour-snapshot.md`
+- `06-telecom-service-network-incident-ops/tests/characterization/test_current_behaviour.py`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/profile_data.py`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/profile-output.json`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/data-quality-baseline.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/defect-list.md`
+
+Pytest collected the new tests without an `__init__.py`. No file under `apps/`, `etl/`, `legacy/`, `data/`, or the two existing test files was edited.
+
+**Blocking issues.**
+
+None. The five Not found labels are written in the data-quality file. They do not stop the next stage.
+
+`git status` still shows three tracked files that were already dirty at the start of this stage: `logs/audit.log` (the four `05:51` lines), `playbook/STATUS.md` (the S0B row), and `transcript/chat_transcript.md` (the project log, including this turn).
+
+**Recommended next action.**
+
+Run stage S03. Harvest the words Confirmed and Not found, and the severity words `gold` and `bronze`, from `data-quality-baseline.md`. Leave the PROPOSED bounds as proposals until an owner is named. When S04 Half A starts, use the Fix table in `defect-list.md`. F01 is the missing-record fallback.
+
+## 2026-10-10 05:31
+
+**Model:** Grok 4.7
+
+### User
+
+should i run @playbook/S2Q-ai-qualification.md before i run @playbook/S03-semantic-layer.md based on @playbook/README.md ?
+
+### Assistant
+
+Yes. Run S2Q next. S03 comes after it.
+
+The playbook table lists the order as S02, then S2Q, then S03. The Depends on column says S2Q depends on S02, and S03 depends on S2Q.
+
+S03’s input list includes `docs/02-baseline/ai-qualification.md`. That file is what S2Q writes. S03 then copies each AI use’s agency and approval point from that table into `ai-context-policy.yaml`.
+
+S02 finished as CONDITIONAL PASS. The README says to stop only when a stage is BLOCKED. You can start S2Q.
+
+Record the S02 line in `playbook/STATUS.md` before you open the next chat. S2Q is a new chat. Attach the inputs in `playbook/S2Q-ai-qualification.md` and paste that prompt in full.
+
+## 2026-10-10
+
+**Model:** Grok 4.7
+
+### User
+
+# S2Q — AI versus no AI, per capability
+
+Phase 2Q in `Execution Plan.md`. Spine stage 8. This is the decision point the trainer guidance calls the real one: for each capability, does it need a model at all, and how much may it do on its own?
+
+## Inputs
+
+- `Project_Intent.md` (sections 3.1, 5.2, 5.3, Appendix C)
+- `06-telecom-service-network-incident-ops/docs/architecture/current-state.md`
+- `06-telecom-service-network-incident-ops/docs/domain-specific-spec.md`
+- `06-telecom-service-network-incident-ops/docs/01-discovery/business-flow-reconstruction.md`
+- `06-telecom-service-network-incident-ops/docs/01-discovery/ai-subsystem-discovery.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/defect-list.md`
+- `06-telecom-service-network-incident-ops/docs/00-contract/cost-envelope.md`
+
+Attached: `Project_Intent - sections 3.1, 5.2, 5.3, Appendix C.md`, `current-state.md`, `domain-specific-spec.md`, `business-flow-reconstruction.md`, `ai-subsystem-discovery.md`, `defect-list.md`, `cost-envelope.md`.
+
+## Prompt
+
+The pasted Stage S2Q prompt. Objective: decide, for each capability in the four business flows and the three named AI products, whether it needs a model at all, which kind, and how much agency it may have. Rows: order qualification; provisioning retry and rollback; alarm dedupe; alarm-to-incident correlation; topology lookup; incident summary; next-action recommendation; configuration suggestion; capacity forecast; remediation execution; remediation validation. Seven columns: what it does today; options considered; pick; why this pick needs no more intelligence than stated; agency allowed; human approval point; reversibility and risk if wrong. Reconcile the cost envelope. Expected shape to confirm against evidence: alarm dedupe is deterministic; missing-id handling is deterministic; incident summary and next-action recommendation may use GenAI with RECOMMEND_ONLY or HOLD_FOR_REVIEW; remediation execution is never AI-executed. Artifacts: `docs/02-baseline/ai-qualification.md` and an update to `docs/00-contract/cost-envelope.md` with status REVISED-S2Q and a change log. End with the seven completion items.
+
+### Assistant
+
+1. Stage status: PASS. Each of the eleven capabilities has a pick and a reason, each GenAI pick names a need a rule cannot meet and names a person who must see the text, and the model is never the actor that changes the live network.
+
+2. Key findings. Alarm dedupe is deterministic code. It groups alarms that share a `dedupe_key` or a `storm_batch_id`. A missing id is also deterministic. Today's code returns `REC-0001` for a missing id (defect F01). The qualified behaviour is that the id is absent. Incident summary is GenAI, outcome RECOMMEND_ONLY, agency recommend. The need is generation of a short account. The `noc_operator` reads it, and the incident row stays unchanged. Next-action recommendation is GenAI, outcome HOLD_FOR_REVIEW, agency recommend. The need is reasoning over varied inputs, plus generation. The `noc_operator` accepts or rejects the sentence before any change ticket exists. A missing id or a `stale_topology_flag` of `true` blocks the call before the model runs. Configuration suggestion is GenAI, outcome HOLD_FOR_REVIEW, agency recommend. The need is generation of a suggested change, and reasoning over vendor, firmware, and alarms that vary by device. The `network_engineer` accepts or rejects the text. The model does not push the config. Capacity forecast is deterministic code. The files store `bandwidth_mbps` and `requested_bandwidth`. No utilization history is in the repo, so no forecast model is selected. Remediation execution is workflow automation. Agency execute applies only after a named human stores an approval id. The model stops at the recommendation rows. This packet adds no execute route. Eight capabilities have hosted-model cost 0 by assignment in the cost envelope. The three GenAI prices stay Unknown. The SIMULATED sums 845675 and 6736.4198 stay, with their honesty labels. Those sums are not split onto the GenAI rows, because the CSV `use_case` column does not name the three products.
+
+3. Major risks. The live stub still returns `guardrail_status` `not_enforced` and the sentence "Review and approve before action", with no approval id. This stage did not change that code. A later worker can still treat that JSON as a change ticket. The operating contract forbids that step. A wrong summary or a wrong configuration suggestion, once copied onto a device, is a live network change. Until F01 is fixed, a summary can describe `REC-0001` when the caller asked for an id that is not in the file. The approver's desk job is PROPOSED. It is not confirmed.
+
+4. Assumptions and unknowns. The map from Network Incident Copilot, Configuration Assistant, and Capacity Intelligence onto the rows is an Inference. The files give the names only. The alarm-to-incident join key is Unknown. How many alarms make a storm is Unknown. This stage sets no count. The legal maximum for `retry_count` is Unknown. Defect F18's bound of 1000 stays PROPOSED, owner Unknown. What a blank `stale_topology_flag` should do is Unknown. No command catalog and no capacity history are in the repo. The price per token, the hosted model name, and the currency of `cost_units` stay Unknown. PROPOSED desk jobs, owner Mangesh (FDE), to confirm at stage S04-09: `noc_operator` for the summary and the next-action sentence; `network_engineer` for the configuration suggestion and for the live change.
+
+5. Artifacts created. `06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md` holds the header, the eleven-row table, a note for each GenAI pick, and the list of eight capabilities that stay deterministic. `06-telecom-service-network-incident-ops/docs/00-contract/cost-envelope.md` is now status REVISED-S2Q, version 1.1, with the hosted-model rows and a change log. `playbook/STATUS.md` has the S02 line and the S2Q line.
+
+6. Blocking issues. None.
+
+7. Recommended next action. Run stage S03. Write `ai-context-policy.yaml` from this table. Copy the pick, the outcome, and the human approval point for incident summary, next-action recommendation, and configuration suggestion. Leave the eight deterministic capabilities out of the model policy.
+
+## 2026-10-10 06:03
+
+**Model:** Grok 4.7
+
+### User
+
+are we ready to run @playbook/S03-semantic-layer.md now?
+
+### Assistant
+
+Yes. Start S03 in a new chat. S2Q is PASS, and the playbook stops the sequence only when a stage is BLOCKED.
+
+S03 depends on S2Q. That stage finished as PASS. S02 is CONDITIONAL PASS because five quality labels were not found in the files. That condition does not stop the next stage. The six discovery notes, the baseline files, and `docs/02-baseline/ai-qualification.md` are on disk. `Semantic_Layer_capture.pdf` is at the project root. There is no `semantic-layer/` folder yet. S03 is the stage that creates it.
+
+Open a new chat. Attach every file under Inputs in `playbook/S03-semantic-layer.md`, including the PDF and `Project_Intent.md` sections 5.1, 6.2, and Appendix E. Paste the prompt in that file in full.
+
+The checkboxes in `Project_Intent.md` section 6.1 are still empty. The work those boxes describe is already in the earlier stage files. S03 ticks section 6.2 inside the README it writes. Phase 4 waits until S03R passes. Do not start an S04 chat from this one.
+
+1. Stage status: PASS for S2Q, so S03 may start. S2Q is not BLOCKED, and every S03 input file is on disk.
+2. Key findings. The playbook order is S2Q, then S03, then S03R. S2Q wrote the qualification table S03 must copy into `ai-context-policy.yaml`.
+3. Major risks. A semantic layer written in this same chat can mix the qualification decision with the YAML. The playbook asks for a new chat and the full prompt.
+4. Assumptions and unknowns. Section 6.1 boxes are unticked in `Project_Intent.md`. The evidence for those boxes is already in the discovery, baseline, and S2Q files. `playbook/STATUS.md` has no S01 row. The six files under `docs/01-discovery/` are present.
+5. Artifacts created. None in this turn. The next stage creates `06-telecom-service-network-incident-ops/semantic-layer/`.
+6. Blocking issues. None.
+7. Recommended next action. Open a new chat, attach the S03 inputs, and paste the prompt from `playbook/S03-semantic-layer.md`.
+
+## 2026-10-10 06:12
+
+**Model:** Grok 4.7
+
+### User
+
+will the subsequent steps from S03R-semantic-layer-review through S05-14-audit-chain add their outputs to the Semantic Layer?
+
+### Assistant
+
+No. S03 writes `semantic-layer/`. S03R through S05-14 read that folder and write their own files beside it.
+
+Each of those stages cites a YAML id. The playbook "What it produces" column sends the new files elsewhere:
+
+| Stage | Where the new files go |
+|---|---|
+| S03R | `docs/02-baseline/semantic-layer-review.md` |
+| S04-03 | `docs/03-identity/`, `tests/access/` |
+| S04-04 | `docs/04-secrets/` |
+| S04-05 | `docs/05-iac/` |
+| S04-06 | `docs/06-policy/`, `policy/` |
+| S04-07 | `docs/07-cicd/`, `evidence/`. CI runs the semantic-layer tests. It does not add a meaning file. |
+| S04-08 | `docs/08-observability/` |
+| S04-09 | `docs/09-ai-guardrails/`, `tests/ai/`, and a later edit to `ai_gateway.py` |
+| S04-10 | `docs/10-performance/` |
+| S04-11 | `docs/11-reliability/`, `tests/reliability/` |
+| S04-12 | `docs/12-finops/` |
+| S05-13 | `docs/13-security-validation/` |
+| S05-14 | `docs/14-audit/` |
+
+S03R says "Do not edit any file under semantic-layer/." It writes a review and a "Fixes required" list. If a row fails, the fix goes back into `semantic-layer/` before S04 starts. That is a correction of S03, and the review file stays in `docs/02-baseline/`.
+
+`Execution Plan.md` says the YAML is the source of truth. If a later file disagrees with the YAML, fix that later file or write an ADR. S04-03 says the same thing for a missing persona: write an open question for S03. Do not invent the name in the identity design.
+
+S06 and S08 follow the same rule. The PRD cites YAML ids. S08 gives the second model the same `semantic-layer/` tree, unchanged.
+
+## 2026-10-10 06:35
+
+**Model:** Grok 4.7
+
+### User
+
+The Lead Trainer for the FDE program repeatedly emphasized that "Complete the transformation, develop the semantic layer, and then develop the PRD and then develop the app." Does that mean we have placed the Semantic Layer creation (S03) to early in the playbook instead of further down where the PRD is created?
+
+### Assistant
+
+The trainer's sentence is the challenge guide's page 6 list. The playbook starts the semantic layer earlier than that list, on purpose, and the plan records the reason.
+
+The guide has two lists. Page 1 is the 16-challenge journey. Page 6 is the product path: develop and extract the semantic layer, develop the PRD, develop the app, demo, test the layer with a new model, compare the two apps. `Project_Intent.md` Appendix A titles page 6 "Product path after the spine." Read as one queue, the layer comes after challenge 16.
+
+This packet does not run it as one queue. `Project_Intent.md` section 5.4 orders the work as D1 discovery, D2 baseline, D3 semantic layer, D4 spine controls, D5 PRD, D6 app. Section 6.1 names the start gate "Ready to start the semantic layer (after D1 and D2)." `Execution Plan.md` section 5 says why: Phase 3 comes before Phase 4 because the access matrix, the policy inputs, the AI context policy, and the metrics all reuse YAML ids; Phase 4 and 5 come before Phase 6 so the PRD can require controls that already have a design.
+
+The control stages depend on the layer. S04-03 uses persona ids from `access-semantics.yaml`. S04-06 comments each Rego rule with a YAML rule id. S04-08 maps every log field to a YAML id. S04-09 builds the prompt allow-list from `ai-context-policy.yaml`. S05-14 maps the provenance fields to YAML ids. If the layer were written next to S06, those stages would have no ids, or they would invent names.
+
+The part that matches the trainer is already in place. The layer exists before the PRD. S06 writes the PRD from the layer and the control designs. S07 builds the app from the PRD. S08 gives the unchanged layer to the second model. One reading of the trainer's phrase does fit the playbook: "Complete the transformation" can mean the discovery, the baseline, and the per-capability AI decision. Those are done before S03.
+
+Leave S03 where it is.
+
+## 2026-10-10 06:42
+
+**Model:** Grok 4.7
+
+### User
+
+The Lead Trainer specifically said that if we lose access to the Model (e.g. the Frontier Model vendor decided to discontinue the model due to a Government Hold), the Semantic Layer should be the fallback mechanism to generate the output. Without incorporating the steps from S04-03-identity through S05-14-audit-chain, we will not have all the elements of the modernization captured in the sematic layer. Do you agree?
+
+### Assistant
+
+I agree with half of it. The meaning that S04-03 through S05-14 introduce must land in the YAML. The code and the test files those stages write must not. And the playbook has a gap between those two facts.
+
+What the fallback is in this packet. S08 is the test of the trainer's claim. The second model receives `semantic-layer/` and `docs/prd/prd.md`, plus the test files. It builds `apps/api_model_b/`. It may not ask for a new meaning. So the fallback is the YAML and the PRD together.
+
+What belongs in the YAML from S04 and S05: the policy input fields `role`, `resource`, `purpose`, `scope`, `risk` (S04-03); the rule "an AI remediation recommendation becomes a change" (S04-06); the fourteen log fields (S04-08); the prompt allow-list, output schema, timeout outcome, stale-topology BLOCK (S04-09); the idempotency keys (S04-11); cost and token metrics (S04-12); the provenance groups and the "cannot be proven" list (S05-14). Most are already asked for in the S03 prompt, items 4 through 7.
+
+What does not belong: `policy/opa/ai_action.rego`, the rewritten `ai_gateway.py`, `.github/workflows/ci.yml`, `tests/ai/`, `tests/access/`, Terraform. Code is what a model rebuilds from the meaning.
+
+The gap. S04-03 says a missing persona is "an open question for S03." S06 says the same. S08 and S09 forbid any YAML change. No stage reopens S03 to absorb those questions. One concrete case: S04-03 requires `scope` in the policy input model, and S03 prompt item 5 maps personas to "actions, resources, purpose, and risk." `scope` is missing.
+
+What I would change, before S03 runs: add `scope` to S03 item 5; add a short stage between S05-14 and S06, `S05R-semantic-layer-revision.md`, that collects every open question, folds each into the YAML with a `source:` list, bumps the version, reruns `build.py` and the tests, reruns the S03R rows, and records the diff. S06 cites that version. S08 hashes it.
+
+## 2026-10-10 06:52
+
+**Model:** Grok 4.7
+
+### User
+
+Make two edits to the playbook, before you run S03:
+
+Add scope to S03 prompt item 5, so access-semantics.yaml has the five fields S04-03 and S04-06 need.
+Add a short stage between S05-14 and S06, for example S05R-semantic-layer-revision.md. Its job: collect every "open question for S03" from the S04 and S05 outputs, fold each into the YAML with a source: list, bump the version, rerun build.py and the tests, rerun the S03R check rows, and record the diff. S06 then cites that version. S08 hands that version over unchanged and hashes it.
+With those two edits, the YAML holds every meaning the modernization introduced, and S08 proves a new model can rebuild the app from it. Without them, the control-stage meanings sit in docs/03-identity/ through docs/14-audit/ as Markdown, and a second model would not receive them." Ensure required changes are made in the @Project_Intent.md and @Execution Plan.md, @playbook/README.md or any other .md file in the project, if at all needed to address the above change.
+
+### Assistant
+
+Both edits are in, plus the files that had to agree with them.
+
+**Edit 1, `playbook/S03-semantic-layer.md`.** Item 5 now reads: personas map to actions, resources, purpose, scope, and risk. Scope is the set of records a persona may touch. Each of the five fields gets its own value list with ids, because S04-03 writes the policy input model from them and S04-06 reads them in Rego. Two more lines: every YAML file carries a `version:` string, `1.0.0` at this stage; and the lifecycle note says S05R folds in the control-design terms and raises the version. The expected-output rows for `access-semantics.yaml` and `README.md` match.
+
+**Edit 2, `playbook/S05R-semantic-layer-revision.md`, new.** Same shape as the other stage files. Eight required steps: collect every "Open question for S03" line and every unresolved term from `docs/03-identity/` through `docs/14-audit/`, the S03R review, Rego comments, and tests; decide add, alias, reject, or defer per row; fold each add into its YAML file with a stable id, plain description, `source:` list, and `proposed: true` plus owner where the repo lacks it; protect every id that code, policy, tests, or docs cite; raise one version string in every YAML file and the README; rebuild and retest; rerun S03R rows R1 to R15 and the eight failure-list rows; record the diff. Artifacts: the revised `semantic-layer/` and `docs/02-baseline/semantic-layer-revision.md`. BLOCKED when a test fails, a cited id was removed, or any AI use has execute agency. After S05R, a YAML change needs an ADR.
+
+**Files changed so the stages agree.**
+
+| File | Change |
+|---|---|
+| `playbook/README.md` | S05R row in the stage table. S06 now depends on S05R PASS. A shared "Open questions for S03" rule. D3 and D7 hand-back lines name the S05R version. |
+| `playbook/S04-03-identity.md`, `S04-04` to `S04-12`, `S05-13`, `S05-14` | One constraint line each: a missing term becomes an "Open question for S03:" line, and S05R folds it in. Each prompt is pasted alone, so the rule had to be in the prompt. |
+| `playbook/S03R-semantic-layer-review.md` | Lifecycle: S05R reruns rows R1 to R15; S08 gets the S05R version. |
+| `playbook/S06-prd.md` | Inputs add `semantic-layer-revision.md`. The PRD header records the S05R version. A missing term stops the PRD and reruns S05R. |
+| `playbook/S08-second-model.md` | Part 1 records the version string beside the hashes and stops if it differs from S05R and the PRD header. |
+| `Execution Plan.md` | v1.1. Phase 5R in the flowchart, the reads table, the order reasons, the stage list, a full Phase 5R section, Phase 3 scope and version lines, the Phase 4 open-question rule, Phase 6 scope, the coverage check, and a change log in section 10. |
+| `Project_Intent.md` | Section 5.4 gains a "D3 revision (stage S05R)" row. Section 6.3 D3 line names S05R. Appendix E: `access-semantics.yaml` lists scope; a closing paragraph says how open questions reach the YAML. |
+| `Project_Intent (sections 5.1, 6.2, Appendix E).md` | The same Appendix E edits, so the S03 input slice matches the main file. |
+| `Telecom Application Modernization.md` | The semantic-layer row names S05R. |
+
+**Not changed.** `docs/00-contract/operating-contract.md` row 7 names S03R and S06R as the human review points. S05R edits YAML under `semantic-layer/`, which row 1 already allows as a new file. The contract does not need a new row for it. The `.bak` files were left alone.
+
+S03 is still the next stage to run.
+
+
+## 2026-10-10 07:32
+
+**Model:** Claude Fable 5.1
+
+### User
+
+Run stage S03 — Semantic layer (product path step 1, D3). Build `semantic-layer/` in the exact tree from `Semantic_Layer_capture.pdf`, plus `generated/` and `build.py`. Inputs: the capture PDF, `Project_Intent.md` sections 5.1, 6.2, Appendix E, the domain spec, the six discovery notes, the three baseline notes, `main.py`, `ai_gateway.py`, `access.rego`, and the synthetic data headers and distinct values. Harvest every entity, field, role, persona, status word, AI field, and rule candidate with its source. Give each a dot-form id. Write the four collisions. Write at least six rules, six metrics, seven personas with five value lists, the AI context policy with the four outcomes and fail-to-person. Schema validates every YAML file. Tests fail on a missing item, a glossary mismatch, generated drift, or an undefined id. Version 1.0.0. Record the build and test output in the README. End with the seven-item final response.
+
+### Assistant
+
+Stage S03 is done. The tree is at `06-telecom-service-network-incident-ops/semantic-layer/`.
+
+What was built. Seven YAML files at version 1.0.0: entities (7 entities, 68 fields, 15 concepts), relationships (15 links), status-taxonomy (44 words, 36 status fields, 8 code words, 4 collisions plus 5 other overlaps), business-rules (13), metrics (9), access-semantics (7 personas, 5 value lists, 5 API roles, 3 OPA rules, clinician removed), ai-context-policy (allow list, forbidden fields, output schema, 9 provenance fields, 4 outcomes, 6 fail modes, 11 AI uses). One JSON Schema with seven branches. 34 tests. `build.py` writes eight JSON files into `generated/`. `glossary.md` has 153 rows. `README.md` ticks all seven 6.2 items and records the build output.
+
+Done test. Deleted `generated/`, ran `build.py`, ran the tests: 34 passed. Changed the glossary Term `gold` to `golden`: the glossary test failed with `('golden', 'status.word.gold', 'gold')`. Restored it. The inherited suite still passes: 8 passed.
+
+1. Stage status: PASS. The schema validates all seven YAML files, 34 tests pass, `generated/` is reproduced by `build.py`, and every 6.2 item is ticked without a gap.
+
+2. Key findings. The same 14-word pool fills 16 columns across the six CSV files, including `hostname`, `vendor`, `firmware`, `root_cause`, `model`, and `guardrail_status`. `mgmt_ip` holds the words `alpha`, `beta`, `gamma`, `legacy`, `modernized`, not addresses. `gold`, `silver`, and `bronze` fill the severity columns of alarms and incidents next to `critical` and `high`. Every API-read field is a device field; 56 of 68 fields are read by nothing. The order-to-circuit link in Appendix E has no shared key column. The alarm-to-incident join is Unknown. No rule in the layer is enforced in code today.
+
+3. Major risks. A reader can treat a PROPOSED persona grant, purpose, prompt allow list, or output schema as approved. `jsonschema` is in `.venv` only; a clean install from `requirements.txt` cannot run `build.py` or the tests. `status-taxonomy.yaml` is 3500 lines and may be skimmed; the tests recount it against the CSVs. The mapping of `operator` to `noc_operator` and `engineer` to `network_engineer` is an Inference.
+
+4. Assumptions and unknowns. Assumed: a column drawn from a small word pool is a status column; the three flag columns are booleans stored as text. Unknown: the allowed severity list and order, the storm size, the retry maximum, the `sla_breach_risk` range, the model timeout, what a blank `stale_topology_flag` should do, the approver's desk job, which personas may read `mgmt_ip` and `credential_profile`, whether `automation_service` is `app_shared`, whether `engineer` stays on the API list, which order built which circuit.
+
+5. Artifacts created. `06-telecom-service-network-incident-ops/semantic-layer/README.md`, `glossary.md`, `entities.yaml`, `relationships.yaml`, `status-taxonomy.yaml`, `business-rules.yaml`, `metrics.yaml`, `access-semantics.yaml`, `ai-context-policy.yaml`, `schemas/semantic-layer.schema.json`, `tests/test_semantic_layer.py`, `build.py`, `generated/` (eight JSON files). Also one row added to `playbook/STATUS.md`. `jsonschema` 4.26.0 installed into `.venv`.
+
+6. Blocking issues. None.
+
+7. Recommended next action. Run stage S03R, the human review of this tree, before any Phase 4 work. The reviewer should read the four collisions, the seven persona grants, and the prompt allow list first, and decide whether `jsonschema` goes into `requirements.txt`.
+
+## 2026-10-10 08:24
+
+**Model:** claude-opus-5.5
+
+### User
+
+# S03R — Semantic layer review
+
+Review gate after Phase 3. Run this in a fresh chat so the reviewer has not seen the drafting conversation. A FAIL row blocks Phase 4.
+
+Inputs: `Semantic_Layer_capture.pdf`; `Project_Intent.md` (section 6.2); `06-telecom-service-network-incident-ops/semantic-layer/` (the whole tree); `docs/02-baseline/ai-qualification.md`; `docs/02-baseline/data-quality-baseline.md`; `playbook/README.md` (the failure list).
+
+(Full S03R prompt pasted from `playbook/S03R-semantic-layer-review.md`: checks R1 to R15, evidence rules, guardrails, required artifact `docs/02-baseline/semantic-layer-review.md`, completion gate, lifecycle linkage, and the seven-item final response.)
+
+### Assistant
+
+The review is BLOCKED for S04, but the problems are small. Every hard-block check passes. The schema validates all seven YAML files, all 34 tests pass, a clean rebuild of `generated/` gives identical bytes, no secret is in the tree, and no model gets execute agency. Six softer rows fail. Three of them (R9, R14.4, R14.8) fall outside what CONDITIONAL PASS allows, so S04 cannot start yet.
+
+The review is in `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md`. It has 14 check rows, 8 failure-list rows, the pasted build and test output, 7 fixes, and 4 advisories. I did not edit anything under `semantic-layer/`. For R11 I rebuilt a copy in a temp folder.
+
+1. **Stage status: BLOCKED.** No hard-block row failed. R9 and R14 failed, and the gate allows a FAIL only in R12 or R15, so S04 may not start.
+
+2. **Key findings.**
+   - The structure is sound. The tree matches the capture PDF plus `build.py` and `generated/`. All six required rules, all seven personas, and all four collisions are present. `clinician` is under `removed_roles`. The eleven AI uses copy S2Q's pick, agency, and approval point.
+   - R9 and R14.8: the YAML uses the agency words (analyse, recommend, decide, execute) and the pick words (rules, deterministic_code, workflow_automation, genai) in 32 places. Neither the YAML nor the glossary says what they mean. The glossary also has no rows for the eleven `ai_use.*` ids or the nine `provenance.*` fields. No row says what `mgmt_ip` or `credential_profile` is.
+   - R12 and R14.7: the retry bound of 1000 and the 0-to-1 `sla_breach_risk` range are marked PROPOSED, but they say "Owner Unknown". Both came from the S02 baseline with the same gap.
+   - R14.4: the glossary says each meaning is a Verified Fact unless a row says otherwise. It also says the repo defines none of the 44 status words. So rows like `new` and `debug` are really Inference.
+   - R15: I picked three rows at random with seed 20261010. `guardrail` is clear. `east-4` never says what a network zone is. `cost per correlated incident` reads awkwardly and never explains "correlated".
+
+3. **Major risks.**
+   - A second model given this tree must guess what "analyse" and "deterministic_code" mean.
+   - The tests did not catch the glossary gap. The glossary check skips `ai_use.` and `provenance.` and does not check the agency or pick words.
+   - A reader can treat an ownerless PROPOSED number as an approved rule.
+
+4. **Assumptions and unknowns.**
+   - I read R8 as "no model acts with execute agency". The one `agency: execute` item is remediation execution, which is workflow automation and calls no model.
+   - The gate defines no status word for a FAIL in R9 or R14 alone. I used BLOCKED because `playbook/README.md` says any FAIL blocks the next stage.
+   - Who should own the two bounds is unknown.
+
+5. **Artifacts created.**
+   - `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md`
+   - One row added to `playbook/STATUS.md`
+
+6. **Blocking issues.** R9, R14.4, and R14.8 must be fixed before S04. R12, R14.7, and R15 need their fixes too. The fix list has one item for each. The main items are: add agency and pick value lists with ids to the YAML, add the missing glossary rows, extend `GLOSSARY_PREFIXES`, name an owner for the two bounds, fix the blanket label, and rewrite two glossary rows.
+
+7. **Recommended next action.** Go back to S03 with the seven fixes. Then run `build.py` and the tests, and run S03R again in a fresh chat. Also add `__pycache__/` to `.gitignore` before committing, so the committed tree matches the PDF.
+
+## 2026-10-10 08:37
+
+**Model:** claude-opus-5.5
+
+### User
+
+Should we create a new stage in the playbook to run S03 (S03 w S03R suggested fixes) with the recommended next action from @playbook/S03R-semantic-layer-review.md output above?
+
+### Assistant
+
+Yes, but make it a small, reusable fix stage, not a copy of S03 with these seven fixes written into it.
+
+**Why not just re-run S03 as is.** The S03 prompt builds the whole tree from scratch. A full re-run would regenerate 657 items, and a reviewer would have to check all of them again. It could also change things that already passed, like the collisions, the persona grants, or the AI-use rows. The fixes only touch about a dozen lines across four YAML files, the glossary, the test file, and the baseline.
+
+**Why not put the seven fixes into the stage file.** The S03R prompt is reused later, and S05R reruns rows R1 to R15. The next review may produce a different fix list. A stage that reads whatever fix list the latest review wrote works every time.
+
+**What I'd suggest.** Add `playbook/S03F-semantic-layer-fixes.md` with these parts:
+
+- **Inputs:** `docs/02-baseline/semantic-layer-review.md` (the "Fixes required" list), the `semantic-layer/` tree, and the files the fixes name. This round, that includes `data-quality-baseline.md`.
+- **Scope:** apply each listed fix and nothing else. Every edit cites its fix number. Advisories are optional and must be listed separately.
+- **Guardrails:** keep version `1.0.0` and add a change-log row that says "S03R fixes applied". Raising the version is S05R's job, and the tests hard-code `1.0.0`. Do not change any item that passed review.
+- **Gate:** PASS when every fix is applied, `build.py` runs, the tests pass, and the new glossary prefix checks are in the tests. Then S03R is run again in a fresh chat.
+- **Expected output:** a short `docs/02-baseline/semantic-layer-fixes.md` that maps each fix to the file and line changed. The README change log is updated.
+
+It also needs a row in the `playbook/README.md` stage table. Its condition would be "S03R not PASS", and it would loop back to S03R. A line in `STATUS.md` would record each round.
+
+One decision is yours: who owns the 1000 retry bound and the 0-to-1 risk range. The fix list offers "Mangesh (FDE) until a business owner is named". The other option is to drop those numbers from the semantic layer.
+
+Do you want me to write `S03F` and add it to the playbook README?
+
+## 2026-10-10 08:41
+
+**Model:** claude-opus-5.5
+
+### User
+
+will S03F be re-usable?
+
+### Assistant
+
+Yes, if it is written so that it reads its inputs and assumes nothing about them. Four choices in the file make it reusable.
+
+1. **It reads the fix list. It does not contain it.** The only input that changes between runs is the "Fixes required" section of the latest `semantic-layer-review.md`. Round 2 might have two fixes or ten. The prompt stays the same.
+2. **It keeps the current version.** If it says "keep 1.0.0", it breaks after S05R raises the version. It should say "keep the version that `README.md` shows, and add a change-log row". That works before and after S05R.
+3. **It follows the ADR rule after S05R.** `Project_Intent.md` says a YAML change after S05R needs an ADR. So S03F should check the version first. If the version is above `1.0.0`, every fix also gets an ADR.
+4. **It stops on fixes that need a person.** Some fixes need a human decision, like this round's owner for the two bounds. When a fix offers options, S03F asks before editing and does not pick one itself.
+
+With those choices, it works in three places:
+
+- each S03R → S03F → S03R loop before S04
+- after S05R, when S05R reruns rows R1 to R15 and one fails
+- any later rerun of S03R, for example before S08 hands the tree to the second model
+
+It does not cover the PRD. S06R reviews `docs/prd/`, which is a different set of files with its own checks. If S06R fails often, a matching S06F can follow the same pattern.
+
+Do you want me to write S03F with these four choices built in?
+
+## 2026-10-10 08:43
+
+**Model:** claude-opus-5.5
+
+### User
+
+Write S03F and add it to the playbook README. Update any other file that needs to know this change (e.g. project intent, execution plan, etc).
+
+### Assistant
+
+I've written `playbook/S03F-semantic-layer-fixes.md` and linked it from every file that describes the review loop. Nothing under `semantic-layer/` was touched. The fixes there are S03F's job.
+
+One change from what I said last turn. I said S03F would add an ADR to each fix once the version is above `1.0.0`. Instead, S03F always keeps the version, and it stops running once the PRD cites the version. After that point, a change goes through S05R with an ADR (a short written decision record). The reason is that S08 checks the semantic-layer version against the PRD header and the S05R revision file. Changing the tree under the same version after S06 would break that check.
+
+**What S03F does:**
+- It reads the numbered "Fixes required" list from the newest review file. That is `semantic-layer-review.md`, or `semantic-layer-revision.md` once S05R has run.
+- It applies only those fixes and keeps the version. It rebuilds, runs the tests, and runs the S03 glossary done test.
+- Each round is written as "Round N" in a new file, `docs/02-baseline/semantic-layer-fixes.md`. S03R overwrites its review file every run, so this keeps the history.
+- The only part you edit is the "Decisions for this round" block at the top of the prompt. If a fix needs a choice that isn't recorded there, S03F does not apply that fix and reports BLOCKED.
+
+**Files updated:**
+- **`playbook/README.md`:**
+  - a new row in the stage table, and the S03R and S06 "Depends on" cells widened
+  - how-to step 6 says how to clear a failed review
+  - a paragraph in the review section
+  - a new line in the D3 checklist item
+- **`playbook/README(the failure list).md`:** the same paragraph and checklist line, so the copy you attach to review chats matches.
+- **`playbook/S03R-semantic-layer-review.md`:** fixes must be numbered, with "Choice needed" on any fix you must decide. The done test and lifecycle now point to S03F.
+- **`playbook/S05R-semantic-layer-revision.md`:** its rerun rows now produce a numbered fix list. If a row fails, it runs S03F, then S03R, before S06.
+- **`Execution Plan.md`:** the phase diagram label, the stage list, the review paragraph, the Phase 3 lifecycle and gate, and the Phase 5R steps.
+- **`Project_Intent.md`** and its Appendix E excerpt: one paragraph on the fix loop.
+- **`Telecom Application Modernization.md`:** the semantic-layer row names S03F.
+- **`docs/02-baseline/semantic-layer-review.md`:** the fix list now points to S03F, and fix 4 is marked "Choice needed" with options A and B.
+- **`playbook/STATUS.md`:** the S03R note now says "run S03F", and there is a row for this playbook change.
+
+I left `operating-contract.md` alone. Its row 7 already covers your review of each diff. S06 and S08 also stay as they are, because S03F keeps the version they cite.
+
+**Next step:** open a new chat, attach the S03F inputs, and fill the Decisions block with your choice for fix 4. For example: `Fix 4: Option A.`
+
+## 2026-10-10 08:58
+
+**Model:** claude-opus-5.5
+
+### User
+
+will S03R, S03F and S05R stages need to be iterated multiple times?
+
+### Assistant
+
+Yes, they can repeat. The playbook sets no limit on how many times. How often each one runs depends on its role.
+
+**S03R and S03F loop until the review passes.** Each round is S03F, then S03R again in a fresh chat. Expect one or two rounds this time. The seven fixes are small and each names its files and lines. A second round happens if the new reviewer finds something the first one missed. A fresh chat reads the tree without memory of the earlier review, so that can happen. It can also happen if a fix introduces a new problem. For example, new glossary rows might not match the YAML.
+
+**S05R normally runs once.** It runs after S05-14 and raises the version, for example to `1.1.0`. Two things can repeat it:
+- **Its own rerun S03R rows fail.** Then the S03F, S03R loop runs again at the S05R version. S05R itself does not rerun.
+- **S06 finds a term the YAML lacks.** `S06-prd.md` says to stop, write an "Open question for S03" line, and rerun S05R. Each rerun raises the version again, for example to `1.2.0`. The S03R rows are checked again, and S03F runs if they fail.
+
+So the worst realistic path is S03R and S03F twice before S04, then S05R once with maybe one S03F round, then one more S05R if the PRD finds a gap. After S06 cites a version, S03F stops. Every later change goes through S05R with an ADR.
+
+**One gap: nothing stops an endless loop.** A reviewer can keep finding small issues round after round. You could add a cap to S03F, for example: "If round 3 still has a FAIL, stop. The owner decides whether to accept the remaining FAIL rows as named risks or change the check." The decision would go in `STATUS.md` and the review header.
+
+Do you want me to add that cap to S03F and the README?
+
+## 2026-10-10 09:03
+
+**Model:** claude-opus-5.5
+
+### User
+
+Explain - "Fill the Decisions block with your choice for fix 4, for example Fix 4: Option A."
+
+### Assistant
+
+Fix 4 needs a decision that only you can make, so S03F asks you to write it down before it runs.
+
+**What fix 4 is about.** The semantic layer uses two numbers that came from the S02 baseline:
+- **1000.** A service order retried 1000 times or more is counted as odd. One order, `ORD-00002`, was retried 4052 times.
+- **0 to 1.** This is the expected range for the incident score `sla_breach_risk`. One incident, `INC-00019`, holds 1.42, which is outside it.
+
+Both numbers are marked PROPOSED, but the owner is written as "Unknown". The playbook says a proposed number must name an owner. That is why R12 and R14.7 failed. A model should not pick who owns a business number, so the review lists two options.
+
+**The two options.**
+- **Option A: name an owner.** "Owner Unknown" becomes "Owner Mangesh (FDE) until a business owner is named". The numbers stay. The same change goes into `data-quality-baseline.md`, where the numbers came from.
+- **Option B: remove the numbers.** The semantic layer drops 1000 and 0-to-1 and points to the baseline instead. A later stage that needs a number must ask for it with an "Open question for S03" line.
+
+**Where you write it.** `playbook/S03F-semantic-layer-fixes.md` has a "Decisions for this round" block at the top of the prompt, at lines 38 to 40. It holds `None` now. When you paste the prompt into the new chat, replace `None` with your choice, for example:
+
+    ## Decisions for this round
+    Fix 4: Option A.
+
+Make that change in the pasted copy, not in the file. The file should keep `None` so the next round starts clean. If you leave `None`, S03F skips fix 4, applies the other six, and reports BLOCKED. Then R12 fails again at the next review.
+
+**My suggestion is Option A.** Later stages are likely to need the retry bound and the risk range, for example reliability in S04-11. Naming yourself as interim owner records who is responsible until a business owner takes over. It does not mean the business has approved the numbers. The words "until a business owner is named" say that.
+
+## 2026-10-10 09:06
+
+**Model:** claude-opus-5.5
+
+### User
+
+Are there Business Owners or Roles defined where I can assign a owner?
+
+### Assistant
+
+No. The repo and the project files don't name any business owner, stakeholder, or owning team who could own these numbers. Here is what exists:
+
+- **Mangesh (FDE), the only named owner.** You are the owner on every PROPOSED item in the semantic layer (28 items) and on every row of `docs/00-contract/operating-contract.md`.
+- **Seven personas.** These are `noc_operator`, `network_engineer`, `field_engineer`, `customer_support`, `automation_service`, `vendor_account`, and `ai_agent`, from `docs/domain-specific-spec.md`. They are job roles of people and machines that use the system. No file says any of them owns a business number. Their grants are themselves PROPOSED by you.
+- **An `owner_team` column in `devices.csv`.** It holds status words like `normal` and `vendor`, not team names, so it can't serve as an owner list.
+- **A stakeholder step in the challenge guide.** Spine step 2 has a folder, `docs/02-stakeholders/`, listed in `docs/00-contract/challenge-to-spine-crosswalk.md` line 39. This playbook doesn't produce that folder, so no stakeholder list was ever written.
+- **A rule in `Project_Intent.md` line 248.** It says a later cutoff "needs a named owner and an Architecture Decision Record". It doesn't say who that owner is.
+
+So for fix 4 there is no real business owner to choose. You could make one up, for example "Owner: service assurance manager". That would be an invented role with no source, which breaks the same evidence rules the review checks. Options A and B are the honest choices:
+
+- **Option A** makes you the interim owner and says plainly that a business owner is still missing.
+- **Option B** removes the numbers, so no owner is needed.
+
+If you pick Option A, the missing business owner should not get lost. Later stages can carry it forward. The readiness stage (S09) lists accepted risks with owners, and "no business owner for the retry bound and the risk range" fits there. If the trainer or the packet ever names a real owner, S05R can swap in that name with a source.
+
+## 2026-10-10 09:08
+
+**Model:** claude-opus-5.5
+
+### User
+
+For now, we can set the defacto Business Owner as "Team-Force" for all decisions.
+
+### Assistant
+
+Team-Force is now the business owner of every open business decision, until the packet or the trainer names a real one. This decision also settles fix 4, so S03F needs no choice from you this round.
+
+**Where the decision is recorded:**
+- **`docs/00-contract/operating-contract.md` row 10 (new, contract now v1.1).** It says:
+  - Team-Force owns every number, range, cutoff, target, allowed word list, or legal value the packet leaves open.
+  - Naming the owner does not approve the number. It stays PROPOSED until Team-Force accepts it in writing.
+  - You stay the author of each stage and the reviewer of each change.
+- **`playbook/README.md` standing constraints**, so every stage prompt points to row 10.
+- **`Project_Intent.md`**, and its 4.2/4.3 excerpt, at the line that says a later cutoff needs a named owner.
+
+**What changed in the fix list (`docs/02-baseline/semantic-layer-review.md`):**
+- **Fix 4** now says "Owner: Team-Force". It also covers every file that repeats the two bounds, not just the semantic layer:
+  - `data-quality-baseline.md`
+  - `defect-list.md` rows F18 and F19
+  - `ai-qualification.md`
+- **Fix 8 is new.** Three open questions in the semantic-layer README also say "owner Unknown": the severity word order, the storm size, and which order built which circuit. They become Team-Force too.
+- **Advisory A5 is new.** The S02 profiling script and its saved output still say "Owner: Unknown". They are the recorded S02 run, so the fix leaves them alone.
+
+**S03F changes.** It now reads row 10 by itself, so the Decisions block is only for choices between options. For this round, leave it as `None`.
+
+Two limits on the decision:
+1. **Team-Force can't approve a live network change.** Row 9 still needs one named person to write the approval id, and a team name doesn't count.
+2. **Your 28 design proposals keep you as owner.** These are things like persona grants, purposes, and the prompt allow list. They're design choices, not business numbers, and "Mangesh (FDE)" already counts as a named owner. Tell me if you want those moved to Team-Force too.
+
+I left your `Important Notes` file alone. It still says "seven fixes"; the list now has eight.
+
+## 2026-10-10 09:19
+
+**Model:** claude-opus-5.5
+
+### User
+
+design proposals owner should be "Team-Force". Team-Force is the FDE Team that Mangesh belongs to.
+
+### Assistant
+
+Team-Force now owns every PROPOSED item, both the business numbers and the design proposals. The semantic layer itself still says "Mangesh (FDE)" until S03F applies the new fix 9.
+
+**What I changed:**
+- **`docs/00-contract/operating-contract.md` row 10** now says:
+  - Team-Force is the FDE team Mangesh belongs to.
+  - It owns open business decisions and design proposals, such as persona grants, purposes, scopes, the prompt allow list, the output schema, and proposed desk jobs.
+  - Mangesh acts for Team-Force. He writes each stage, reviews each diff, and confirms the other contract rows.
+  - A business owner named later replaces Team-Force for the business numbers only.
+- **Fix 9 is new in `docs/02-baseline/semantic-layer-review.md`.** S03F will:
+  - change the 28 `owner: Mangesh (FDE)` keys in the YAML to `owner: Team-Force`. That is 19 in `access-semantics.yaml`, 7 in `ai-context-policy.yaml`, and 2 in `metrics.yaml`.
+  - change the "Owner Mangesh (FDE)" text in the YAML and the semantic-layer README.
+  - change the eight "Owner: Mangesh (FDE)" lines in `ai-qualification.md`.
+  - The AI policy copies its approval-point text from `ai-qualification.md`, so the fix changes both files together. Check R7 then still finds the same meaning.
+- **The `playbook/README.md` standing constraint and `Project_Intent.md`**, with its 4.2/4.3 excerpt, now say who Team-Force is.
+- **`playbook/STATUS.md`** has a row for this decision.
+
+**What I left alone.** Every "Author: Mangesh (FDE)" line stays, because you wrote those files. Row 9 also stays: a live network change still needs one named person to write the approval id.
+
+**One new risk, recorded in the contract.** The team that proposes an item now also owns it. No business owner outside the FDE team checks the numbers. I added this to the contract's residual risks so S09 can list it as an accepted risk.
+
+The fix list now has nine fixes, and none needs a choice. For S03F, leave the Decisions block as `None`.
+
+## 2026-10-10 09:26
+
+**Model:** claude-opus-5.5
+
+### User
+
+Should the next step be copying content of @playbook/S03F-semantic-layer-fixes.md in a new chat along with mentioned inputs and executing it?
+
+### Assistant
+
+Yes. The next step is to open a new chat, paste the S03F prompt, attach its inputs, and run it. The Decisions block already says `None`, which is correct, because none of the nine fixes needs a choice.
+
+**Steps:**
+1. **Commit the current work first.** Then the S03F changes show up as a clean diff that you can review, as operating-contract.md row 7 requires.
+2. **Open a new chat.** Paste only the text inside the text code block, starting at `# Stage S03F - Semantic layer fixes`. The sections above it, such as "When to run it" and "Before you paste", are notes for you.
+3. **Attach these inputs with @:**
+   - `playbook/S03-semantic-layer.md`
+   - `playbook/S03R-semantic-layer-review.md`
+   - `playbook/README.md`
+   - `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-review.md`
+   - `06-telecom-service-network-incident-ops/semantic-layer/` (the whole folder)
+   - `06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md`
+   - `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`
+   - `06-telecom-service-network-incident-ops/docs/02-baseline/data-quality-baseline.md` and `defect-list.md`. Fix 4 edits these two files, so they count as "every other file the fix list names".
+
+   Skip `semantic-layer-revision.md` and `semantic-layer-fixes.md`. They don't exist yet: S05R has not run, and this is round 1 of S03F.
+4. **Check the result.** S03F should end with:
+   - a new `docs/02-baseline/semantic-layer-fixes.md` with a "Round 1" section
+   - the version still at 1.0.0
+   - `build.py --check` and pytest both passing
+   - each FAIL row (R9, R12, R14.4, R14.7, R14.8, R15) mapped to the fixes that close it
+5. **Review the diff yourself,** then commit.
+6. **Run S03R again in a fresh chat,** not in the S03F chat. A fresh chat keeps the reviewer independent of the chat that made the fixes. If S03R passes, S04 can start. If a row still fails, run another S03F round.
+
+This turn is added to `transcript/chat_transcript.md`.
+
+## 2026-10-10 09:50
+
+**Model:** claude-opus-5.5
+
+### User
+
+will S03F make any changes to the repo?
+
+### Assistant
+
+Yes. S03F edits files in your working folder. It does not commit, push, or touch git. It changes only files the nine fixes name, plus its own report.
+
+**Files it edits inside `semantic-layer/`:**
+
+| File | What changes |
+|---|---|
+| `ai-context-policy.yaml` | Fix 1 adds the lists of allowed agency values and pick values, each with ids. Fix 9 changes the 7 owner keys and the related owner text to Team-Force. |
+| `schemas/semantic-layer.schema.json` | Fix 1 adds rules for the new agency and pick ids. |
+| `tests/test_semantic_layer.py` | Fix 1 adds the new id prefixes to `ID_PREFIXES`. Fix 2 adds prefixes to `GLOSSARY_PREFIXES`, so the tests check that every new id has a glossary row. |
+| `glossary.md` | Fix 2 adds rows for the new words, the 11 AI uses, and the 9 provenance fields. Fixes 3, 5, 6, and 7 rewrite four existing rows. Fix 4 adds the Team-Force owner on line 199. |
+| `metrics.yaml`, `entities.yaml` | Fix 4 adds `Owner: Team-Force` to the 1000 retry limit and the 0-1 range. Fix 9 changes the 2 owner keys in `metrics.yaml`. |
+| `access-semantics.yaml` | Fix 9 changes 19 owner keys. |
+| `business-rules.yaml` | Fix 9 changes one owner line. |
+| `README.md` | Fixes 4, 8, and 9 change the owner text. S03F also adds one change-log row and replaces the "Last build" block. The version stays 1.0.0. |
+| `generated/*.json` | S03F deletes the folder, and `build.py` writes it again from the YAML. |
+
+**Files it edits outside `semantic-layer/`:**
+- `docs/02-baseline/data-quality-baseline.md` (fix 4)
+- `docs/02-baseline/defect-list.md`, rows F18 and F19 (fix 4)
+- `docs/02-baseline/ai-qualification.md` (fix 4 and fix 9)
+
+**File it creates:** `docs/02-baseline/semantic-layer-fixes.md`, with the "Round 1" report.
+
+**Side effects:**
+- The done test changes one status word in `glossary.md` on purpose, checks that the tests fail, and then puts the word back. That change should not remain in the diff.
+- Running pytest can rewrite the `__pycache__` files. Review advisory A1 already says to add `__pycache__` to `.gitignore`. S03F does not do that, because it skips advisories.
+
+**What it must not touch:**
+- application code
+- `policy/` and `data/`
+- `semantic-layer-review.md`
+- any file no fix names
+- the review advisories A1-A5
+
+If any other file changes, the completion gate marks the stage BLOCKED. Commit before you run S03F. Then `git diff --stat` afterwards shows the exact set of changed files, and you can compare it with the lists above.

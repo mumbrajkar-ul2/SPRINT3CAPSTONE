@@ -1,0 +1,904 @@
+{
+  "source": "docs/02-baseline/profile_data.py",
+  "numbers_are": "REAL counts from this run",
+  "files": [
+    {
+      "file": "devices.csv",
+      "rows": 354,
+      "expected_rows": 354,
+      "row_count_matches_manifest": true,
+      "key_column": "device_id",
+      "distinct_keys": 351,
+      "duplicate_keys": {
+        "DEV-00004": 2,
+        "DEV-00013": 2,
+        "DEV-00019": 2
+      },
+      "extra_rows_from_duplicates": 3,
+      "duplicate_pairs": [
+        {
+          "key": "DEV-00004",
+          "lines": [
+            5,
+            352
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "hostname",
+            "vendor",
+            "device_type",
+            "site_id",
+            "mgmt_ip",
+            "owner_team",
+            "credential_profile",
+            "last_seen_at",
+            "stale_topology_flag"
+          ]
+        },
+        {
+          "key": "DEV-00013",
+          "lines": [
+            14,
+            354
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "last_seen_at"
+          ]
+        },
+        {
+          "key": "DEV-00019",
+          "lines": [
+            20,
+            355
+          ],
+          "identical": true,
+          "columns_that_differ": []
+        }
+      ],
+      "blanks_per_column": {
+        "hostname": 1,
+        "vendor": 1,
+        "device_type": 1,
+        "site_id": 1,
+        "network_zone": 1,
+        "mgmt_ip": 1,
+        "firmware": 1,
+        "owner_team": 1,
+        "credential_profile": 1,
+        "last_seen_at": 1,
+        "stale_topology_flag": 1
+      },
+      "blank_rows": [
+        {
+          "line": 353,
+          "key": "DEV-BAD1",
+          "blank_columns": [
+            "hostname",
+            "vendor",
+            "device_type",
+            "site_id",
+            "network_zone",
+            "mgmt_ip",
+            "firmware",
+            "owner_team",
+            "credential_profile",
+            "last_seen_at",
+            "stale_topology_flag"
+          ]
+        }
+      ],
+      "timestamp_columns": [
+        "last_seen_at"
+      ],
+      "timestamp_year_counts": {
+        "last_seen_at": {
+          "1900": 1,
+          "2026": 352
+        }
+      },
+      "timestamps_whose_year_is_not_2026": [
+        {
+          "line": 354,
+          "key": "DEV-00013",
+          "column": "last_seen_at",
+          "value": "1900-01-01T00:00:00",
+          "year": 1900
+        }
+      ]
+    },
+    {
+      "file": "circuits.csv",
+      "rows": 354,
+      "expected_rows": 354,
+      "row_count_matches_manifest": true,
+      "key_column": "circuit_id",
+      "distinct_keys": 351,
+      "duplicate_keys": {
+        "CIR-00004": 2,
+        "CIR-00013": 2,
+        "CIR-00019": 2
+      },
+      "extra_rows_from_duplicates": 3,
+      "duplicate_pairs": [
+        {
+          "key": "CIR-00004",
+          "lines": [
+            5,
+            352
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "customer_id",
+            "a_end",
+            "z_end",
+            "bandwidth_mbps",
+            "status",
+            "provisioned_at",
+            "sla_tier",
+            "orphan_flag"
+          ]
+        },
+        {
+          "key": "CIR-00013",
+          "lines": [
+            14,
+            354
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "provisioned_at"
+          ]
+        },
+        {
+          "key": "CIR-00019",
+          "lines": [
+            20,
+            355
+          ],
+          "identical": true,
+          "columns_that_differ": []
+        }
+      ],
+      "blanks_per_column": {
+        "customer_id": 1,
+        "a_end": 1,
+        "z_end": 1,
+        "bandwidth_mbps": 1,
+        "service_class": 1,
+        "status": 1,
+        "provisioned_at": 1,
+        "sla_tier": 1,
+        "orphan_flag": 1
+      },
+      "blank_rows": [
+        {
+          "line": 353,
+          "key": "CIR-BAD1",
+          "blank_columns": [
+            "customer_id",
+            "a_end",
+            "z_end",
+            "bandwidth_mbps",
+            "service_class",
+            "status",
+            "provisioned_at",
+            "sla_tier",
+            "orphan_flag"
+          ]
+        }
+      ],
+      "timestamp_columns": [
+        "provisioned_at"
+      ],
+      "timestamp_year_counts": {
+        "provisioned_at": {
+          "1900": 1,
+          "2026": 352
+        }
+      },
+      "timestamps_whose_year_is_not_2026": [
+        {
+          "line": 354,
+          "key": "CIR-00013",
+          "column": "provisioned_at",
+          "value": "1900-01-01T00:00:00",
+          "year": 1900
+        }
+      ]
+    },
+    {
+      "file": "alarms.csv",
+      "rows": 354,
+      "expected_rows": 354,
+      "row_count_matches_manifest": true,
+      "key_column": "alarm_id",
+      "distinct_keys": 351,
+      "duplicate_keys": {
+        "ALA-00004": 2,
+        "ALA-00013": 2,
+        "ALA-00019": 2
+      },
+      "extra_rows_from_duplicates": 3,
+      "duplicate_pairs": [
+        {
+          "key": "ALA-00004",
+          "lines": [
+            5,
+            352
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "device_id",
+            "interface",
+            "severity",
+            "alarm_type",
+            "first_seen_at",
+            "last_seen_at",
+            "dedupe_key",
+            "maintenance_window",
+            "storm_batch_id"
+          ]
+        },
+        {
+          "key": "ALA-00013",
+          "lines": [
+            14,
+            354
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "first_seen_at"
+          ]
+        },
+        {
+          "key": "ALA-00019",
+          "lines": [
+            20,
+            355
+          ],
+          "identical": true,
+          "columns_that_differ": []
+        }
+      ],
+      "blanks_per_column": {
+        "device_id": 1,
+        "interface": 1,
+        "severity": 1,
+        "alarm_type": 1,
+        "first_seen_at": 1,
+        "last_seen_at": 1,
+        "dedupe_key": 1,
+        "maintenance_window": 1,
+        "storm_batch_id": 1
+      },
+      "blank_rows": [
+        {
+          "line": 353,
+          "key": "ALA-BAD1",
+          "blank_columns": [
+            "device_id",
+            "interface",
+            "severity",
+            "alarm_type",
+            "first_seen_at",
+            "last_seen_at",
+            "dedupe_key",
+            "maintenance_window",
+            "storm_batch_id"
+          ]
+        }
+      ],
+      "timestamp_columns": [
+        "first_seen_at",
+        "last_seen_at"
+      ],
+      "timestamp_year_counts": {
+        "first_seen_at": {
+          "1900": 1,
+          "2026": 352
+        },
+        "last_seen_at": {
+          "2026": 353
+        }
+      },
+      "timestamps_whose_year_is_not_2026": [
+        {
+          "line": 354,
+          "key": "ALA-00013",
+          "column": "first_seen_at",
+          "value": "1900-01-01T00:00:00",
+          "year": 1900
+        }
+      ]
+    },
+    {
+      "file": "incidents.csv",
+      "rows": 354,
+      "expected_rows": 354,
+      "row_count_matches_manifest": true,
+      "key_column": "incident_id",
+      "distinct_keys": 351,
+      "duplicate_keys": {
+        "INC-00004": 2,
+        "INC-00013": 2,
+        "INC-00019": 2
+      },
+      "extra_rows_from_duplicates": 3,
+      "duplicate_pairs": [
+        {
+          "key": "INC-00004",
+          "lines": [
+            5,
+            352
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "customer_id",
+            "circuit_id",
+            "severity",
+            "status",
+            "opened_at",
+            "root_cause",
+            "automation_used",
+            "sla_breach_risk"
+          ]
+        },
+        {
+          "key": "INC-00013",
+          "lines": [
+            14,
+            354
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "opened_at"
+          ]
+        },
+        {
+          "key": "INC-00019",
+          "lines": [
+            20,
+            355
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "sla_breach_risk"
+          ]
+        }
+      ],
+      "blanks_per_column": {
+        "customer_id": 1,
+        "circuit_id": 1,
+        "severity": 1,
+        "status": 1,
+        "opened_at": 1,
+        "root_cause": 1,
+        "automation_used": 1,
+        "sla_breach_risk": 1
+      },
+      "blank_rows": [
+        {
+          "line": 353,
+          "key": "INC-BAD1",
+          "blank_columns": [
+            "customer_id",
+            "circuit_id",
+            "severity",
+            "status",
+            "opened_at",
+            "root_cause",
+            "automation_used",
+            "sla_breach_risk"
+          ]
+        }
+      ],
+      "timestamp_columns": [
+        "opened_at"
+      ],
+      "timestamp_year_counts": {
+        "opened_at": {
+          "1900": 1,
+          "2026": 352
+        }
+      },
+      "timestamps_whose_year_is_not_2026": [
+        {
+          "line": 354,
+          "key": "INC-00013",
+          "column": "opened_at",
+          "value": "1900-01-01T00:00:00",
+          "year": 1900
+        }
+      ]
+    },
+    {
+      "file": "service_orders.csv",
+      "rows": 354,
+      "expected_rows": 354,
+      "row_count_matches_manifest": true,
+      "key_column": "order_id",
+      "distinct_keys": 351,
+      "duplicate_keys": {
+        "ORD-00004": 2,
+        "ORD-00013": 2,
+        "ORD-00019": 2
+      },
+      "extra_rows_from_duplicates": 3,
+      "duplicate_pairs": [
+        {
+          "key": "ORD-00004",
+          "lines": [
+            5,
+            352
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "customer_id",
+            "service_type",
+            "requested_bandwidth",
+            "qualification_status",
+            "provisioning_status",
+            "retry_count",
+            "rollback_status"
+          ]
+        },
+        {
+          "key": "ORD-00013",
+          "lines": [
+            14,
+            354
+          ],
+          "identical": true,
+          "columns_that_differ": []
+        },
+        {
+          "key": "ORD-00019",
+          "lines": [
+            20,
+            355
+          ],
+          "identical": true,
+          "columns_that_differ": []
+        }
+      ],
+      "blanks_per_column": {
+        "customer_id": 1,
+        "service_type": 1,
+        "requested_bandwidth": 1,
+        "qualification_status": 1,
+        "provisioning_status": 1,
+        "retry_count": 1,
+        "rollback_status": 1
+      },
+      "blank_rows": [
+        {
+          "line": 353,
+          "key": "SER-BAD1",
+          "blank_columns": [
+            "customer_id",
+            "service_type",
+            "requested_bandwidth",
+            "qualification_status",
+            "provisioning_status",
+            "retry_count",
+            "rollback_status"
+          ]
+        }
+      ],
+      "timestamp_columns": [],
+      "timestamp_year_counts": {},
+      "timestamps_whose_year_is_not_2026": []
+    },
+    {
+      "file": "ai_invocations.csv",
+      "rows": 354,
+      "expected_rows": 354,
+      "row_count_matches_manifest": true,
+      "key_column": "ai_call_id",
+      "distinct_keys": 351,
+      "duplicate_keys": {
+        "AI_-00004": 2,
+        "AI_-00013": 2,
+        "AI_-00019": 2
+      },
+      "extra_rows_from_duplicates": 3,
+      "duplicate_pairs": [
+        {
+          "key": "AI_-00004",
+          "lines": [
+            5,
+            352
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "incident_id",
+            "use_case",
+            "model",
+            "topology_snapshot_id",
+            "alarm_count",
+            "token_count",
+            "recommendation_risk",
+            "approval_required",
+            "guardrail_status"
+          ]
+        },
+        {
+          "key": "AI_-00013",
+          "lines": [
+            14,
+            354
+          ],
+          "identical": true,
+          "columns_that_differ": []
+        },
+        {
+          "key": "AI_-00019",
+          "lines": [
+            20,
+            355
+          ],
+          "identical": false,
+          "columns_that_differ": [
+            "recommendation_risk"
+          ]
+        }
+      ],
+      "blanks_per_column": {
+        "incident_id": 1,
+        "use_case": 1,
+        "model": 1,
+        "topology_snapshot_id": 1,
+        "alarm_count": 1,
+        "token_count": 1,
+        "recommendation_risk": 1,
+        "approval_required": 1,
+        "guardrail_status": 1
+      },
+      "blank_rows": [
+        {
+          "line": 353,
+          "key": "AI_-BAD1",
+          "blank_columns": [
+            "incident_id",
+            "use_case",
+            "model",
+            "topology_snapshot_id",
+            "alarm_count",
+            "token_count",
+            "recommendation_risk",
+            "approval_required",
+            "guardrail_status"
+          ]
+        }
+      ],
+      "timestamp_columns": [],
+      "timestamp_year_counts": {},
+      "timestamps_whose_year_is_not_2026": []
+    }
+  ],
+  "alarms_last_seen_before_first_seen": {
+    "count": 166,
+    "examples": [
+      {
+        "line": 3,
+        "alarm_id": "ALA-00002",
+        "first_seen_at": "2026-07-31T23:45:00",
+        "last_seen_at": "2026-02-23T09:35:00"
+      },
+      {
+        "line": 4,
+        "alarm_id": "ALA-00003",
+        "first_seen_at": "2026-08-02T04:20:00",
+        "last_seen_at": "2026-01-07T12:50:00"
+      },
+      {
+        "line": 9,
+        "alarm_id": "ALA-00008",
+        "first_seen_at": "2026-09-14T20:13:00",
+        "last_seen_at": "2026-04-24T02:51:00"
+      }
+    ]
+  },
+  "service_orders_retry_count": {
+    "bound": 1000,
+    "bound_status": "PROPOSED",
+    "bound_owner": "Unknown",
+    "numeric_rows": 353,
+    "blank_rows": 1,
+    "non_numeric": [],
+    "minimum": 32,
+    "maximum": 4995,
+    "at_or_above_bound": 294,
+    "below_bound": 59,
+    "below_bound_examples": [
+      {
+        "line": 73,
+        "order_id": "ORD-00072",
+        "retry_count": 32
+      },
+      {
+        "line": 300,
+        "order_id": "ORD-00299",
+        "retry_count": 54
+      },
+      {
+        "line": 309,
+        "order_id": "ORD-00308",
+        "retry_count": 58
+      },
+      {
+        "line": 83,
+        "order_id": "ORD-00082",
+        "retry_count": 68
+      },
+      {
+        "line": 283,
+        "order_id": "ORD-00282",
+        "retry_count": 121
+      }
+    ]
+  },
+  "incidents_severity": {
+    "distinct_values": [
+      "",
+      "bronze",
+      "critical",
+      "gold",
+      "high",
+      "low",
+      "medium",
+      "silver"
+    ],
+    "counts": {
+      "high": 57,
+      "gold": 41,
+      "medium": 47,
+      "bronze": 50,
+      "silver": 65,
+      "critical": 39,
+      "low": 54,
+      "": 1
+    },
+    "includes_gold": true,
+    "includes_bronze": true,
+    "gold_rows": 41,
+    "bronze_rows": 50
+  },
+  "alarms_severity": {
+    "distinct_values": [
+      "",
+      "bronze",
+      "critical",
+      "gold",
+      "high",
+      "low",
+      "medium",
+      "silver"
+    ],
+    "counts": {
+      "medium": 53,
+      "low": 50,
+      "high": 48,
+      "silver": 57,
+      "gold": 48,
+      "critical": 45,
+      "bronze": 52,
+      "": 1
+    },
+    "includes_gold": true,
+    "includes_bronze": true,
+    "gold_rows": 48,
+    "bronze_rows": 52
+  },
+  "ai_call_id": {
+    "rule": "A value is malformed when it starts with AI_-",
+    "malformed_count": 353,
+    "other_ids": [
+      {
+        "line": 2,
+        "ai_call_id": "REC-0001"
+      }
+    ],
+    "includes_AI_-00002": true,
+    "includes_AI_-BAD1": true,
+    "well_formed_AI_dash_digits": 0
+  },
+  "incidents_sla_breach_risk": {
+    "range_low": 0.0,
+    "range_high": 1.0,
+    "range_status": "PROPOSED",
+    "range_owner": "Unknown",
+    "inside_range": 352,
+    "blank": 1,
+    "outside_range": [
+      {
+        "line": 355,
+        "incident_id": "INC-00019",
+        "sla_breach_risk": "1.42"
+      }
+    ]
+  },
+  "ai_recommendation_risk": {
+    "numeric_cells": [
+      {
+        "line": 355,
+        "ai_call_id": "AI_-00019",
+        "recommendation_risk": "1.42"
+      }
+    ],
+    "word_counts": {
+      "standard": 25,
+      "high_risk": 28,
+      "not_enforced": 25,
+      "normal": 25,
+      "degraded": 27,
+      "internal": 35,
+      "pending": 25,
+      "requires_review": 28,
+      "vendor": 13,
+      "ai_assisted": 20,
+      "approved": 25,
+      "manual": 27,
+      "legacy": 23,
+      "rejected": 26,
+      "<blank>": 1
+    }
+  },
+  "events": {
+    "lines": 3000,
+    "bad_json": 0,
+    "correlation_id_null": 982,
+    "correlation_id_blank": 1010,
+    "correlation_id_null_or_blank": 1992,
+    "correlation_id_filled": 1008
+  },
+  "quality_issues": [
+    {
+      "entity": "devices",
+      "item": "duplicate business key",
+      "mark": "Confirmed",
+      "evidence": "3 extra rows. Keys: {'DEV-00004': 2, 'DEV-00013': 2, 'DEV-00019': 2}."
+    },
+    {
+      "entity": "devices",
+      "item": "blank mandatory fields",
+      "mark": "Confirmed",
+      "evidence": "Blank cells are on these rows: [{\"line\": 353, \"key\": \"DEV-BAD1\", \"blank_columns\": [\"hostname\", \"vendor\", \"device_type\", \"site_id\", \"network_zone\", \"mgmt_ip\", \"firmware\", \"owner_team\", \"credential_profile\", \"last_seen_at\", \"stale_topology_flag\"]}]. The repo does not name which columns are mandatory. This mark treats a blank cell as the seeded blank."
+    },
+    {
+      "entity": "devices",
+      "item": "impossible timestamp",
+      "mark": "Confirmed",
+      "evidence": "Timestamp columns: ['last_seen_at']. Year is not 2026: [{'line': 354, 'key': 'DEV-00013', 'column': 'last_seen_at', 'value': '1900-01-01T00:00:00', 'year': 1900}]."
+    },
+    {
+      "entity": "devices",
+      "item": "out-of-range score or risk marker",
+      "mark": "Not found",
+      "evidence": "This file has no sla_breach_risk, retry_count, or recommendation_risk column. No numeric cutoff was applied to the other columns. Columns: ['device_id', 'hostname', 'vendor', 'device_type', 'site_id', 'network_zone', 'mgmt_ip', 'firmware', 'owner_team', 'credential_profile', 'last_seen_at', 'stale_topology_flag']."
+    },
+    {
+      "entity": "circuits",
+      "item": "duplicate business key",
+      "mark": "Confirmed",
+      "evidence": "3 extra rows. Keys: {'CIR-00004': 2, 'CIR-00013': 2, 'CIR-00019': 2}."
+    },
+    {
+      "entity": "circuits",
+      "item": "blank mandatory fields",
+      "mark": "Confirmed",
+      "evidence": "Blank cells are on these rows: [{\"line\": 353, \"key\": \"CIR-BAD1\", \"blank_columns\": [\"customer_id\", \"a_end\", \"z_end\", \"bandwidth_mbps\", \"service_class\", \"status\", \"provisioned_at\", \"sla_tier\", \"orphan_flag\"]}]. The repo does not name which columns are mandatory. This mark treats a blank cell as the seeded blank."
+    },
+    {
+      "entity": "circuits",
+      "item": "impossible timestamp",
+      "mark": "Confirmed",
+      "evidence": "Timestamp columns: ['provisioned_at']. Year is not 2026: [{'line': 354, 'key': 'CIR-00013', 'column': 'provisioned_at', 'value': '1900-01-01T00:00:00', 'year': 1900}]."
+    },
+    {
+      "entity": "circuits",
+      "item": "out-of-range score or risk marker",
+      "mark": "Not found",
+      "evidence": "This file has no sla_breach_risk, retry_count, or recommendation_risk column. No numeric cutoff was applied to the other columns. Columns: ['circuit_id', 'customer_id', 'a_end', 'z_end', 'bandwidth_mbps', 'service_class', 'status', 'provisioned_at', 'sla_tier', 'orphan_flag']."
+    },
+    {
+      "entity": "alarms",
+      "item": "duplicate business key",
+      "mark": "Confirmed",
+      "evidence": "3 extra rows. Keys: {'ALA-00004': 2, 'ALA-00013': 2, 'ALA-00019': 2}."
+    },
+    {
+      "entity": "alarms",
+      "item": "blank mandatory fields",
+      "mark": "Confirmed",
+      "evidence": "Blank cells are on these rows: [{\"line\": 353, \"key\": \"ALA-BAD1\", \"blank_columns\": [\"device_id\", \"interface\", \"severity\", \"alarm_type\", \"first_seen_at\", \"last_seen_at\", \"dedupe_key\", \"maintenance_window\", \"storm_batch_id\"]}]. The repo does not name which columns are mandatory. This mark treats a blank cell as the seeded blank."
+    },
+    {
+      "entity": "alarms",
+      "item": "impossible timestamp",
+      "mark": "Confirmed",
+      "evidence": "Timestamp columns: ['first_seen_at', 'last_seen_at']. Year is not 2026: [{'line': 354, 'key': 'ALA-00013', 'column': 'first_seen_at', 'value': '1900-01-01T00:00:00', 'year': 1900}]. Also 166 alarms have last_seen_at before first_seen_at."
+    },
+    {
+      "entity": "alarms",
+      "item": "out-of-range score or risk marker",
+      "mark": "Not found",
+      "evidence": "This file has no sla_breach_risk, retry_count, or recommendation_risk column. No numeric cutoff was applied to the other columns. Columns: ['alarm_id', 'device_id', 'interface', 'severity', 'alarm_type', 'first_seen_at', 'last_seen_at', 'dedupe_key', 'maintenance_window', 'storm_batch_id']."
+    },
+    {
+      "entity": "incidents",
+      "item": "duplicate business key",
+      "mark": "Confirmed",
+      "evidence": "3 extra rows. Keys: {'INC-00004': 2, 'INC-00013': 2, 'INC-00019': 2}."
+    },
+    {
+      "entity": "incidents",
+      "item": "blank mandatory fields",
+      "mark": "Confirmed",
+      "evidence": "Blank cells are on these rows: [{\"line\": 353, \"key\": \"INC-BAD1\", \"blank_columns\": [\"customer_id\", \"circuit_id\", \"severity\", \"status\", \"opened_at\", \"root_cause\", \"automation_used\", \"sla_breach_risk\"]}]. The repo does not name which columns are mandatory. This mark treats a blank cell as the seeded blank."
+    },
+    {
+      "entity": "incidents",
+      "item": "impossible timestamp",
+      "mark": "Confirmed",
+      "evidence": "Timestamp columns: ['opened_at']. Year is not 2026: [{'line': 354, 'key': 'INC-00013', 'column': 'opened_at', 'value': '1900-01-01T00:00:00', 'year': 1900}]."
+    },
+    {
+      "entity": "incidents",
+      "item": "out-of-range score or risk marker",
+      "mark": "Confirmed",
+      "evidence": "PROPOSED range 0 to 1 inclusive. Owner: Unknown. Outside that range: [{'line': 355, 'incident_id': 'INC-00019', 'sla_breach_risk': '1.42'}]. Inside: 352."
+    },
+    {
+      "entity": "service_orders",
+      "item": "duplicate business key",
+      "mark": "Confirmed",
+      "evidence": "3 extra rows. Keys: {'ORD-00004': 2, 'ORD-00013': 2, 'ORD-00019': 2}."
+    },
+    {
+      "entity": "service_orders",
+      "item": "blank mandatory fields",
+      "mark": "Confirmed",
+      "evidence": "Blank cells are on these rows: [{\"line\": 353, \"key\": \"SER-BAD1\", \"blank_columns\": [\"customer_id\", \"service_type\", \"requested_bandwidth\", \"qualification_status\", \"provisioning_status\", \"retry_count\", \"rollback_status\"]}]. The repo does not name which columns are mandatory. This mark treats a blank cell as the seeded blank."
+    },
+    {
+      "entity": "service_orders",
+      "item": "impossible timestamp",
+      "mark": "Not found",
+      "evidence": "No column in this file is a full set of date-time values. Columns: ['order_id', 'customer_id', 'service_type', 'requested_bandwidth', 'qualification_status', 'provisioning_status', 'retry_count', 'rollback_status']."
+    },
+    {
+      "entity": "service_orders",
+      "item": "out-of-range score or risk marker",
+      "mark": "Confirmed",
+      "evidence": "PROPOSED bound retry_count >= 1000. Owner: Unknown. At or above the bound: 294. Below the bound: 59. Minimum 32. Maximum 4995."
+    },
+    {
+      "entity": "ai_invocations",
+      "item": "duplicate business key",
+      "mark": "Confirmed",
+      "evidence": "3 extra rows. Keys: {'AI_-00004': 2, 'AI_-00013': 2, 'AI_-00019': 2}."
+    },
+    {
+      "entity": "ai_invocations",
+      "item": "blank mandatory fields",
+      "mark": "Confirmed",
+      "evidence": "Blank cells are on these rows: [{\"line\": 353, \"key\": \"AI_-BAD1\", \"blank_columns\": [\"incident_id\", \"use_case\", \"model\", \"topology_snapshot_id\", \"alarm_count\", \"token_count\", \"recommendation_risk\", \"approval_required\", \"guardrail_status\"]}]. The repo does not name which columns are mandatory. This mark treats a blank cell as the seeded blank."
+    },
+    {
+      "entity": "ai_invocations",
+      "item": "impossible timestamp",
+      "mark": "Not found",
+      "evidence": "No column in this file is a full set of date-time values. Columns: ['ai_call_id', 'incident_id', 'use_case', 'model', 'topology_snapshot_id', 'alarm_count', 'token_count', 'recommendation_risk', 'approval_required', 'guardrail_status']."
+    },
+    {
+      "entity": "ai_invocations",
+      "item": "out-of-range score or risk marker",
+      "mark": "Confirmed",
+      "evidence": "recommendation_risk holds words on the other rows. Numeric cells: [{'line': 355, 'ai_call_id': 'AI_-00019', 'recommendation_risk': '1.42'}]."
+    }
+  ],
+  "manifest_jsonl_events": 3000,
+  "events_line_count_matches_manifest": true
+}

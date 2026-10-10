@@ -1,0 +1,596 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/semantic-layer/1.0.0/semantic-layer.schema.json",
+  "title": "Semantic layer 1.0.0",
+  "description": "One schema for the seven YAML files under semantic-layer/. The top-level key file picks the branch. Every item has an id in dot form and a source list. An item with proposed true must name an owner.",
+  "oneOf": [
+    { "$ref": "#/$defs/entities_file" },
+    { "$ref": "#/$defs/relationships_file" },
+    { "$ref": "#/$defs/status_taxonomy_file" },
+    { "$ref": "#/$defs/business_rules_file" },
+    { "$ref": "#/$defs/metrics_file" },
+    { "$ref": "#/$defs/access_semantics_file" },
+    { "$ref": "#/$defs/ai_context_policy_file" }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$"
+    },
+    "id_list": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "source": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "text": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "item_base": {
+      "type": "object",
+      "required": ["id", "source"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "source": { "$ref": "#/$defs/source" },
+        "proposed": { "type": "boolean" },
+        "owner": { "$ref": "#/$defs/text" }
+      },
+      "dependentRequired": { "proposed": ["owner"] }
+    },
+    "named_item": {
+      "allOf": [
+        { "$ref": "#/$defs/item_base" },
+        {
+          "required": ["name", "description"],
+          "properties": {
+            "name": { "$ref": "#/$defs/text" },
+            "description": { "$ref": "#/$defs/text" }
+          }
+        }
+      ]
+    },
+    "file_base": {
+      "type": "object",
+      "required": ["version", "file", "description", "source"],
+      "properties": {
+        "version": { "$ref": "#/$defs/version" },
+        "file": { "type": "string" },
+        "description": { "$ref": "#/$defs/text" },
+        "source": { "$ref": "#/$defs/source" }
+      }
+    },
+
+    "entity_field": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["type", "api_reads_today"],
+          "properties": {
+            "type": { "enum": ["identifier", "word", "timestamp", "number", "boolean_word", "text"] },
+            "api_reads_today": { "type": "boolean" },
+            "key": { "type": "boolean" },
+            "sensitive": { "type": "boolean" },
+            "never_in_prompt": { "type": "boolean" },
+            "status_field": { "$ref": "#/$defs/id" },
+            "references": { "$ref": "#/$defs/id" },
+            "id_form": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "entity": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["table", "key_field", "row_count", "api_reads_today", "fields"],
+          "properties": {
+            "table": { "$ref": "#/$defs/text" },
+            "key_field": { "$ref": "#/$defs/id" },
+            "row_count": { "type": "integer", "minimum": 0 },
+            "distinct_keys": { "type": "integer", "minimum": 0 },
+            "duplicate_keys": { "type": "array", "items": { "type": "string" } },
+            "blank_row_key": { "type": "string" },
+            "api_reads_today": { "type": "boolean" },
+            "api_read_note": { "type": "string" },
+            "fields": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/entity_field" } }
+          }
+        }
+      ]
+    },
+    "entities_file": {
+      "allOf": [
+        { "$ref": "#/$defs/file_base" },
+        {
+          "required": ["entities", "concepts"],
+          "properties": {
+            "file": { "const": "entities" },
+            "field_types": { "type": "array", "items": { "type": "string" } },
+            "entities": { "type": "array", "minItems": 7, "maxItems": 7, "items": { "$ref": "#/$defs/entity" } },
+            "concepts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/named_item" } }
+          }
+        }
+      ]
+    },
+
+    "relationship": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["from", "cardinality", "key_fields", "join_key_status", "join_observed_in_code"],
+          "anyOf": [ { "required": ["to"] }, { "required": ["to_any_of"] } ],
+          "properties": {
+            "from": { "$ref": "#/$defs/id" },
+            "to": { "$ref": "#/$defs/id" },
+            "to_any_of": { "$ref": "#/$defs/id_list" },
+            "cardinality": { "enum": ["one_to_many", "many_to_one", "many_to_many"] },
+            "key_fields": {
+              "type": "object",
+              "properties": {
+                "from": { "$ref": "#/$defs/id" },
+                "to": { "$ref": "#/$defs/id" }
+              },
+              "additionalProperties": false
+            },
+            "join_key_status": { "enum": ["present", "unknown", "table_name_only"] },
+            "join_observed_in_code": { "type": "boolean" }
+          }
+        }
+      ]
+    },
+    "relationships_file": {
+      "allOf": [
+        { "$ref": "#/$defs/file_base" },
+        {
+          "required": ["relationships"],
+          "properties": {
+            "file": { "const": "relationships" },
+            "cardinality_words": { "type": "array", "items": { "type": "string" } },
+            "relationships": { "type": "array", "minItems": 5, "items": { "$ref": "#/$defs/relationship" } }
+          }
+        }
+      ]
+    },
+
+    "status_word": {
+      "allOf": [
+        { "$ref": "#/$defs/item_base" },
+        {
+          "required": ["word", "description", "appears_in"],
+          "properties": {
+            "word": { "$ref": "#/$defs/text" },
+            "description": { "$ref": "#/$defs/text" },
+            "appears_in": { "$ref": "#/$defs/id_list" }
+          }
+        }
+      ]
+    },
+    "value_set": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["words"],
+          "properties": { "words": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } } }
+        }
+      ]
+    },
+    "observed_value": {
+      "allOf": [
+        { "$ref": "#/$defs/item_base" },
+        {
+          "required": ["value", "observed_count"],
+          "properties": {
+            "value": { "type": "string" },
+            "word": { "$ref": "#/$defs/id" },
+            "ref": { "$ref": "#/$defs/id" },
+            "observed_count": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    },
+    "status_field": {
+      "allOf": [
+        { "$ref": "#/$defs/item_base" },
+        {
+          "required": ["entity", "field", "description", "allowed_list_defined_by_repo", "blank_count", "observed_values"],
+          "properties": {
+            "entity": { "$ref": "#/$defs/id" },
+            "field": { "$ref": "#/$defs/id" },
+            "value_set": { "$ref": "#/$defs/id" },
+            "values_are": { "type": "string" },
+            "description": { "$ref": "#/$defs/text" },
+            "allowed_list_defined_by_repo": { "type": "boolean" },
+            "allowed_list_source": { "$ref": "#/$defs/source" },
+            "blank_count": { "type": "integer", "minimum": 0 },
+            "observed_values": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/observed_value" } },
+            "off_vocabulary_values": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["value", "observed_count", "note", "source"],
+                "properties": {
+                  "value": { "type": "string" },
+                  "observed_count": { "type": "integer", "minimum": 1 },
+                  "note": { "$ref": "#/$defs/text" },
+                  "source": { "$ref": "#/$defs/source" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "code_value": {
+      "allOf": [
+        { "$ref": "#/$defs/item_base" },
+        {
+          "required": ["value", "description"],
+          "properties": {
+            "value": { "$ref": "#/$defs/text" },
+            "word": { "$ref": "#/$defs/id" },
+            "ref": { "$ref": "#/$defs/id" },
+            "description": { "$ref": "#/$defs/text" }
+          }
+        }
+      ]
+    },
+    "collision": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["resolution"],
+          "properties": {
+            "words": { "$ref": "#/$defs/id_list" },
+            "fields": { "$ref": "#/$defs/id_list" },
+            "roles": { "$ref": "#/$defs/id_list" },
+            "defect_refs": { "type": "array", "items": { "type": "string" } },
+            "resolution": { "$ref": "#/$defs/text" }
+          }
+        }
+      ]
+    },
+    "status_taxonomy_file": {
+      "allOf": [
+        { "$ref": "#/$defs/file_base" },
+        {
+          "required": ["words", "value_sets", "status_fields", "code_values", "collisions"],
+          "properties": {
+            "file": { "const": "status-taxonomy" },
+            "words": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/status_word" } },
+            "value_sets": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/value_set" } },
+            "status_fields": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/status_field" } },
+            "code_values": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/code_value" } },
+            "collisions": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/collision" } },
+            "other_overlaps": { "type": "array", "items": { "$ref": "#/$defs/named_item" } }
+          }
+        }
+      ]
+    },
+
+    "rule": {
+      "allOf": [
+        { "$ref": "#/$defs/item_base" },
+        {
+          "required": ["name", "kind", "applies_to", "statement", "current_behaviour", "enforced_today", "enforcement_stage"],
+          "properties": {
+            "name": { "$ref": "#/$defs/text" },
+            "kind": { "enum": ["data_invariant", "lookup", "access", "ai_gate"] },
+            "applies_to": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+            "statement": { "$ref": "#/$defs/text" },
+            "current_behaviour": { "$ref": "#/$defs/text" },
+            "defect_refs": { "type": "array", "items": { "type": "string", "pattern": "^[FK][0-9]{2}$" } },
+            "enforced_today": { "type": "boolean" },
+            "enforcement_stage": { "type": "string", "pattern": "^S[0-9]{2}(-[0-9]{2})?[A-Z]?$" },
+            "stage_note": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "business_rules_file": {
+      "allOf": [
+        { "$ref": "#/$defs/file_base" },
+        {
+          "required": ["rules"],
+          "properties": {
+            "file": { "const": "business-rules" },
+            "rule_kinds": { "type": "array", "items": { "type": "string" } },
+            "rules": { "type": "array", "minItems": 6, "items": { "$ref": "#/$defs/rule" } }
+          }
+        }
+      ]
+    },
+
+    "metric": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["unit", "formula", "source_fields", "today", "target"],
+          "properties": {
+            "unit": { "$ref": "#/$defs/text" },
+            "formula": { "$ref": "#/$defs/text" },
+            "source_fields": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+            "live_source": { "type": "string" },
+            "today": { "$ref": "#/$defs/text" },
+            "target": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "required": ["value", "proposed", "owner"],
+                  "properties": {
+                    "value": { "type": ["number", "string"] },
+                    "proposed": { "const": true },
+                    "owner": { "$ref": "#/$defs/text" }
+                  }
+                }
+              ]
+            },
+            "proposed_bound_note": { "type": "string" },
+            "required_fields_note": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "metrics_file": {
+      "allOf": [
+        { "$ref": "#/$defs/file_base" },
+        {
+          "required": ["metrics"],
+          "properties": {
+            "file": { "const": "metrics" },
+            "metrics": { "type": "array", "minItems": 6, "items": { "$ref": "#/$defs/metric" } }
+          }
+        }
+      ]
+    },
+
+    "value_list": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/named_item" }
+    },
+    "grant": {
+      "type": "object",
+      "required": ["action", "resources", "purpose", "scope", "risk"],
+      "properties": {
+        "action": { "$ref": "#/$defs/id" },
+        "resources": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+        "purpose": { "$ref": "#/$defs/id" },
+        "scope": { "$ref": "#/$defs/id" },
+        "risk": { "$ref": "#/$defs/id" },
+        "requires_rule": { "$ref": "#/$defs/id" },
+        "note": { "type": "string" }
+      }
+    },
+    "persona": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["grants", "denied"],
+          "properties": {
+            "event_count": { "type": "integer", "minimum": 0 },
+            "api_role_today": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/id" } ] },
+            "grants": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/grant" } },
+            "denied": { "$ref": "#/$defs/id_list" }
+          }
+        }
+      ]
+    },
+    "api_role": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["accepted_on", "maps_to_persona"],
+          "properties": {
+            "accepted_on": { "$ref": "#/$defs/text" },
+            "maps_to_persona": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/id" } ] },
+            "mapping_label": { "enum": ["Verified Fact", "Inference", "Assumption", "Unknown"] }
+          }
+        }
+      ]
+    },
+    "access_semantics_file": {
+      "allOf": [
+        { "$ref": "#/$defs/file_base" },
+        {
+          "required": ["actions", "resources", "purposes", "scopes", "risks", "api_roles_today", "opa_rules_today", "removed_roles", "personas"],
+          "properties": {
+            "file": { "const": "access-semantics" },
+            "actions": { "$ref": "#/$defs/value_list" },
+            "resources": { "$ref": "#/$defs/value_list" },
+            "purposes": { "$ref": "#/$defs/value_list" },
+            "scopes": { "$ref": "#/$defs/value_list" },
+            "risks": { "$ref": "#/$defs/value_list" },
+            "api_roles_today": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/api_role" } },
+            "opa_rules_today": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/named_item" } },
+            "removed_roles": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["role", "reason", "source"],
+                "properties": {
+                  "role": { "$ref": "#/$defs/id" },
+                  "reason": { "$ref": "#/$defs/text" },
+                  "defect_refs": { "type": "array", "items": { "type": "string" } },
+                  "source": { "$ref": "#/$defs/source" }
+                }
+              }
+            },
+            "personas": { "type": "array", "minItems": 7, "maxItems": 7, "items": { "$ref": "#/$defs/persona" } }
+          }
+        }
+      ]
+    },
+
+    "output_field": {
+      "type": "object",
+      "required": ["name", "type", "description"],
+      "properties": {
+        "name": { "$ref": "#/$defs/text" },
+        "type": { "enum": ["string", "integer", "number", "boolean", "object", "array"] },
+        "description": { "$ref": "#/$defs/text" },
+        "one_of": { "$ref": "#/$defs/id_list" },
+        "nullable": { "type": "boolean" }
+      }
+    },
+    "provenance_field": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["present_today", "where_today"],
+          "properties": {
+            "present_today": { "type": "boolean" },
+            "where_today": { "$ref": "#/$defs/text" }
+          }
+        }
+      ]
+    },
+    "outcome": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["agency", "used_by"],
+          "properties": {
+            "name": { "enum": ["RECOMMEND_ONLY", "HOLD_FOR_REVIEW", "BLOCK", "EXECUTE"] },
+            "agency": { "enum": ["analyse", "recommend", "decide", "execute"] },
+            "used_by": { "$ref": "#/$defs/id_list" },
+            "gates": { "$ref": "#/$defs/id_list" }
+          }
+        }
+      ]
+    },
+    "fail_trigger": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["outcome"],
+          "properties": { "outcome": { "$ref": "#/$defs/id" } }
+        }
+      ]
+    },
+    "ai_use": {
+      "allOf": [
+        { "$ref": "#/$defs/named_item" },
+        {
+          "required": ["pick", "agency", "outcome", "approval_point", "approver", "reads"],
+          "properties": {
+            "pick": { "enum": ["genai", "rules", "deterministic_code", "workflow_automation", "classical_ml", "agentic_ai"] },
+            "agency": { "enum": ["analyse", "recommend", "decide", "execute"] },
+            "outcome": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/id" } ] },
+            "block_conditions": { "$ref": "#/$defs/id_list" },
+            "approval_point": { "$ref": "#/$defs/text" },
+            "approver": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/id" } ] },
+            "executor": { "$ref": "#/$defs/id" },
+            "reads": { "$ref": "#/$defs/id_list" }
+          },
+          "if": { "properties": { "pick": { "const": "genai" } } },
+          "then": { "properties": { "agency": { "enum": ["analyse", "recommend"] } } }
+        }
+      ]
+    },
+    "ai_context_policy_file": {
+      "allOf": [
+        { "$ref": "#/$defs/file_base" },
+        {
+          "required": ["model_today", "prompt_fields", "output_schema", "provenance", "outcomes", "fail_to_person", "ai_uses"],
+          "properties": {
+            "file": { "const": "ai-context-policy" },
+            "model_today": {
+              "allOf": [
+                { "$ref": "#/$defs/named_item" },
+                {
+                  "required": ["model", "guardrail_status", "prompt_template"],
+                  "properties": {
+                    "model": { "$ref": "#/$defs/text" },
+                    "guardrail_status": { "$ref": "#/$defs/text" },
+                    "prompt_template": { "$ref": "#/$defs/text" }
+                  }
+                }
+              ]
+            },
+            "prompt_fields": {
+              "allOf": [
+                { "$ref": "#/$defs/named_item" },
+                {
+                  "required": ["allowed", "forbidden", "forbidden_credential_names", "today"],
+                  "properties": {
+                    "allowed": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+                    "forbidden": {
+                      "type": "array",
+                      "minItems": 2,
+                      "items": {
+                        "type": "object",
+                        "required": ["field", "reason"],
+                        "properties": { "field": { "$ref": "#/$defs/id" }, "reason": { "$ref": "#/$defs/text" } }
+                      }
+                    },
+                    "forbidden_credential_names": {
+                      "type": "object",
+                      "required": ["description", "names", "source"],
+                      "properties": {
+                        "description": { "$ref": "#/$defs/text" },
+                        "names": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]+$" } },
+                        "source": { "$ref": "#/$defs/source" }
+                      }
+                    },
+                    "today": { "$ref": "#/$defs/text" }
+                  }
+                }
+              ]
+            },
+            "output_schema": {
+              "allOf": [
+                { "$ref": "#/$defs/named_item" },
+                {
+                  "required": ["fields_today", "required"],
+                  "properties": {
+                    "fields_today": { "type": "array", "items": { "type": "string" } },
+                    "required": { "type": "array", "minItems": 5, "items": { "$ref": "#/$defs/output_field" } }
+                  }
+                }
+              ]
+            },
+            "provenance": {
+              "allOf": [
+                { "$ref": "#/$defs/named_item" },
+                {
+                  "required": ["fields"],
+                  "properties": { "fields": { "type": "array", "minItems": 5, "items": { "$ref": "#/$defs/provenance_field" } } }
+                }
+              ]
+            },
+            "outcomes": {
+              "allOf": [
+                { "$ref": "#/$defs/named_item" },
+                {
+                  "required": ["values"],
+                  "properties": { "values": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "$ref": "#/$defs/outcome" } } }
+                }
+              ]
+            },
+            "fail_to_person": {
+              "allOf": [
+                { "$ref": "#/$defs/named_item" },
+                {
+                  "required": ["hand_to", "audit_row_required", "timeout_seconds", "triggers"],
+                  "properties": {
+                    "hand_to": { "$ref": "#/$defs/id" },
+                    "audit_row_required": { "const": true },
+                    "timeout_seconds": { "oneOf": [ { "type": "null" }, { "type": "number", "exclusiveMinimum": 0 } ] },
+                    "triggers": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/fail_trigger" } }
+                  }
+                }
+              ]
+            },
+            "ai_uses": { "type": "array", "minItems": 11, "items": { "$ref": "#/$defs/ai_use" } }
+          }
+        }
+      ]
+    }
+  }
+}

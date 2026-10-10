@@ -1,0 +1,684 @@
+{
+  "version": "1.0.0",
+  "file": "ai-context-policy",
+  "description": "The rules around every model call. Fields that may enter a prompt. Fields that never may. The shape every answer must have. The provenance fields that say where the answer came from. The four outcomes. What happens on a timeout or a bad answer. And, for each of the eleven capabilities from ai-qualification.md, the pick, the agency, and the human approval point. The allow list and the output shape are PROPOSED. Stage S04-09 confirms them.",
+  "source": [
+    "docs/02-baseline/ai-qualification.md",
+    "apps/api/services/ai_gateway.py",
+    "apps/api/main.py",
+    "docs/01-discovery/ai-subsystem-discovery.md",
+    "docs/02-baseline/defect-list.md",
+    "docs/00-contract/operating-contract.md",
+    "../Project_Intent.md"
+  ],
+  "model_today": {
+    "id": "policy.model_today",
+    "name": "live model today",
+    "model": "local-sim-v1",
+    "guardrail_status": "not_enforced",
+    "prompt_template": "Summarize this operational record and recommend next action: {record}",
+    "description": "The live gateway is a stub. It fills {record} with the whole device row, waits 0.01 seconds, and returns a fixed summary pattern, one fixed recommendation sentence, a token estimate, source_count 1, and guardrail_status not_enforced. It calls no network model.",
+    "source": [
+      "apps/api/services/ai_gateway.py",
+      "docs/01-discovery/ai-subsystem-discovery.md"
+    ]
+  },
+  "prompt_fields": {
+    "id": "policy.prompt_fields",
+    "name": "prompt field allow list",
+    "description": "Only the fields below may be placed in prompt text. Any field not listed stays out. The two forbidden device fields stay out whatever they hold. Credentials of any kind stay out.",
+    "proposed": true,
+    "owner": "Mangesh (FDE)",
+    "confirm_at": "S04-09",
+    "allowed": [
+      "field.device.device_id",
+      "field.device.hostname",
+      "field.device.vendor",
+      "field.device.device_type",
+      "field.device.site_id",
+      "field.device.network_zone",
+      "field.device.firmware",
+      "field.device.owner_team",
+      "field.device.last_seen_at",
+      "field.device.stale_topology_flag",
+      "field.alarm.alarm_id",
+      "field.alarm.device_id",
+      "field.alarm.interface",
+      "field.alarm.severity",
+      "field.alarm.alarm_type",
+      "field.alarm.first_seen_at",
+      "field.alarm.last_seen_at",
+      "field.alarm.dedupe_key",
+      "field.alarm.maintenance_window",
+      "field.alarm.storm_batch_id",
+      "field.incident.incident_id",
+      "field.incident.circuit_id",
+      "field.incident.severity",
+      "field.incident.status",
+      "field.incident.opened_at",
+      "field.incident.root_cause",
+      "field.incident.automation_used",
+      "field.incident.sla_breach_risk",
+      "field.circuit.circuit_id",
+      "field.circuit.bandwidth_mbps",
+      "field.circuit.service_class",
+      "field.circuit.status",
+      "field.circuit.sla_tier"
+    ],
+    "forbidden": [
+      {
+        "field": "field.device.mgmt_ip",
+        "reason": "A management address is a way into the device. Locked in Project_Intent.md 4.3."
+      },
+      {
+        "field": "field.device.credential_profile",
+        "reason": "It names the login details the device uses. Locked in Project_Intent.md 4.3."
+      },
+      {
+        "field": "field.incident.customer_id",
+        "reason": "A customer id is not needed to write a summary or a next action. PROPOSED."
+      },
+      {
+        "field": "field.circuit.customer_id",
+        "reason": "Same as above. PROPOSED."
+      }
+    ],
+    "forbidden_credential_names": {
+      "description": "Names of secrets in the repo. The names are listed. The values are not and must never be.",
+      "names": [
+        "SHARED_DB_PASSWORD",
+        "SHARED_DB_USER",
+        "DATABASE_URL",
+        "AI_GATEWAY_KEY",
+        "LEGACY_BATCH_PASSWORD",
+        "OT_VENDOR_TOKEN"
+      ],
+      "source": [
+        "legacy/reconcile_legacy.py",
+        ".env.example",
+        "docs/01-discovery/component-inventory.md"
+      ]
+    },
+    "today": "PROMPT_TEMPLATE.format(record=record) places every device cell in the prompt, including both forbidden fields. Defect F12.",
+    "source": [
+      "apps/api/services/ai_gateway.py",
+      "docs/02-baseline/defect-list.md",
+      "docs/00-contract/operating-contract.md",
+      "../Project_Intent.md"
+    ]
+  },
+  "output_schema": {
+    "id": "policy.output_schema",
+    "name": "required output schema",
+    "description": "Every model answer is a JSON object with these fields. A missing field or a wrong type is a schema failure and hands the case to a person. The outcome field holds one of the four outcome words.",
+    "proposed": true,
+    "owner": "Mangesh (FDE)",
+    "confirm_at": "S04-09",
+    "fields_today": [
+      "model",
+      "summary",
+      "recommendation",
+      "token_estimate",
+      "source_count",
+      "guardrail_status"
+    ],
+    "required": [
+      {
+        "name": "record_id",
+        "type": "string",
+        "description": "The id the caller asked about. Must equal the id that was looked up, not a substitute row."
+      },
+      {
+        "name": "summary",
+        "type": "string",
+        "description": "The short account of the record."
+      },
+      {
+        "name": "recommendation",
+        "type": "string",
+        "description": "The next-action sentence. Text only. Never a command."
+      },
+      {
+        "name": "outcome",
+        "type": "string",
+        "one_of": [
+          "outcome.recommend_only",
+          "outcome.hold_for_review",
+          "outcome.block",
+          "outcome.execute"
+        ],
+        "description": "Which of the four outcomes this answer carries. EXECUTE is never set by the model."
+      },
+      {
+        "name": "model",
+        "type": "string",
+        "description": "The model name."
+      },
+      {
+        "name": "model_version",
+        "type": "string",
+        "description": "The model version."
+      },
+      {
+        "name": "prompt_hash",
+        "type": "string",
+        "description": "A hash of the exact prompt text that was sent."
+      },
+      {
+        "name": "tokens",
+        "type": "integer",
+        "description": "Tokens used. Replaces token_estimate."
+      },
+      {
+        "name": "latency_ms",
+        "type": "integer",
+        "description": "Milliseconds from request to answer."
+      },
+      {
+        "name": "source_count",
+        "type": "integer",
+        "description": "How many records the answer drew on."
+      },
+      {
+        "name": "guardrail_status",
+        "type": "string",
+        "description": "Whether the checks ran. not_enforced is a failure value once S04-09 lands."
+      },
+      {
+        "name": "approval_required",
+        "type": "boolean",
+        "description": "Whether a human approval id is needed before any change."
+      },
+      {
+        "name": "policy_result",
+        "type": "string",
+        "description": "The access policy answer for this call. allow or deny."
+      },
+      {
+        "name": "approval_id",
+        "type": "string",
+        "nullable": true,
+        "description": "The stored approval id, once a named human writes one. Null until then. The model never fills it."
+      },
+      {
+        "name": "correlation_id",
+        "type": "string",
+        "description": "The request chain id. Written to the audit row too."
+      }
+    ],
+    "source": [
+      "apps/api/services/ai_gateway.py",
+      "docs/02-baseline/defect-list.md",
+      "docs/01-discovery/ai-subsystem-discovery.md"
+    ]
+  },
+  "provenance": {
+    "id": "policy.provenance",
+    "name": "model provenance fields",
+    "description": "These fields travel on the answer body and on the audit row. present_today says whether the live call records the field.",
+    "fields": [
+      {
+        "id": "provenance.model",
+        "name": "model",
+        "present_today": true,
+        "where_today": "Response body and audit details. Value local-sim-v1.",
+        "description": "Which model answered.",
+        "source": [
+          "apps/api/services/ai_gateway.py",
+          "apps/api/main.py"
+        ]
+      },
+      {
+        "id": "provenance.model_version",
+        "name": "model_version",
+        "present_today": false,
+        "where_today": "Absent. The string local-sim-v1 doubles as name and version.",
+        "description": "Which version of the model answered.",
+        "source": [
+          "docs/01-discovery/ai-subsystem-discovery.md"
+        ]
+      },
+      {
+        "id": "provenance.prompt_hash",
+        "name": "prompt_hash",
+        "present_today": false,
+        "where_today": "Absent from the body and the audit row.",
+        "description": "A hash of the exact prompt text, so a reviewer can prove what was sent without storing the text.",
+        "source": [
+          "docs/01-discovery/ai-subsystem-discovery.md"
+        ]
+      },
+      {
+        "id": "provenance.tokens",
+        "name": "tokens",
+        "present_today": true,
+        "where_today": "Response body as token_estimate. CSV column token_count. Not on the audit row.",
+        "description": "Tokens used by the call.",
+        "source": [
+          "apps/api/services/ai_gateway.py",
+          "data/synthetic/ai_invocations.csv"
+        ]
+      },
+      {
+        "id": "provenance.latency_ms",
+        "name": "latency_ms",
+        "present_today": false,
+        "where_today": "Absent from the live call. events.jsonl has latency_ms on every line.",
+        "description": "How long the call took.",
+        "source": [
+          "data/synthetic/events.jsonl",
+          "apps/api/services/ai_gateway.py"
+        ]
+      },
+      {
+        "id": "provenance.actor",
+        "name": "actor",
+        "present_today": false,
+        "where_today": "Absent. The summary route takes no role.",
+        "description": "Who asked.",
+        "source": [
+          "apps/api/main.py",
+          "docs/02-baseline/defect-list.md"
+        ]
+      },
+      {
+        "id": "provenance.correlation_id",
+        "name": "correlation_id",
+        "present_today": false,
+        "where_today": "Absent from the audit row.",
+        "description": "Which request chain the call belongs to.",
+        "source": [
+          "apps/api/services/audit.py",
+          "docs/02-baseline/defect-list.md"
+        ]
+      },
+      {
+        "id": "provenance.policy_result",
+        "name": "policy_result",
+        "present_today": false,
+        "where_today": "Absent. The route calls no policy.",
+        "description": "What the access policy said for this call.",
+        "source": [
+          "docs/01-discovery/ai-subsystem-discovery.md"
+        ]
+      },
+      {
+        "id": "provenance.approval_id",
+        "name": "approval_id",
+        "present_today": false,
+        "where_today": "Absent from the body and the audit row. No route writes one.",
+        "description": "The named human's stored approval.",
+        "source": [
+          "docs/00-contract/operating-contract.md",
+          "docs/01-discovery/ai-subsystem-discovery.md"
+        ]
+      }
+    ],
+    "source": [
+      "docs/01-discovery/ai-subsystem-discovery.md",
+      "apps/api/services/ai_gateway.py",
+      "apps/api/services/audit.py"
+    ]
+  },
+  "outcomes": {
+    "id": "policy.outcomes",
+    "name": "the four AI outcomes",
+    "description": "Every model answer carries exactly one of these four words. Locked in Project_Intent.md 4.3.",
+    "values": [
+      {
+        "id": "outcome.recommend_only",
+        "name": "RECOMMEND_ONLY",
+        "agency": "recommend",
+        "description": "The text is shown to a person. The stored rows stay as they are. No approval step is required for the text itself.",
+        "used_by": [
+          "ai_use.incident_summary"
+        ],
+        "source": [
+          "docs/02-baseline/ai-qualification.md",
+          "../Project_Intent.md"
+        ]
+      },
+      {
+        "id": "outcome.hold_for_review",
+        "name": "HOLD_FOR_REVIEW",
+        "agency": "recommend",
+        "description": "The text waits for a named person to accept or reject it. Nothing moves until that person acts.",
+        "used_by": [
+          "ai_use.next_action_recommendation",
+          "ai_use.configuration_suggestion"
+        ],
+        "source": [
+          "docs/02-baseline/ai-qualification.md",
+          "../Project_Intent.md"
+        ]
+      },
+      {
+        "id": "outcome.block",
+        "name": "BLOCK",
+        "agency": "analyse",
+        "description": "A rule stopped the call before or after the model ran. No text is acted on. The case goes to a person with the reason.",
+        "used_by": [
+          "ai_use.next_action_recommendation",
+          "ai_use.configuration_suggestion"
+        ],
+        "source": [
+          "docs/02-baseline/ai-qualification.md",
+          "../Project_Intent.md"
+        ]
+      },
+      {
+        "id": "outcome.execute",
+        "name": "EXECUTE",
+        "agency": "execute",
+        "description": "A change runs on a live device or circuit. Only workflow automation may reach this outcome, and only after four gates: a policy allow, a human approval id, an audit row written first, and a reversible validated change. The model never sets this outcome. No route reaches it in this packet.",
+        "used_by": [
+          "ai_use.remediation_execution"
+        ],
+        "gates": [
+          "rule.ai_recommendation_needs_policy_approval_audit_before_state_change",
+          "rule.ai_output_cannot_execute"
+        ],
+        "source": [
+          "docs/00-contract/operating-contract.md",
+          "docs/02-baseline/ai-qualification.md",
+          "../Project_Intent.md"
+        ]
+      }
+    ],
+    "source": [
+      "docs/02-baseline/ai-qualification.md",
+      "../Project_Intent.md"
+    ]
+  },
+  "fail_to_person": {
+    "id": "policy.fail_to_person",
+    "name": "fail to person",
+    "description": "When a model call times out, returns an answer that fails the output schema, or hits a block rule, the system writes an audit row and hands the case to a named person. It never retries into an action. It never fills in a default answer.",
+    "hand_to": "persona.noc_operator",
+    "hand_to_label": "PROPOSED desk job. Owner Mangesh (FDE). Stage S04-09 confirms.",
+    "audit_row_required": true,
+    "timeout_seconds": null,
+    "timeout_note": "The repo states no timeout. Stage S04-09 sets one. This file does not invent the number.",
+    "triggers": [
+      {
+        "id": "failmode.timeout",
+        "name": "timeout",
+        "outcome": "outcome.hold_for_review",
+        "description": "The model did not answer within the timeout. The case goes to the person with no text.",
+        "source": [
+          "docs/00-contract/operating-contract.md",
+          "docs/runbooks/failure-injection-drills.md"
+        ]
+      },
+      {
+        "id": "failmode.schema_failure",
+        "name": "schema failure",
+        "outcome": "outcome.hold_for_review",
+        "description": "The answer is missing a required field or has a wrong type. The answer is discarded. The case goes to the person.",
+        "source": [
+          "docs/00-contract/operating-contract.md",
+          "apps/api/services/ai_gateway.py"
+        ]
+      },
+      {
+        "id": "failmode.missing_id",
+        "name": "missing id",
+        "outcome": "outcome.block",
+        "description": "No row has the requested id. The call stops before the model runs. Today the stub summarises REC-0001 instead. Defect F02.",
+        "source": [
+          "docs/02-baseline/ai-qualification.md",
+          "docs/02-baseline/defect-list.md"
+        ]
+      },
+      {
+        "id": "failmode.stale_topology_true",
+        "name": "stale topology flag is true",
+        "outcome": "outcome.block",
+        "description": "stale_topology_flag is true. The call stops before the model runs.",
+        "source": [
+          "docs/02-baseline/ai-qualification.md"
+        ]
+      },
+      {
+        "id": "failmode.stale_topology_blank",
+        "name": "stale topology flag is blank",
+        "outcome": "outcome.hold_for_review",
+        "description": "stale_topology_flag is empty. What a blank flag should do is Unknown. Until an owner decides, the case goes to the person.",
+        "proposed": true,
+        "owner": "Mangesh (FDE)",
+        "source": [
+          "docs/02-baseline/ai-qualification.md",
+          "data/synthetic/devices.csv"
+        ]
+      },
+      {
+        "id": "failmode.forbidden_field_in_prompt",
+        "name": "forbidden field in prompt",
+        "outcome": "outcome.block",
+        "description": "The prompt builder found mgmt_ip, credential_profile, or a credential name in the text. The call stops.",
+        "source": [
+          "docs/02-baseline/defect-list.md",
+          "../Project_Intent.md"
+        ]
+      }
+    ],
+    "source": [
+      "docs/00-contract/operating-contract.md",
+      "docs/02-baseline/ai-qualification.md"
+    ]
+  },
+  "ai_uses": [
+    {
+      "id": "ai_use.order_qualification",
+      "name": "order qualification",
+      "pick": "rules",
+      "agency": "analyse",
+      "outcome": null,
+      "approval_point": "None at this agency. A provision of a circuit is a live network change. A named human approves that change on the remediation execution row.",
+      "approver": null,
+      "reads": [
+        "field.service_order.qualification_status"
+      ],
+      "description": "A rule reads the stored word in qualification_status and shows it. Not implemented today.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "ai_use.provisioning_retry_and_rollback",
+      "name": "provisioning retry and rollback",
+      "pick": "deterministic_code",
+      "agency": "analyse",
+      "outcome": null,
+      "approval_point": "None at this agency. A rollback that changes a live circuit uses the human approval on the remediation execution row.",
+      "approver": null,
+      "reads": [
+        "field.service_order.retry_count",
+        "field.service_order.provisioning_status",
+        "field.service_order.rollback_status"
+      ],
+      "description": "Code reads the retry number and the rollback word and shows them. The legal maximum is Unknown. Not implemented today.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "ai_use.alarm_dedupe",
+      "name": "alarm dedupe",
+      "pick": "deterministic_code",
+      "agency": "analyse",
+      "outcome": null,
+      "approval_point": "None at this agency. The noc_operator decides whether the group becomes one incident.",
+      "approver": "persona.noc_operator",
+      "reads": [
+        "field.alarm.dedupe_key",
+        "field.alarm.storm_batch_id"
+      ],
+      "description": "Code groups alarms by equal dedupe_key and equal storm_batch_id. Not implemented today.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "ai_use.alarm_to_incident_correlation",
+      "name": "alarm-to-incident correlation",
+      "pick": "deterministic_code",
+      "agency": "analyse",
+      "outcome": null,
+      "approval_point": "None at this agency. The noc_operator opens or merges the incident. The later read is GET /alarms/storms/{storm_batch_id}.",
+      "approver": "persona.noc_operator",
+      "reads": [
+        "field.alarm.storm_batch_id",
+        "field.alarm.first_seen_at",
+        "field.alarm.last_seen_at"
+      ],
+      "description": "Code lists shared ids and applies the timestamp-order flag. The join key is Unknown. Not implemented today.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "ai_use.topology_lookup",
+      "name": "topology lookup",
+      "pick": "deterministic_code",
+      "agency": "analyse",
+      "outcome": null,
+      "approval_point": "None at this agency. The lookup returns a row. It leaves the device unchanged.",
+      "approver": null,
+      "reads": [
+        "field.device.device_id",
+        "field.device.stale_topology_flag"
+      ],
+      "description": "GET /records/{record_id} today. A missing id must be reported as missing. Defect F01 is the current wrong return.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "apps/api/main.py"
+      ]
+    },
+    {
+      "id": "ai_use.incident_summary",
+      "name": "incident summary",
+      "pick": "genai",
+      "agency": "recommend",
+      "outcome": "outcome.recommend_only",
+      "approval_point": "The noc_operator reads the account when it is shown. The system leaves the incident row unchanged. Desk job PROPOSED. Owner Mangesh (FDE). Stage S04-09 confirms.",
+      "approver": "persona.noc_operator",
+      "reads": [
+        "field.device.device_id",
+        "field.incident.incident_id",
+        "field.alarm.alarm_id"
+      ],
+      "description": "A language model writes a short account a person can read. The live stub POST /ai/summarize/{record_id} prints one fixed pattern. Product name Network Incident Copilot is an Inference.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "apps/api/services/ai_gateway.py"
+      ]
+    },
+    {
+      "id": "ai_use.next_action_recommendation",
+      "name": "next-action recommendation",
+      "pick": "genai",
+      "agency": "recommend",
+      "outcome": "outcome.hold_for_review",
+      "block_conditions": [
+        "failmode.missing_id",
+        "failmode.stale_topology_true"
+      ],
+      "approval_point": "The noc_operator accepts or rejects the sentence before any change ticket exists. Desk job PROPOSED. Owner Mangesh (FDE). Stage S04-09 confirms. The later decision route is POST /approvals/{id}.",
+      "approver": "persona.noc_operator",
+      "reads": [
+        "field.device.device_id",
+        "field.device.stale_topology_flag",
+        "field.incident.incident_id"
+      ],
+      "description": "A language model writes a next-action sentence that follows the fields of the case. A rule runs first. A missing id or a true stale flag is BLOCK. The live stub returns one fixed sentence.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "apps/api/services/ai_gateway.py",
+        "docs/00-contract/operating-contract.md"
+      ]
+    },
+    {
+      "id": "ai_use.configuration_suggestion",
+      "name": "configuration suggestion",
+      "pick": "genai",
+      "agency": "recommend",
+      "outcome": "outcome.hold_for_review",
+      "block_conditions": [
+        "failmode.missing_id",
+        "failmode.stale_topology_true"
+      ],
+      "approval_point": "The network_engineer accepts or rejects the suggestion before it can enter a change plan. Desk job PROPOSED. Owner Mangesh (FDE). Stage S04-09 confirms.",
+      "approver": "persona.network_engineer",
+      "reads": [
+        "field.device.device_id",
+        "field.device.vendor",
+        "field.device.firmware",
+        "field.alarm.alarm_id"
+      ],
+      "description": "A language model writes a suggested change in words for one device. The model does not push the change. Not implemented. Product name Configuration Assistant is an Inference.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "docs/architecture/known-gaps.md"
+      ]
+    },
+    {
+      "id": "ai_use.capacity_forecast",
+      "name": "capacity forecast",
+      "pick": "deterministic_code",
+      "agency": "analyse",
+      "outcome": null,
+      "approval_point": "None at this agency. A decision to add bandwidth is an order and a provision. A person makes that decision on those rows.",
+      "approver": null,
+      "reads": [
+        "field.circuit.bandwidth_mbps",
+        "field.service_order.requested_bandwidth"
+      ],
+      "description": "Code shows the stored bandwidth numbers. No file holds a use history, so no forecast model is picked. Product name Capacity Intelligence is an Inference.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "ai_use.remediation_execution",
+      "name": "remediation execution",
+      "pick": "workflow_automation",
+      "agency": "execute",
+      "outcome": "outcome.execute",
+      "approval_point": "A named human approves before the change. The system stores an approval id. The approval sits after the policy allow and before the change. The model does not approve. Desk job PROPOSED network_engineer. Owner Mangesh (FDE). PROVISIONAL until stage S04-09.",
+      "approver": "persona.network_engineer",
+      "executor": "persona.automation_service",
+      "reads": [],
+      "description": "Policy allow, stored human approval id, audit row, then the change. No execute route exists in this packet. The model stops at the recommendation rows.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "docs/00-contract/operating-contract.md",
+        "../Project_Intent.md"
+      ]
+    },
+    {
+      "id": "ai_use.remediation_validation",
+      "name": "remediation validation",
+      "pick": "deterministic_code",
+      "agency": "analyse",
+      "outcome": null,
+      "approval_point": "None at this agency. A person reads the match or the mismatch. A rollback uses the human approval on the remediation execution row.",
+      "approver": null,
+      "reads": [
+        "field.incident.automation_used"
+      ],
+      "description": "Code compares the state after a change with the state the approval named. The expected state is not defined in the repo. Not implemented today.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    }
+  ]
+}

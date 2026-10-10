@@ -52,6 +52,7 @@ STOP after Half A. Return the seven-item final response. Wait for "Half A accept
 - No EXECUTE outcome may be reachable without approval_id and an audit row. Write a test that proves it.
 - No invented threshold. The policy decides on named inputs, not on a numeric cutoff, unless the cutoff is PROPOSED with an owner and marked so in the Rego comment.
 - Each artifact starts with a header table: Stage, Date / version, Author, Status, Evidence sources, Assumptions, Unresolved issues, Residual risks.
+- If this design needs a term, id, status word, persona, resource, scope value, metric, or field the YAML lacks, do not define it here. Write one line that starts with "Open question for S03:" and names the term and what this design needs it for. Stage S05R folds it into the YAML.
 
 ## Locked facts (read, do not re-derive)
 | Item | Value |

@@ -1,0 +1,314 @@
+{
+  "version": "1.0.0",
+  "file": "business-rules",
+  "description": "The rules this system must keep. Each rule has a stable id, the entities and fields it touches, what the code does today, the defect rows that show the gap, and the stage that will enforce it. enforced_today is false on every rule. The repo has no code that enforces any of them.",
+  "source": [
+    "docs/02-baseline/defect-list.md",
+    "docs/02-baseline/ai-qualification.md",
+    "docs/02-baseline/data-quality-baseline.md",
+    "docs/00-contract/operating-contract.md",
+    "docs/01-discovery/brownfield-risk-register.md",
+    "apps/api/services/domain_service.py",
+    "apps/api/services/ai_gateway.py",
+    "apps/api/main.py",
+    "../Project_Intent.md"
+  ],
+  "rule_kinds": [
+    "data_invariant",
+    "lookup",
+    "access",
+    "ai_gate"
+  ],
+  "rules": [
+    {
+      "id": "rule.missing_id_not_other_device",
+      "name": "a missing id must not return another device",
+      "kind": "lookup",
+      "applies_to": [
+        "entity.device",
+        "field.device.device_id"
+      ],
+      "statement": "When no device row has the requested id, the lookup returns no device. It does not return the first row or any other row.",
+      "current_behaviour": "domain_service.load_record returns rows[0] when no cell matches. GET /records/DOES-NOT-EXIST returns the REC-0001 row with HTTP 200. The summary of a missing id is a summary of REC-0001.",
+      "defect_refs": [
+        "F01",
+        "F02"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-11",
+      "stage_note": "Operating contract row 2 allows GET /records/{id} to return 404 for a missing id. The inherited test test_missing_id_returns_first_row will fail at that point and must be replaced.",
+      "source": [
+        "apps/api/services/domain_service.py",
+        "docs/02-baseline/defect-list.md",
+        "docs/00-contract/operating-contract.md"
+      ]
+    },
+    {
+      "id": "rule.record_lookup_matches_key_only",
+      "name": "a record lookup matches the key column only",
+      "kind": "lookup",
+      "applies_to": [
+        "entity.device",
+        "field.device.device_id"
+      ],
+      "statement": "The lookup compares the requested id with device_id only. It does not compare the id with hostname, vendor, or any other cell.",
+      "current_behaviour": "load_record tests record_id in row.values(). A request for the word legacy would return a row whose hostname is legacy.",
+      "defect_refs": [
+        "F17",
+        "F22"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-11",
+      "source": [
+        "apps/api/services/domain_service.py",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "rule.ai_output_cannot_execute",
+      "name": "AI output cannot execute",
+      "kind": "ai_gate",
+      "applies_to": [
+        "entity.ai_invocation",
+        "concept.remediation"
+      ],
+      "statement": "Text from a model is a recommendation. No code path takes that text and changes a device, a circuit, an order, or an incident. The model never holds the execute agency.",
+      "current_behaviour": "The live gateway returns the sentence Review and approve before action. No execute route exists. The risk is a later worker who treats the JSON as a change ticket.",
+      "defect_refs": [
+        "F12"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-09",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "docs/00-contract/operating-contract.md",
+        "apps/api/services/ai_gateway.py",
+        "../Project_Intent.md"
+      ]
+    },
+    {
+      "id": "rule.alarm_last_seen_not_before_first_seen",
+      "name": "alarm last_seen_at cannot precede first_seen_at",
+      "kind": "data_invariant",
+      "applies_to": [
+        "entity.alarm",
+        "field.alarm.first_seen_at",
+        "field.alarm.last_seen_at"
+      ],
+      "statement": "On every alarm row, last_seen_at is the same time as first_seen_at or later. A row that breaks this is flagged and does not become an incident on its own.",
+      "current_behaviour": "166 of 354 alarm rows have last_seen_at before first_seen_at. Example ALA-00002 on file line 3. No code reads the file.",
+      "defect_refs": [
+        "F08"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-11",
+      "stage_note": "Project_Intent.md 2.7 says a row shaped like ALA-00002 is flagged and does not become an incident. The flag compares two timestamps. It needs no cutoff.",
+      "source": [
+        "data/synthetic/alarms.csv",
+        "docs/02-baseline/data-quality-baseline.md",
+        "docs/02-baseline/defect-list.md",
+        "../Project_Intent.md"
+      ]
+    },
+    {
+      "id": "rule.shared_admin_not_least_privilege",
+      "name": "a shared admin account is not least privilege",
+      "kind": "access",
+      "applies_to": [
+        "persona.automation_service",
+        "role.admin"
+      ],
+      "statement": "Each actor uses its own identity with only the actions it needs. A shared user whose password sits in source, and an admin role that is allowed every action, both break this. Neither counts as least privilege.",
+      "current_behaviour": "legacy/reconcile_legacy.py holds user app_shared and a password in the source file. The same password text is in .env.example. policy/opa/access.rego allows any admin for any action. The gap list names overpowered_automation_account. Whether automation_service is the app_shared account is Unknown.",
+      "defect_refs": [
+        "F05"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-04",
+      "stage_note": "Stage S04-04 moves the password to the environment. Stage S04-03 and S04-06 replace admin-any with per-persona rules. No password value appears in this file.",
+      "source": [
+        "docs/02-baseline/defect-list.md",
+        "docs/01-discovery/brownfield-risk-register.md",
+        "policy/opa/access.rego",
+        "docs/architecture/known-gaps.md"
+      ]
+    },
+    {
+      "id": "rule.duplicate_dedupe_key_in_storm_is_one_alarm",
+      "name": "duplicate dedupe_key within a storm_batch_id is one alarm",
+      "kind": "data_invariant",
+      "applies_to": [
+        "entity.alarm",
+        "field.alarm.dedupe_key",
+        "field.alarm.storm_batch_id"
+      ],
+      "statement": "Two alarm rows with the same dedupe_key and the same storm_batch_id are one alarm shown twice. They count as one alarm. The rows stay on disk. Grouping does not delete a row.",
+      "current_behaviour": "Three dedupe_key values appear twice. No code groups them. The check is string equality on two columns.",
+      "defect_refs": [],
+      "enforced_today": false,
+      "enforcement_stage": "S04-11",
+      "stage_note": "The pick in ai-qualification.md is deterministic code. How many alarms make a storm is Unknown. This rule sets no count.",
+      "source": [
+        "data/synthetic/alarms.csv",
+        "docs/02-baseline/ai-qualification.md",
+        "docs/01-discovery/business-flow-reconstruction.md"
+      ]
+    },
+    {
+      "id": "rule.ai_recommendation_needs_policy_approval_audit_before_state_change",
+      "name": "an AI recommendation needs a policy result, an approval id, and an audit row before any state change",
+      "kind": "ai_gate",
+      "applies_to": [
+        "entity.ai_invocation",
+        "concept.approval",
+        "concept.audit_row",
+        "concept.policy_decision"
+      ],
+      "statement": "Before any change follows a model recommendation, three things exist in this order. The access policy returned allow. A named human wrote an approval id. An audit row was written. Then, and only then, a change may run. The change must also be reversible and validated.",
+      "current_behaviour": "The summary route calls no policy. No route writes an approval id. The audit row for ai.summary holds record_id and model only. All three gates are absent.",
+      "defect_refs": [
+        "F11",
+        "F12",
+        "F16"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-09",
+      "stage_note": "Operating contract rows 2 and 9 and Project_Intent.md Appendix C name the four gates. The approver desk job is PROPOSED network_engineer with owner Mangesh (FDE) until S04-09 confirms it.",
+      "source": [
+        "docs/00-contract/operating-contract.md",
+        "docs/02-baseline/ai-qualification.md",
+        "docs/02-baseline/defect-list.md",
+        "../Project_Intent.md"
+      ]
+    },
+    {
+      "id": "rule.forbidden_fields_never_enter_prompt",
+      "name": "mgmt_ip, credential_profile, and credentials never enter a prompt",
+      "kind": "ai_gate",
+      "applies_to": [
+        "field.device.mgmt_ip",
+        "field.device.credential_profile",
+        "concept.prompt"
+      ],
+      "statement": "The prompt text sent to a model never contains mgmt_ip, credential_profile, a password, a key, or a token. The allow list in ai-context-policy.yaml names the fields that may enter.",
+      "current_behaviour": "PROMPT_TEMPLATE.format(record=record) places the whole device row in the prompt, including both fields.",
+      "defect_refs": [
+        "F12",
+        "F10"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-09",
+      "source": [
+        "apps/api/services/ai_gateway.py",
+        "docs/02-baseline/defect-list.md",
+        "docs/00-contract/operating-contract.md",
+        "../Project_Intent.md"
+      ]
+    },
+    {
+      "id": "rule.stale_topology_blocks_recommendation",
+      "name": "a stale topology flag blocks a recommendation",
+      "kind": "ai_gate",
+      "applies_to": [
+        "field.device.stale_topology_flag",
+        "entity.ai_invocation"
+      ],
+      "statement": "When stale_topology_flag is true, the recommendation call stops before the model runs. The outcome is BLOCK. What a blank flag should do is Unknown.",
+      "current_behaviour": "The flag is inside the returned row. No branch reads it. 192 rows are true.",
+      "defect_refs": [],
+      "enforced_today": false,
+      "enforcement_stage": "S04-09",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "docs/01-discovery/brownfield-risk-register.md",
+        "data/synthetic/devices.csv"
+      ]
+    },
+    {
+      "id": "rule.denied_access_is_audited",
+      "name": "a denied access writes an audit row and a deny status",
+      "kind": "access",
+      "applies_to": [
+        "concept.audit_row",
+        "concept.policy_decision"
+      ],
+      "statement": "When a role is refused, the response status says refused and an audit row records the refusal. A refused call is not invisible.",
+      "current_behaviour": "A role outside the five-name list gets HTTP 200 with body error forbidden and no audit line.",
+      "defect_refs": [
+        "F14"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-08",
+      "source": [
+        "apps/api/main.py",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "rule.no_default_role",
+      "name": "a call without a role is not treated as operator",
+      "kind": "access",
+      "applies_to": [
+        "role.operator",
+        "concept.policy_decision"
+      ],
+      "statement": "A call that sends no role header is refused. The server does not fill in operator for the caller.",
+      "current_behaviour": "Header(default=\"operator\") on the record route allows the read. The summary route checks no role at all.",
+      "defect_refs": [
+        "F15",
+        "F16"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-03",
+      "source": [
+        "apps/api/main.py",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "rule.audit_row_names_actor_and_correlation",
+      "name": "an audit row names the actor and the request chain",
+      "kind": "access",
+      "applies_to": [
+        "concept.audit_row"
+      ],
+      "statement": "Every audit row holds who acted, which request chain it belongs to, and, for a model call, which approval id and policy result applied. See metric.audit_completeness.",
+      "current_behaviour": "audit.write_event writes ts, action, and details. No actor, no correlation id, no approval id.",
+      "defect_refs": [
+        "F11"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S05-14",
+      "source": [
+        "apps/api/services/audit.py",
+        "docs/02-baseline/defect-list.md",
+        "docs/01-discovery/ai-subsystem-discovery.md"
+      ]
+    },
+    {
+      "id": "rule.one_row_per_key",
+      "name": "one row per business key",
+      "kind": "data_invariant",
+      "applies_to": [
+        "field.device.device_id",
+        "field.circuit.circuit_id",
+        "field.alarm.alarm_id",
+        "field.incident.incident_id",
+        "field.service_order.order_id",
+        "field.ai_invocation.ai_call_id"
+      ],
+      "statement": "Each key value appears on one row of its table. A second row with the same key is a defect to hold aside, not a second object.",
+      "current_behaviour": "Each of the six CSV files has three keys that appear twice. Whether the repeated id should collapse is Unknown. Writes under data/synthetic are prohibited.",
+      "defect_refs": [
+        "F06"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S04-11",
+      "source": [
+        "docs/02-baseline/data-quality-baseline.md",
+        "docs/02-baseline/defect-list.md",
+        "docs/00-contract/operating-contract.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "version": "1.0.0",
+  "file": "metrics",
+  "description": "Measures that later stages compute and report. Each metric names the fields it reads, how it is worked out in words, and what the data shows today. No metric has a target value. A PROPOSED bound from the baseline is recorded as a note with owner Unknown. It is not a target.",
+  "source": [
+    "docs/02-baseline/data-quality-baseline.md",
+    "docs/02-baseline/defect-list.md",
+    "docs/01-discovery/ai-subsystem-discovery.md",
+    "docs/00-contract/cost-envelope.md",
+    "data/synthetic/ai_invocations.csv",
+    "data/synthetic/events.jsonl",
+    "data/synthetic/service_orders.csv",
+    "data/synthetic/incidents.csv",
+    "data/synthetic/alarms.csv",
+    "apps/api/services/ai_gateway.py",
+    "apps/api/services/audit.py",
+    "etl/run_daily_batch.py",
+    "../Project_Intent.md"
+  ],
+  "metrics": [
+    {
+      "id": "metric.tokens_per_invocation",
+      "name": "tokens per invocation",
+      "unit": "tokens",
+      "description": "How many tokens one model call used.",
+      "formula": "The token figure stored on one call row. For a set of calls, the sum of token figures divided by the number of calls.",
+      "source_fields": [
+        "field.ai_invocation.token_count"
+      ],
+      "live_source": "The live body returns token_estimate, computed as len(prompt.split()) * 2. The value for REC-0001 was 64. The gateway does not write the CSV, so the two figures never meet.",
+      "today": "The CSV holds 353 numeric token_count values. The SIMULATED sum in the cost envelope is 845675. That sum is a lab figure.",
+      "target": null,
+      "source": [
+        "data/synthetic/ai_invocations.csv",
+        "apps/api/services/ai_gateway.py",
+        "docs/01-discovery/ai-subsystem-discovery.md",
+        "docs/00-contract/cost-envelope.md"
+      ]
+    },
+    {
+      "id": "metric.cost_per_correlated_incident",
+      "name": "cost per correlated incident",
+      "unit": "cost_units per incident",
+      "description": "How much the model calls for one incident cost, once alarms have been tied to that incident.",
+      "formula": "The sum of cost figures for the calls whose incident_id is this incident, divided by one incident. Cost comes from events cost_units or from a hosted-model price that is Unknown.",
+      "source_fields": [
+        "field.ai_invocation.incident_id",
+        "field.ai_invocation.token_count",
+        "field.event.cost_units",
+        "field.incident.incident_id"
+      ],
+      "today": "The join from alarms to incidents is Unknown, so no incident is correlated yet. events.jsonl has cost_units with an Unknown money unit. The hosted-model price is Unknown. This metric cannot be computed today.",
+      "target": null,
+      "source": [
+        "data/synthetic/ai_invocations.csv",
+        "data/synthetic/events.jsonl",
+        "docs/00-contract/cost-envelope.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "metric.quarantine_rate",
+      "name": "quarantine rate",
+      "unit": "fraction of rows",
+      "description": "The share of rows a batch held aside as bad instead of passing them on.",
+      "formula": "Rows held aside divided by rows processed, for one batch run.",
+      "source_fields": [
+        "field.device.device_id"
+      ],
+      "today": "etl/run_daily_batch.py printed processed 354 and malformed 1. It held nothing aside. It writes no file of bad rows. So the rate today is 0 of 354, while 1 row is known bad. Where a held-aside row would go is Unknown.",
+      "target": null,
+      "source": [
+        "etl/run_daily_batch.py",
+        "docs/02-baseline/defect-list.md",
+        "docs/01-discovery/brownfield-risk-register.md"
+      ]
+    },
+    {
+      "id": "metric.retry_count",
+      "name": "retry count",
+      "unit": "retries",
+      "description": "How many times a service order build was tried again.",
+      "formula": "The retry_count value on one order row. For a set of orders, the minimum, maximum, and the count at or above a bound.",
+      "source_fields": [
+        "field.service_order.retry_count"
+      ],
+      "today": "353 numeric values. Minimum 32. Maximum 4995. 294 at or above 1000. ORD-00002 has 4052.",
+      "target": null,
+      "proposed_bound_note": "The baseline uses 1000 as a PROPOSED bound so the odd case is counted. Owner Unknown. It is not an approved maximum and not a target.",
+      "source": [
+        "data/synthetic/service_orders.csv",
+        "docs/02-baseline/data-quality-baseline.md",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "metric.audit_completeness",
+      "name": "audit completeness",
+      "unit": "fraction of required fields present",
+      "description": "How much of a full decision record each audit row holds.",
+      "formula": "For one audit row, the count of required fields that are filled divided by the count of required fields. Required fields are ts, action, actor, correlation_id, record_id, and, for a model call, model, approval_id, and policy_result.",
+      "source_fields": [
+        "field.event.correlation_id",
+        "field.event.actor"
+      ],
+      "live_source": "logs/audit.log rows hold ts, action, and details. details holds record_id and role for a read, record_id and model for a summary.",
+      "today": "A record.read row fills ts, action, record_id, and a role string. An ai.summary row fills ts, action, record_id, and model. No row has actor, correlation_id, approval_id, or policy_result.",
+      "target": null,
+      "required_fields_note": "The required-field list above is PROPOSED. Owner Mangesh (FDE). Stage S05-14 confirms it. The repo does not define a full decision record.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "apps/api/services/audit.py",
+        "docs/02-baseline/defect-list.md",
+        "docs/01-discovery/ai-subsystem-discovery.md",
+        "docs/transformation-roadmap.md"
+      ]
+    },
+    {
+      "id": "metric.recommendation_latency",
+      "name": "recommendation latency",
+      "unit": "milliseconds",
+      "description": "How long a model call takes from request to answer.",
+      "formula": "The time the answer arrived minus the time the request was sent, in milliseconds, for one call.",
+      "source_fields": [
+        "field.event.latency_ms"
+      ],
+      "live_source": "The live gateway waits time.sleep(0.01) and returns. It records no latency on the body or the audit row. The provenance field latency_ms in ai-context-policy.yaml adds it.",
+      "today": "events.jsonl holds latency_ms on every line. No live call records it.",
+      "target": null,
+      "source": [
+        "data/synthetic/events.jsonl",
+        "apps/api/services/ai_gateway.py",
+        "docs/01-discovery/ai-subsystem-discovery.md"
+      ]
+    },
+    {
+      "id": "metric.sla_breach_risk",
+      "name": "SLA breach risk",
+      "unit": "score",
+      "description": "A stored score for how likely the service promise on an incident will be broken.",
+      "formula": "The sla_breach_risk value on one incident row. The repo does not say how the score is made.",
+      "source_fields": [
+        "field.incident.sla_breach_risk"
+      ],
+      "today": "352 values between 0 and 1. INC-00019 holds 1.42. One cell blank.",
+      "target": null,
+      "proposed_bound_note": "The baseline uses 0 to 1 inclusive as a PROPOSED range. Owner Unknown. It is not an approved range and not a target.",
+      "source": [
+        "data/synthetic/incidents.csv",
+        "docs/02-baseline/data-quality-baseline.md",
+        "../Project_Intent.md"
+      ]
+    },
+    {
+      "id": "metric.alarm_storm_size",
+      "name": "alarm storm size",
+      "unit": "alarms",
+      "description": "How many alarms share one storm batch.",
+      "formula": "The count of alarm rows with the same storm_batch_id, after rows with the same dedupe_key are counted once.",
+      "source_fields": [
+        "field.alarm.storm_batch_id",
+        "field.alarm.dedupe_key"
+      ],
+      "today": "351 distinct storm_batch_id values. Three appear twice. The largest batch in the file is 2 rows. How many alarms make a storm is Unknown.",
+      "target": null,
+      "source": [
+        "data/synthetic/alarms.csv",
+        "docs/01-discovery/data-and-integration-map.md",
+        "docs/02-baseline/ai-qualification.md",
+        "../Project_Intent.md"
+      ]
+    },
+    {
+      "id": "metric.ai_outcome_count",
+      "name": "AI outcome count",
+      "unit": "calls",
+      "description": "How many model calls ended in each of the four outcomes.",
+      "formula": "For each outcome word, the count of calls whose outcome field holds that word.",
+      "source_fields": [
+        "field.ai_invocation.guardrail_status",
+        "field.ai_invocation.approval_required"
+      ],
+      "today": "No live call records an outcome. The CSV columns guardrail_status and approval_required hold the generic status words, not the four outcome words. This metric is 0 for all four outcomes today.",
+      "target": null,
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "data/synthetic/ai_invocations.csv",
+        "../Project_Intent.md"
+      ]
+    }
+  ]
+}

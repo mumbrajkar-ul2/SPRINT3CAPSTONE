@@ -1,0 +1,217 @@
+# relationships.yaml -- semantic layer 1.0.0
+# Links between entities: which key joins them, how many on each side, and whether any code joins them today.
+version: "1.0.0"
+file: relationships
+description: >-
+  How the seven entities link to each other and to the id-only concepts. Each link names the key field on each
+  side and the cardinality. No Python file in the repo joins two tables today. Every join_observed_in_code is false.
+  A link whose key is not in the files says join_key_status unknown.
+source:
+  - docs/domain-specific-spec.md
+  - docs/01-discovery/data-and-integration-map.md
+  - docs/01-discovery/business-flow-reconstruction.md
+  - docs/02-baseline/ai-qualification.md
+  - ../Project_Intent.md
+
+# Cardinality words used below.
+# one_to_many: one row on the from side, many rows on the to side.
+# many_to_one: many rows on the from side, one row on the to side.
+# many_to_many: many on both sides.
+cardinality_words:
+  - one_to_many
+  - many_to_one
+  - many_to_many
+
+relationships:
+  - id: relationship.device_has_alarms
+    name: device has alarms
+    from: entity.device
+    to: entity.alarm
+    cardinality: one_to_many
+    key_fields:
+      from: field.device.device_id
+      to: field.alarm.device_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: One device can raise many alarms. alarms.device_id holds a DEV- id. No code joins the two files.
+    source: [data/synthetic/alarms.csv, data/synthetic/devices.csv, docs/01-discovery/business-flow-reconstruction.md]
+
+  - id: relationship.device_at_site
+    name: device sits at a site
+    from: entity.device
+    to: concept.site
+    cardinality: many_to_one
+    key_fields:
+      from: field.device.site_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: Many devices share one site. There is no site table. The site id is the only site information.
+    source: [data/synthetic/devices.csv]
+
+  - id: relationship.circuit_belongs_to_customer
+    name: circuit belongs to a customer
+    from: entity.circuit
+    to: concept.customer
+    cardinality: many_to_one
+    key_fields:
+      from: field.circuit.customer_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: One customer can buy many circuits. There is no customer table.
+    source: [data/synthetic/circuits.csv, ../Project_Intent.md]
+
+  - id: relationship.incident_affects_circuit
+    name: incident affects a circuit
+    from: entity.incident
+    to: entity.circuit
+    cardinality: many_to_one
+    key_fields:
+      from: field.incident.circuit_id
+      to: field.circuit.circuit_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: One circuit can have many incidents. incidents.circuit_id holds a CIR- id.
+    source: [data/synthetic/incidents.csv, data/synthetic/circuits.csv, ../Project_Intent.md]
+
+  - id: relationship.incident_belongs_to_customer
+    name: incident belongs to a customer
+    from: entity.incident
+    to: concept.customer
+    cardinality: many_to_one
+    key_fields:
+      from: field.incident.customer_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: One customer can have many incidents. The incident also names the circuit, so customer is stored twice along that path.
+    source: [data/synthetic/incidents.csv]
+
+  - id: relationship.incident_has_ai_invocations
+    name: incident has AI invocations
+    from: entity.incident
+    to: entity.ai_invocation
+    cardinality: one_to_many
+    key_fields:
+      from: field.incident.incident_id
+      to: field.ai_invocation.incident_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: >-
+      One incident can have many model calls. ai_invocations.incident_id holds an INC- id.
+      The live summary call reads a device row, so it writes no row here and names no incident.
+    source: [data/synthetic/ai_invocations.csv, data/synthetic/incidents.csv, docs/01-discovery/ai-subsystem-discovery.md]
+
+  - id: relationship.ai_invocation_uses_topology_snapshot
+    name: AI invocation uses a topology snapshot
+    from: entity.ai_invocation
+    to: concept.topology
+    cardinality: many_to_one
+    key_fields:
+      from: field.ai_invocation.topology_snapshot_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: Each call names the stored network picture it used. There is no snapshot table.
+    source: [data/synthetic/ai_invocations.csv]
+
+  - id: relationship.order_belongs_to_customer
+    name: service order belongs to a customer
+    from: entity.service_order
+    to: concept.customer
+    cardinality: many_to_one
+    key_fields:
+      from: field.service_order.customer_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: One customer can place many orders.
+    source: [data/synthetic/service_orders.csv]
+
+  - id: relationship.order_to_circuit
+    name: service order leads to a circuit
+    from: entity.service_order
+    to: entity.circuit
+    cardinality: many_to_many
+    key_fields: {}
+    join_key_status: unknown
+    join_observed_in_code: false
+    description: >-
+      Project_Intent.md Appendix E names an order-to-circuit link. service_orders.csv has no circuit_id.
+      circuits.csv has no order_id. Both tables hold customer_id, so the only shared value is the customer.
+      Which order built which circuit cannot be read from the files.
+    source: [../Project_Intent.md, data/synthetic/service_orders.csv, data/synthetic/circuits.csv]
+
+  - id: relationship.alarm_in_storm_batch
+    name: alarm belongs to a storm batch
+    from: entity.alarm
+    to: concept.storm
+    cardinality: many_to_one
+    key_fields:
+      from: field.alarm.storm_batch_id
+    join_key_status: present
+    join_observed_in_code: false
+    description: Alarms with the same storm_batch_id arrived in one burst. 351 distinct ids. STO-00005, STO-00013, and STO-00019 appear twice.
+    source: [data/synthetic/alarms.csv, docs/01-discovery/data-and-integration-map.md]
+
+  - id: relationship.alarm_shares_dedupe_key
+    name: alarms share a dedupe key
+    from: entity.alarm
+    to: entity.alarm
+    cardinality: many_to_many
+    key_fields:
+      from: field.alarm.dedupe_key
+      to: field.alarm.dedupe_key
+    join_key_status: present
+    join_observed_in_code: false
+    description: Alarms with the same dedupe_key are one alarm repeated. Three keys appear twice. See rule.duplicate_dedupe_key_in_storm_is_one_alarm.
+    source: [data/synthetic/alarms.csv, docs/02-baseline/ai-qualification.md]
+
+  - id: relationship.alarm_to_incident
+    name: alarm is tied to an incident
+    from: entity.alarm
+    to: entity.incident
+    cardinality: many_to_many
+    key_fields: {}
+    join_key_status: unknown
+    join_observed_in_code: false
+    description: >-
+      The flow Alarm storm to incident correlation needs this link. The alarm names a device. The incident names a
+      circuit and a customer. No column is shared. Which columns join an alarm to an incident is Unknown.
+    source: [docs/01-discovery/business-flow-reconstruction.md, docs/02-baseline/ai-qualification.md]
+
+  - id: relationship.event_refers_to_entity
+    name: event refers to an entity table
+    from: entity.event
+    to_any_of: [entity.device, entity.circuit, entity.alarm, entity.incident, entity.service_order, entity.ai_invocation]
+    cardinality: many_to_one
+    key_fields:
+      from: field.event.business_entity
+    join_key_status: table_name_only
+    join_observed_in_code: false
+    description: >-
+      Each event names one of the six tables in business_entity. The event has no row id, so it cannot be joined
+      to one device or one incident. correlation_id is filled on 1008 of 3000 lines.
+    source: [data/synthetic/events.jsonl, docs/01-discovery/data-and-integration-map.md]
+
+  - id: relationship.event_done_by_persona
+    name: event done by a persona
+    from: entity.event
+    to_any_of: [persona.noc_operator, persona.network_engineer, persona.field_engineer, persona.customer_support, persona.automation_service, persona.vendor_account, persona.ai_agent]
+    cardinality: many_to_one
+    key_fields:
+      from: field.event.actor
+    join_key_status: present
+    join_observed_in_code: false
+    description: >-
+      Each event names the persona that did the step. All seven personas appear. The live audit log
+      stores no actor.
+    source: [data/synthetic/events.jsonl, apps/api/services/audit.py, docs/domain-specific-spec.md]
+
+  - id: relationship.event_belongs_to_flow
+    name: event belongs to a business flow
+    from: entity.event
+    to_any_of: [concept.flow_customer_order_to_provisioning, concept.flow_alarm_storm_to_incident_correlation, concept.flow_topology_lookup_to_ai_recommendation, concept.flow_approved_remediation_to_validation]
+    cardinality: many_to_one
+    key_fields:
+      from: field.event.event_type
+    join_key_status: present
+    join_observed_in_code: false
+    description: Each event names one of the four flows. Counts are 741, 706, 782, and 771.
+    source: [data/synthetic/events.jsonl, docs/01-discovery/business-flow-reconstruction.md]

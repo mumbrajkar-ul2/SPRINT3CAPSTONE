@@ -1,0 +1,786 @@
+{
+  "version": "1.0.0",
+  "file": "access-semantics",
+  "description": "The seven telecom personas and what each may do. Every persona entry maps to actions, resources, a purpose, a scope, and a risk. Scope is the set of records a persona may touch. The persona mappings are PROPOSED. The repo holds only a five-name Python allow list and a two-rule OPA file. Neither names a persona except ai_agent. Stage S04-03 confirms the mappings.",
+  "source": [
+    "docs/domain-specific-spec.md",
+    "apps/api/main.py",
+    "policy/opa/access.rego",
+    "data/synthetic/events.jsonl",
+    "docs/02-baseline/defect-list.md",
+    "docs/02-baseline/ai-qualification.md",
+    "docs/00-contract/operating-contract.md",
+    "docs/01-discovery/brownfield-risk-register.md",
+    "../Project_Intent.md"
+  ],
+  "actions": [
+    {
+      "id": "action.read",
+      "name": "read",
+      "agency": "analyse",
+      "description": "Look at stored rows. Nothing changes. This is the one action named in policy/opa/access.rego today.",
+      "source": [
+        "policy/opa/access.rego",
+        "apps/api/main.py"
+      ]
+    },
+    {
+      "id": "action.summarize",
+      "name": "summarize",
+      "agency": "recommend",
+      "description": "Ask a model for a short account of a record. The live route POST /ai/summarize/{record_id} does this with no role check.",
+      "source": [
+        "apps/api/main.py",
+        "apps/api/services/ai_gateway.py"
+      ]
+    },
+    {
+      "id": "action.recommend",
+      "name": "recommend",
+      "agency": "recommend",
+      "description": "Ask a model for a next-action sentence. The later route POST /ai/recommend/{id} does this. The sentence is text a person can accept or reject.",
+      "source": [
+        "docs/00-contract/operating-contract.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "action.approve",
+      "name": "approve",
+      "agency": "decide",
+      "description": "A named person records yes or no on a recommendation. The later route POST /approvals/{id} stores an approval id. No route does this today.",
+      "source": [
+        "docs/00-contract/operating-contract.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "action.write",
+      "name": "write",
+      "agency": "decide",
+      "description": "Change a stored row that is not a live network element. Examples are opening an incident or changing an order status word. No route does this today.",
+      "source": [
+        "docs/01-discovery/business-flow-reconstruction.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "action.execute",
+      "name": "execute",
+      "agency": "execute",
+      "description": "Change a live device or circuit. A config push, a remediation, a provisioning change. No route does this today. It waits for four gates.",
+      "source": [
+        "docs/00-contract/operating-contract.md",
+        "../Project_Intent.md"
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "id": "resource.device",
+      "name": "device",
+      "entity": "entity.device",
+      "description": "A device row. The only resource the API serves today.",
+      "source": [
+        "apps/api/services/domain_service.py"
+      ]
+    },
+    {
+      "id": "resource.circuit",
+      "name": "circuit",
+      "entity": "entity.circuit",
+      "description": "A circuit row.",
+      "source": [
+        "data/synthetic/circuits.csv"
+      ]
+    },
+    {
+      "id": "resource.alarm",
+      "name": "alarm",
+      "entity": "entity.alarm",
+      "description": "An alarm row, or a storm batch of alarm rows.",
+      "source": [
+        "data/synthetic/alarms.csv"
+      ]
+    },
+    {
+      "id": "resource.incident",
+      "name": "incident",
+      "entity": "entity.incident",
+      "description": "An incident row.",
+      "source": [
+        "data/synthetic/incidents.csv"
+      ]
+    },
+    {
+      "id": "resource.service_order",
+      "name": "service order",
+      "entity": "entity.service_order",
+      "description": "A service order row.",
+      "source": [
+        "data/synthetic/service_orders.csv"
+      ]
+    },
+    {
+      "id": "resource.ai_invocation",
+      "name": "AI invocation",
+      "entity": "entity.ai_invocation",
+      "description": "A stored model-call row, or a live model call.",
+      "source": [
+        "data/synthetic/ai_invocations.csv",
+        "apps/api/services/ai_gateway.py"
+      ]
+    },
+    {
+      "id": "resource.event",
+      "name": "event",
+      "entity": "entity.event",
+      "description": "An event log line.",
+      "source": [
+        "data/synthetic/events.jsonl"
+      ]
+    },
+    {
+      "id": "resource.audit_log",
+      "name": "audit log",
+      "concept": "concept.audit_row",
+      "description": "The file logs/audit.log and its rows.",
+      "source": [
+        "apps/api/services/audit.py"
+      ]
+    },
+    {
+      "id": "resource.approval",
+      "name": "approval",
+      "concept": "concept.approval",
+      "description": "A stored approval id and its yes or no.",
+      "source": [
+        "docs/00-contract/operating-contract.md"
+      ]
+    },
+    {
+      "id": "resource.sensitive_device_fields",
+      "name": "sensitive device fields",
+      "fields": [
+        "field.device.mgmt_ip",
+        "field.device.credential_profile"
+      ],
+      "description": "The two device cells that must stay out of prompts. Which personas may read them is Unknown. Today every allowed role reads them.",
+      "source": [
+        "docs/02-baseline/defect-list.md",
+        "docs/00-contract/operating-contract.md"
+      ]
+    }
+  ],
+  "purposes": [
+    {
+      "id": "purpose.incident_triage",
+      "name": "incident triage",
+      "description": "Working out what is wrong and what to do next on an open incident.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "docs/domain-specific-spec.md"
+      ]
+    },
+    {
+      "id": "purpose.network_change_planning",
+      "name": "network change planning",
+      "description": "Preparing a change to a device or circuit before anyone approves it.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "purpose.field_repair",
+      "name": "field repair",
+      "description": "Fixing or replacing equipment at a site.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "docs/domain-specific-spec.md"
+      ]
+    },
+    {
+      "id": "purpose.customer_enquiry",
+      "name": "customer enquiry",
+      "description": "Answering a customer's question about their circuit, order, or incident.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "docs/domain-specific-spec.md"
+      ]
+    },
+    {
+      "id": "purpose.scheduled_automation",
+      "name": "scheduled automation",
+      "description": "A machine running a planned step, such as the daily batch or an approved remediation.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "etl/run_daily_batch.py"
+      ]
+    },
+    {
+      "id": "purpose.vendor_support",
+      "name": "vendor support",
+      "description": "A supplier helping with the equipment they supplied.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "docs/domain-specific-spec.md"
+      ]
+    },
+    {
+      "id": "purpose.ai_assistance",
+      "name": "AI assistance",
+      "description": "A model reading records so it can write a summary or a recommendation.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "apps/api/services/ai_gateway.py"
+      ]
+    },
+    {
+      "id": "purpose.audit_review",
+      "name": "audit review",
+      "description": "Reading the audit log to see who did what.",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "policy/opa/access.rego",
+        "apps/api/services/audit.py"
+      ]
+    }
+  ],
+  "scopes": [
+    {
+      "id": "scope.all_records",
+      "name": "all records",
+      "description": "Every row of the named resource. No filter.",
+      "filter_field": null,
+      "source": [
+        "apps/api/main.py"
+      ]
+    },
+    {
+      "id": "scope.one_site",
+      "name": "one site",
+      "description": "Only rows whose site_id equals the caller's site. Devices carry site_id. Alarms reach a site through the device.",
+      "filter_field": "field.device.site_id",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "data/synthetic/devices.csv"
+      ]
+    },
+    {
+      "id": "scope.one_customer",
+      "name": "one customer",
+      "description": "Only rows whose customer_id equals the customer in the enquiry. Circuits, incidents, and service orders carry customer_id.",
+      "filter_field": "field.circuit.customer_id",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "data/synthetic/circuits.csv",
+        "data/synthetic/incidents.csv",
+        "data/synthetic/service_orders.csv"
+      ]
+    },
+    {
+      "id": "scope.assigned_incident",
+      "name": "assigned incident",
+      "description": "Only the incident the caller is working on, plus the device and alarm rows tied to it. The alarm-to-incident join is Unknown, so today this scope can name the incident row only.",
+      "filter_field": "field.incident.incident_id",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "data/synthetic/incidents.csv",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "scope.own_vendor_devices",
+      "name": "own vendor devices",
+      "description": "Only devices whose vendor is the caller's company. The vendor column holds status words today, so this scope cannot be computed until that column holds supplier names.",
+      "filter_field": "field.device.vendor",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "source": [
+        "data/synthetic/devices.csv",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "scope.none",
+      "name": "none",
+      "description": "No records. Used for an action a persona may never take.",
+      "filter_field": null,
+      "source": [
+        "policy/opa/access.rego"
+      ]
+    }
+  ],
+  "risks": [
+    {
+      "id": "risk.read_only",
+      "name": "read only",
+      "description": "Nothing changes. The harm is that someone sees a row they should not see, such as mgmt_ip.",
+      "source": [
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "risk.recommendation",
+      "name": "recommendation",
+      "description": "Text is produced. Nothing changes. The harm is that a person trusts wrong text, or treats the text as a work order.",
+      "source": [
+        "docs/02-baseline/ai-qualification.md",
+        "docs/00-contract/operating-contract.md"
+      ]
+    },
+    {
+      "id": "risk.decision",
+      "name": "decision",
+      "description": "A stored row changes or an approval is recorded. The harm is a wrong status, a wrong approval, or a closed incident that hides a fault.",
+      "source": [
+        "../Project_Intent.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    },
+    {
+      "id": "risk.live_network_change",
+      "name": "live network change",
+      "description": "A live device or circuit changes. The harm is lost service for the customers on that circuit. Undoing it is another live change.",
+      "source": [
+        "docs/00-contract/operating-contract.md",
+        "docs/02-baseline/ai-qualification.md"
+      ]
+    }
+  ],
+  "api_roles_today": [
+    {
+      "id": "role.admin",
+      "name": "admin",
+      "accepted_on": "GET /records/{record_id}",
+      "maps_to_persona": null,
+      "description": "Accepted by the Python list. No telecom persona is called admin. The OPA file allows admin every action. That is the shared-admin gap.",
+      "source": [
+        "apps/api/main.py",
+        "policy/opa/access.rego"
+      ]
+    },
+    {
+      "id": "role.operator",
+      "name": "operator",
+      "accepted_on": "GET /records/{record_id}",
+      "maps_to_persona": "persona.noc_operator",
+      "mapping_label": "Inference",
+      "description": "Accepted by the Python list. Used when no header is sent. The OPA file allows operator to read. The closest persona is noc_operator. That mapping is an inference.",
+      "source": [
+        "apps/api/main.py",
+        "policy/opa/access.rego",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "role.clinician",
+      "name": "clinician",
+      "accepted_on": "GET /records/{record_id}",
+      "maps_to_persona": null,
+      "description": "Accepted by the Python list. A health-care word in a telecom system. Listed under removed_roles below.",
+      "source": [
+        "apps/api/main.py",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "role.engineer",
+      "name": "engineer",
+      "accepted_on": "GET /records/{record_id}",
+      "maps_to_persona": "persona.network_engineer",
+      "mapping_label": "Inference",
+      "description": "Accepted by the Python list. The closest persona is network_engineer. Whether engineer stays on the list is Unknown.",
+      "source": [
+        "apps/api/main.py",
+        "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "role.ai_agent",
+      "name": "ai_agent",
+      "accepted_on": "GET /records/{record_id}",
+      "maps_to_persona": "persona.ai_agent",
+      "mapping_label": "Verified Fact",
+      "description": "Accepted by the Python list. The only string that is both an API role and a persona.",
+      "source": [
+        "apps/api/main.py",
+        "docs/domain-specific-spec.md"
+      ]
+    }
+  ],
+  "opa_rules_today": [
+    {
+      "id": "policy.opa.admin_any",
+      "name": "any admin",
+      "description": "allow is true when input.role is admin. No action, resource, purpose, or scope check.",
+      "source": [
+        "policy/opa/access.rego"
+      ]
+    },
+    {
+      "id": "policy.opa.operator_read",
+      "name": "operator plus read",
+      "description": "allow is true when input.role is operator and input.action is read.",
+      "source": [
+        "policy/opa/access.rego"
+      ]
+    },
+    {
+      "id": "policy.opa.default_deny",
+      "name": "default deny",
+      "description": "allow is false for every other input. No Python file calls this policy, so the API does not use it.",
+      "source": [
+        "policy/opa/access.rego",
+        "docs/01-discovery/current-state-architecture.md"
+      ]
+    }
+  ],
+  "removed_roles": [
+    {
+      "role": "role.clinician",
+      "reason": "A clinician is a health-care job. The telecom persona list in docs/domain-specific-spec.md does not contain it. The role lets a caller read a device row including mgmt_ip and credential_profile. Why it is on the list is Unknown. Defect F03. Stage S04-03 removes it from the allow list.",
+      "defect_refs": [
+        "F03"
+      ],
+      "source": [
+        "apps/api/main.py",
+        "docs/domain-specific-spec.md",
+        "docs/02-baseline/defect-list.md"
+      ]
+    }
+  ],
+  "personas": [
+    {
+      "id": "persona.noc_operator",
+      "name": "noc_operator",
+      "description": "A person in the network operations centre who watches alarms and handles incidents. Reads the model's summary and accepts or rejects its next-action sentence. Opens or merges an incident.",
+      "event_count": 435,
+      "api_role_today": "role.operator",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "grants": [
+        {
+          "action": "action.read",
+          "resources": [
+            "resource.device",
+            "resource.alarm",
+            "resource.incident",
+            "resource.circuit"
+          ],
+          "purpose": "purpose.incident_triage",
+          "scope": "scope.all_records",
+          "risk": "risk.read_only"
+        },
+        {
+          "action": "action.summarize",
+          "resources": [
+            "resource.incident",
+            "resource.device"
+          ],
+          "purpose": "purpose.incident_triage",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.recommendation"
+        },
+        {
+          "action": "action.recommend",
+          "resources": [
+            "resource.incident",
+            "resource.device"
+          ],
+          "purpose": "purpose.incident_triage",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.recommendation"
+        },
+        {
+          "action": "action.approve",
+          "resources": [
+            "resource.ai_invocation"
+          ],
+          "purpose": "purpose.incident_triage",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.decision",
+          "note": "Accepts or rejects the recommendation text. This is not the approval of a live network change."
+        },
+        {
+          "action": "action.write",
+          "resources": [
+            "resource.incident"
+          ],
+          "purpose": "purpose.incident_triage",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.decision"
+        }
+      ],
+      "denied": [
+        "action.execute"
+      ],
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/02-baseline/ai-qualification.md",
+        "data/synthetic/events.jsonl"
+      ]
+    },
+    {
+      "id": "persona.network_engineer",
+      "name": "network_engineer",
+      "description": "A person who designs and changes the network. Reads the configuration suggestion and accepts or rejects it. PROPOSED as the named human who approves a live network change.",
+      "event_count": 440,
+      "api_role_today": "role.engineer",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "grants": [
+        {
+          "action": "action.read",
+          "resources": [
+            "resource.device",
+            "resource.circuit",
+            "resource.alarm",
+            "resource.incident",
+            "resource.sensitive_device_fields"
+          ],
+          "purpose": "purpose.network_change_planning",
+          "scope": "scope.all_records",
+          "risk": "risk.read_only",
+          "note": "The only persona proposed to read mgmt_ip and credential_profile. Which roles may see them is Unknown today."
+        },
+        {
+          "action": "action.recommend",
+          "resources": [
+            "resource.device"
+          ],
+          "purpose": "purpose.network_change_planning",
+          "scope": "scope.all_records",
+          "risk": "risk.recommendation"
+        },
+        {
+          "action": "action.approve",
+          "resources": [
+            "resource.approval"
+          ],
+          "purpose": "purpose.network_change_planning",
+          "scope": "scope.all_records",
+          "risk": "risk.decision",
+          "note": "The approval of a live network change. The desk job is PROPOSED and PROVISIONAL until stage S04-09."
+        }
+      ],
+      "denied": [
+        "action.execute"
+      ],
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/02-baseline/ai-qualification.md",
+        "docs/00-contract/operating-contract.md"
+      ]
+    },
+    {
+      "id": "persona.field_engineer",
+      "name": "field_engineer",
+      "description": "A person who goes to a site and works on the equipment there.",
+      "event_count": 422,
+      "api_role_today": null,
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "grants": [
+        {
+          "action": "action.read",
+          "resources": [
+            "resource.device",
+            "resource.alarm"
+          ],
+          "purpose": "purpose.field_repair",
+          "scope": "scope.one_site",
+          "risk": "risk.read_only"
+        }
+      ],
+      "denied": [
+        "action.approve",
+        "action.execute",
+        "action.write"
+      ],
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/events.jsonl"
+      ]
+    },
+    {
+      "id": "persona.customer_support",
+      "name": "customer_support",
+      "description": "A person who answers a customer. Sees the customer's own circuits, orders, and incidents. Does not see device management fields.",
+      "event_count": 420,
+      "api_role_today": null,
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "grants": [
+        {
+          "action": "action.read",
+          "resources": [
+            "resource.circuit",
+            "resource.service_order",
+            "resource.incident"
+          ],
+          "purpose": "purpose.customer_enquiry",
+          "scope": "scope.one_customer",
+          "risk": "risk.read_only"
+        }
+      ],
+      "denied": [
+        "action.approve",
+        "action.execute",
+        "action.write",
+        "action.recommend"
+      ],
+      "source": [
+        "docs/domain-specific-spec.md",
+        "data/synthetic/events.jsonl"
+      ]
+    },
+    {
+      "id": "persona.automation_service",
+      "name": "automation_service",
+      "description": "A machine account that runs planned steps. The daily batch is one. A later approved remediation is another. It may execute only after a human approval id exists. It never writes that id itself.",
+      "event_count": 444,
+      "api_role_today": null,
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "grants": [
+        {
+          "action": "action.read",
+          "resources": [
+            "resource.device"
+          ],
+          "purpose": "purpose.scheduled_automation",
+          "scope": "scope.all_records",
+          "risk": "risk.read_only"
+        },
+        {
+          "action": "action.execute",
+          "resources": [
+            "resource.device",
+            "resource.circuit"
+          ],
+          "purpose": "purpose.scheduled_automation",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.live_network_change",
+          "requires_rule": "rule.ai_recommendation_needs_policy_approval_audit_before_state_change",
+          "note": "No execute route exists. This grant describes the later gated path only. The account leaves the approval id empty."
+        }
+      ],
+      "denied": [
+        "action.approve"
+      ],
+      "open_question": "Whether automation_service is the shared user app_shared is Unknown.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/00-contract/operating-contract.md",
+        "docs/01-discovery/brownfield-risk-register.md"
+      ]
+    },
+    {
+      "id": "persona.vendor_account",
+      "name": "vendor_account",
+      "description": "A supplier's login. Reads the devices that supplier made. The vendor column holds status words today, so the filter cannot run yet.",
+      "event_count": 424,
+      "api_role_today": null,
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "grants": [
+        {
+          "action": "action.read",
+          "resources": [
+            "resource.device",
+            "resource.alarm"
+          ],
+          "purpose": "purpose.vendor_support",
+          "scope": "scope.own_vendor_devices",
+          "risk": "risk.read_only"
+        }
+      ],
+      "denied": [
+        "action.approve",
+        "action.execute",
+        "action.write",
+        "action.recommend"
+      ],
+      "note_today": "The replay sent X-User-Role vendor and got error forbidden with HTTP 200 and no audit line.",
+      "source": [
+        "docs/domain-specific-spec.md",
+        "docs/02-baseline/defect-list.md",
+        "data/synthetic/events.jsonl"
+      ]
+    },
+    {
+      "id": "persona.ai_agent",
+      "name": "ai_agent",
+      "description": "The model acting as a caller. Reads the allowed prompt fields and writes a summary or a recommendation. Never approves. Never executes. Never reads mgmt_ip or credential_profile.",
+      "event_count": 415,
+      "api_role_today": "role.ai_agent",
+      "proposed": true,
+      "owner": "Mangesh (FDE)",
+      "grants": [
+        {
+          "action": "action.read",
+          "resources": [
+            "resource.device",
+            "resource.alarm",
+            "resource.incident"
+          ],
+          "purpose": "purpose.ai_assistance",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.read_only",
+          "note": "Read is limited to the prompt allow list in ai-context-policy.yaml, not the whole row."
+        },
+        {
+          "action": "action.summarize",
+          "resources": [
+            "resource.incident",
+            "resource.device"
+          ],
+          "purpose": "purpose.ai_assistance",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.recommendation"
+        },
+        {
+          "action": "action.recommend",
+          "resources": [
+            "resource.incident",
+            "resource.device"
+          ],
+          "purpose": "purpose.ai_assistance",
+          "scope": "scope.assigned_incident",
+          "risk": "risk.recommendation"
+        }
+      ],
+      "denied": [
+        "action.approve",
+        "action.execute",
+        "action.write"
+      ],
+      "source": [
+        "docs/domain-specific-spec.md",
+        "apps/api/main.py",
+        "docs/02-baseline/ai-qualification.md",
+        "../Project_Intent.md"
+      ]
+    }
+  ]
+}

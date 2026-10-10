@@ -7,3 +7,11 @@
 {"ts": "2026-10-08T18:58:49.524986", "action": "ai.summary", "details": {"record_id": "DOES-NOT-EXIST", "model": "local-sim-v1"}}
 {"ts": "2026-10-09T01:05:34.969973", "action": "record.read", "details": {"record_id": "REC-0001", "role": "operator"}}
 {"ts": "2026-10-09T01:05:34.986947", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}
+{"ts": "2026-10-10T05:51:56.265742", "action": "record.read", "details": {"record_id": "REC-0001", "role": "operator"}}
+{"ts": "2026-10-10T05:51:56.506914", "action": "record.read", "details": {"record_id": "DOES-NOT-EXIST", "role": "operator"}}
+{"ts": "2026-10-10T05:51:56.581993", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}
+{"ts": "2026-10-10T05:52:07.963793", "action": "record.read", "details": {"record_id": "DOES-NOT-EXIST", "role": "operator"}}
+{"ts": "2026-10-10T14:57:55.682401", "action": "record.read", "details": {"record_id": "DOES-NOT-EXIST", "role": "operator"}}
+{"ts": "2026-10-10T14:57:55.697764", "action": "record.read", "details": {"record_id": "REC-0001", "role": "clinician"}}
+{"ts": "2026-10-10T14:57:55.721253", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}
+{"ts": "2026-10-10T14:57:55.933215", "action": "ai.summary", "details": {"record_id": "REC-0001", "model": "local-sim-v1"}}

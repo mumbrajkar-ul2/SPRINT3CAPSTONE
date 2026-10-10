@@ -1,0 +1,3533 @@
+# status-taxonomy.yaml -- semantic layer 1.0.0
+# Every status word in code, docs, and data, by column, with observed row counts.
+# Counts come from one read-only pass over data/synthetic on 2026-10-10.
+# This file sets no allowed list and no severity cutoff. The repo defines none.
+version: 1.0.0
+file: status-taxonomy
+description: >-
+  Every status word used in code, docs, and the CSV files, with the column it sits in and how many rows hold it. Counts are from one read of data/synthetic on 2026-10-10. The repo defines no allowed list for any column. Each field below says so with allowed_list_defined_by_repo false.
+source:
+- data/synthetic/devices.csv
+- data/synthetic/circuits.csv
+- data/synthetic/alarms.csv
+- data/synthetic/incidents.csv
+- data/synthetic/service_orders.csv
+- data/synthetic/ai_invocations.csv
+- data/synthetic/events.jsonl
+- apps/api/main.py
+- apps/api/services/ai_gateway.py
+- docs/02-baseline/data-quality-baseline.md
+- docs/01-discovery/data-and-integration-map.md
+- docs/02-baseline/defect-list.md
+words:
+- id: status.word.ai_assisted
+  word: ai_assisted
+  description: >-
+    A status word. It says a model took part. It also fills columns such as hostname and firmware where it has no clear meaning. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.alpha
+  word: alpha
+  description: >-
+    An endpoint word. It fills mgmt_ip on devices and a_end and z_end on circuits. The repo does not say what place or address it stands for.
+  appears_in:
+  - status.device.mgmt_ip
+  - status.circuit.a_end
+  - status.circuit.z_end
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+- id: status.word.approved
+  word: approved
+  description: >-
+    A workflow word. A step was accepted. In this data the same word also fills 16 other columns, such as hostname and firmware. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.circuit.status
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.status
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.beta
+  word: beta
+  description: An endpoint word. It fills mgmt_ip, a_end, and z_end. The repo does not say what it stands for.
+  appears_in:
+  - status.device.mgmt_ip
+  - status.circuit.a_end
+  - status.circuit.z_end
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+- id: status.word.bronze
+  word: bronze
+  description: >-
+    A service-class word. In this data it also fills the incident and alarm severity columns. That use is a collision. The repo does not define it.
+  appears_in:
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  - status.alarm.severity
+  - status.incident.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+- id: status.word.central_5
+  word: central-5
+  description: A network zone name on devices. The repo does not describe the zone.
+  appears_in:
+  - status.device.network_zone
+  source:
+  - data/synthetic/devices.csv
+- id: status.word.closed
+  word: closed
+  description: >-
+    A workflow word. Work on the row ended. For an incident, closing while the fault remains is the harm named in Project_Intent.md section 3.1.
+  appears_in:
+  - status.circuit.status
+  - status.incident.status
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.critical
+  word: critical
+  description: >-
+    A severity word. It sits in the alarm and incident severity columns, in both circuit class columns, and in the event severity field. The repo does not say where it ranks.
+  appears_in:
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  - status.alarm.severity
+  - status.incident.severity
+  - status.event.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/events.jsonl
+  - data/synthetic/incidents.csv
+- id: status.word.debug
+  word: debug
+  description: An event log level. The lowest level in events.jsonl.
+  appears_in:
+  - status.event.severity
+  source:
+  - data/synthetic/events.jsonl
+- id: status.word.degraded
+  word: degraded
+  description: >-
+    A status word. Something works but not fully. It fills 16 columns, including hostname and guardrail_status. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.east_4
+  word: east-4
+  description: A network zone name on devices. The repo does not describe the zone.
+  appears_in:
+  - status.device.network_zone
+  source:
+  - data/synthetic/devices.csv
+- id: status.word.error
+  word: error
+  description: An event log level. Something failed in events.jsonl.
+  appears_in:
+  - status.event.severity
+  source:
+  - data/synthetic/events.jsonl
+- id: status.word.exception
+  word: exception
+  description: >-
+    A workflow word. The row hit a case the normal path does not handle. The repo does not define the case.
+  appears_in:
+  - status.circuit.status
+  - status.incident.status
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.failed
+  word: failed
+  description: A workflow word. The step did not finish. The repo does not say what happens next.
+  appears_in:
+  - status.circuit.status
+  - status.incident.status
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.false
+  word: 'false'
+  description: A no value. Stored as the text false in the three flag columns.
+  appears_in:
+  - status.device.stale_topology_flag
+  - status.circuit.orphan_flag
+  - status.incident.automation_used
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+- id: status.word.gamma
+  word: gamma
+  description: An endpoint word. It fills mgmt_ip, a_end, and z_end. The first device row has mgmt_ip gamma.
+  appears_in:
+  - status.device.mgmt_ip
+  - status.circuit.a_end
+  - status.circuit.z_end
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+- id: status.word.gold
+  word: gold
+  description: >-
+    A service-class word. In this data it also fills the incident and alarm severity columns. That use is a collision. The repo does not define it.
+  appears_in:
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  - status.alarm.severity
+  - status.incident.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+- id: status.word.high
+  word: high
+  description: A severity word. The repo does not say where it ranks or what it triggers.
+  appears_in:
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  - status.alarm.severity
+  - status.incident.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+- id: status.word.high_risk
+  word: high_risk
+  description: >-
+    A status word. It marks a row as risky. It fills 16 columns, including hostname and recommendation_risk. The repo does not define the risk scale.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.in_progress
+  word: in_progress
+  description: >-
+    A workflow word. Someone or something is working on the row. The repo does not define the step order.
+  appears_in:
+  - status.circuit.status
+  - status.incident.status
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.info
+  word: info
+  description: An event log level. A normal note in events.jsonl.
+  appears_in:
+  - status.event.severity
+  source:
+  - data/synthetic/events.jsonl
+- id: status.word.internal
+  word: internal
+  description: A status word. It fills 16 columns, including use_case and root_cause. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.legacy
+  word: legacy
+  description: >-
+    A status word. It names an older generation. It fills 16 word columns and also the mgmt_ip, a_end, and z_end columns. The first device row has hostname legacy.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.mgmt_ip
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.circuit.a_end
+  - status.circuit.z_end
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.low
+  word: low
+  description: A severity word. The repo does not say where it ranks.
+  appears_in:
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  - status.alarm.severity
+  - status.incident.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+- id: status.word.manual
+  word: manual
+  description: >-
+    A status word. A person did the step. It fills 16 columns, including root_cause and approval_required. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.manual_hold
+  word: manual_hold
+  description: A workflow word. A person stopped the row from moving. The repo does not say who may do that.
+  appears_in:
+  - status.circuit.status
+  - status.incident.status
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.medium
+  word: medium
+  description: A severity word. The repo does not say where it ranks.
+  appears_in:
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  - status.alarm.severity
+  - status.incident.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+- id: status.word.modernized
+  word: modernized
+  description: An endpoint word. It fills mgmt_ip, a_end, and z_end. The repo does not say what it stands for.
+  appears_in:
+  - status.device.mgmt_ip
+  - status.circuit.a_end
+  - status.circuit.z_end
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+- id: status.word.new
+  word: new
+  description: >-
+    A workflow word. The row was created and nothing has happened to it yet. The repo does not define the step order.
+  appears_in:
+  - status.circuit.status
+  - status.incident.status
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.normal
+  word: normal
+  description: >-
+    A status word. Nothing unusual. It fills 16 columns, including hostname and use_case. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.north_1
+  word: north-1
+  description: A network zone name on devices. The repo does not describe the zone.
+  appears_in:
+  - status.device.network_zone
+  source:
+  - data/synthetic/devices.csv
+- id: status.word.not_enforced
+  word: not_enforced
+  description: >-
+    A status word. A control exists in name and is not applied. The live summary returns guardrail_status not_enforced on every call. The same word also fills 15 other columns.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.pending
+  word: pending
+  description: >-
+    A status word. Waiting. It fills 16 columns, including hostname and model. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.queued
+  word: queued
+  description: A workflow word. The row is waiting for the next step. The repo does not define the step order.
+  appears_in:
+  - status.circuit.status
+  - status.incident.status
+  - status.service_order.qualification_status
+  - status.service_order.provisioning_status
+  - status.service_order.rollback_status
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.rejected
+  word: rejected
+  description: >-
+    A status word. A step was turned down. It fills 16 columns, including owner_team and service_type. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.remote_6
+  word: remote-6
+  description: A network zone name on devices. The repo does not describe the zone.
+  appears_in:
+  - status.device.network_zone
+  source:
+  - data/synthetic/devices.csv
+- id: status.word.requires_review
+  word: requires_review
+  description: >-
+    A status word. A person must look at the row. The first device row has vendor requires_review. It fills 16 columns. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.silver
+  word: silver
+  description: >-
+    A service-class word. In this data it also fills the incident and alarm severity columns. The repo does not define it.
+  appears_in:
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  - status.alarm.severity
+  - status.incident.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+- id: status.word.south_2
+  word: south-2
+  description: A network zone name on devices. The repo does not describe the zone.
+  appears_in:
+  - status.device.network_zone
+  source:
+  - data/synthetic/devices.csv
+- id: status.word.standard
+  word: standard
+  description: >-
+    A status word. The usual kind. It fills 16 columns, including hostname and model. The repo does not define it.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.true
+  word: 'true'
+  description: A yes value. Stored as the text true in the three flag columns.
+  appears_in:
+  - status.device.stale_topology_flag
+  - status.circuit.orphan_flag
+  - status.incident.automation_used
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+- id: status.word.vendor
+  word: vendor
+  description: >-
+    A status word. It points at a supplier. It fills 16 columns, including the vendor column itself and credential_profile. The repo does not name any vendor.
+  appears_in:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  source:
+  - data/synthetic/ai_invocations.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/devices.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+- id: status.word.warn
+  word: warn
+  description: An event log level. Something to watch in events.jsonl.
+  appears_in:
+  - status.event.severity
+  source:
+  - data/synthetic/events.jsonl
+- id: status.word.west_3
+  word: west-3
+  description: A network zone name on devices. The repo does not describe the zone.
+  appears_in:
+  - status.device.network_zone
+  source:
+  - data/synthetic/devices.csv
+value_sets:
+- id: valueset.severity_words
+  name: severity words
+  description: >-
+    Seven words that fill alarm severity, incident severity, circuit service_class, and circuit sla_tier. The repo sets no rank order and no allowed list.
+  words:
+  - status.word.bronze
+  - status.word.critical
+  - status.word.gold
+  - status.word.high
+  - status.word.low
+  - status.word.medium
+  - status.word.silver
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/circuits.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: valueset.workflow_words
+  name: workflow words
+  description: >-
+    Eight words that fill circuit status, incident status, and the three service-order status columns. The repo does not define the step order.
+  words:
+  - status.word.approved
+  - status.word.closed
+  - status.word.exception
+  - status.word.failed
+  - status.word.in_progress
+  - status.word.manual_hold
+  - status.word.new
+  - status.word.queued
+  source:
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+  - docs/01-discovery/business-flow-reconstruction.md
+- id: valueset.generic_status_words
+  name: generic status words
+  description: >-
+    Fourteen words that fill 16 columns across the six CSV files, including hostname, vendor, firmware, root_cause, model, and guardrail_status. The same pool fills columns whose names promise different kinds of value.
+  words:
+  - status.word.ai_assisted
+  - status.word.approved
+  - status.word.degraded
+  - status.word.high_risk
+  - status.word.internal
+  - status.word.legacy
+  - status.word.manual
+  - status.word.normal
+  - status.word.not_enforced
+  - status.word.pending
+  - status.word.rejected
+  - status.word.requires_review
+  - status.word.standard
+  - status.word.vendor
+  source:
+  - data/synthetic/devices.csv
+  - data/synthetic/alarms.csv
+  - data/synthetic/incidents.csv
+  - data/synthetic/service_orders.csv
+  - data/synthetic/ai_invocations.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: valueset.boolean_words
+  name: boolean words
+  description: The text values true and false. They fill stale_topology_flag, orphan_flag, and automation_used.
+  words:
+  - status.word.false
+  - status.word.true
+  source:
+  - data/synthetic/devices.csv
+  - data/synthetic/circuits.csv
+  - data/synthetic/incidents.csv
+  - docs/01-discovery/data-and-integration-map.md
+- id: valueset.endpoint_words
+  name: endpoint words
+  description: >-
+    Five words that fill mgmt_ip on devices and a_end and z_end on circuits. mgmt_ip holds these words, not network addresses.
+  words:
+  - status.word.alpha
+  - status.word.beta
+  - status.word.gamma
+  - status.word.legacy
+  - status.word.modernized
+  source:
+  - data/synthetic/devices.csv
+  - data/synthetic/circuits.csv
+- id: valueset.network_zone_words
+  name: network zone words
+  description: Six zone names on devices.
+  words:
+  - status.word.central_5
+  - status.word.east_4
+  - status.word.north_1
+  - status.word.remote_6
+  - status.word.south_2
+  - status.word.west_3
+  source:
+  - data/synthetic/devices.csv
+- id: valueset.event_severity_words
+  name: event severity words
+  description: Five log levels in events.jsonl. The word critical is also an alarm and incident severity word.
+  words:
+  - status.word.critical
+  - status.word.debug
+  - status.word.error
+  - status.word.info
+  - status.word.warn
+  source:
+  - data/synthetic/events.jsonl
+  - docs/01-discovery/data-and-integration-map.md
+status_fields:
+- id: status.device.hostname
+  entity: entity.device
+  field: field.device.hostname
+  value_set: valueset.generic_status_words
+  description: >-
+    Column hostname in devices.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.hostname.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 32
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 32
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 32
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 31
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 30
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 28
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 26
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 21
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 21
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 19
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 17
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.hostname.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 14
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.vendor
+  entity: entity.device
+  field: field.device.vendor
+  value_set: valueset.generic_status_words
+  description: >-
+    Column vendor in devices.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.vendor.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 33
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 32
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 31
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 29
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 29
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 26
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 24
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 24
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 23
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 22
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 22
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 21
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.vendor.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 12
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.device_type
+  entity: entity.device
+  field: field.device.device_type
+  value_set: valueset.generic_status_words
+  description: >-
+    Column device_type in devices.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.device_type.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 33
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 30
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 30
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 27
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 26
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 24
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 24
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 23
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 23
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 22
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 21
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.device_type.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 20
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.network_zone
+  entity: entity.device
+  field: field.device.network_zone
+  value_set: valueset.network_zone_words
+  description: >-
+    Column network_zone in devices.csv. 6 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.network_zone.east_4
+    value: east-4
+    word: status.word.east_4
+    observed_count: 70
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.network_zone.west_3
+    value: west-3
+    word: status.word.west_3
+    observed_count: 64
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.network_zone.north_1
+    value: north-1
+    word: status.word.north_1
+    observed_count: 62
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.network_zone.central_5
+    value: central-5
+    word: status.word.central_5
+    observed_count: 60
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.network_zone.remote_6
+    value: remote-6
+    word: status.word.remote_6
+    observed_count: 52
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.network_zone.south_2
+    value: south-2
+    word: status.word.south_2
+    observed_count: 45
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.mgmt_ip
+  entity: entity.device
+  field: field.device.mgmt_ip
+  value_set: valueset.endpoint_words
+  description: >-
+    Column mgmt_ip in devices.csv. 5 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.mgmt_ip.alpha
+    value: alpha
+    word: status.word.alpha
+    observed_count: 80
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.mgmt_ip.gamma
+    value: gamma
+    word: status.word.gamma
+    observed_count: 77
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.mgmt_ip.modernized
+    value: modernized
+    word: status.word.modernized
+    observed_count: 74
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.mgmt_ip.beta
+    value: beta
+    word: status.word.beta
+    observed_count: 66
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.mgmt_ip.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 56
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.firmware
+  entity: entity.device
+  field: field.device.firmware
+  value_set: valueset.generic_status_words
+  description: >-
+    Column firmware in devices.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.firmware.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 35
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 34
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 34
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 27
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 24
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 24
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 23
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 23
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 22
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 22
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 19
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.firmware.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 16
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.owner_team
+  entity: entity.device
+  field: field.device.owner_team
+  value_set: valueset.generic_status_words
+  description: >-
+    Column owner_team in devices.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.owner_team.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 32
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 32
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 29
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 27
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 26
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 25
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 23
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 23
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 22
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 21
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.owner_team.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 18
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.credential_profile
+  entity: entity.device
+  field: field.device.credential_profile
+  value_set: valueset.generic_status_words
+  description: >-
+    Column credential_profile in devices.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.credential_profile.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 36
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 30
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 30
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 29
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 28
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 28
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 28
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 27
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 26
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 21
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 20
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 17
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 17
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.credential_profile.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 16
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.device.stale_topology_flag
+  entity: entity.device
+  field: field.device.stale_topology_flag
+  value_set: valueset.boolean_words
+  description: >-
+    Column stale_topology_flag in devices.csv. 2 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.device.stale_topology_flag.true
+    value: 'true'
+    word: status.word.true
+    observed_count: 192
+    source:
+    - data/synthetic/devices.csv
+  - id: status.device.stale_topology_flag.false
+    value: 'false'
+    word: status.word.false
+    observed_count: 161
+    source:
+    - data/synthetic/devices.csv
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.circuit.a_end
+  entity: entity.circuit
+  field: field.circuit.a_end
+  value_set: valueset.endpoint_words
+  description: >-
+    Column a_end in circuits.csv. 5 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.circuit.a_end.alpha
+    value: alpha
+    word: status.word.alpha
+    observed_count: 77
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.a_end.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 75
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.a_end.modernized
+    value: modernized
+    word: status.word.modernized
+    observed_count: 74
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.a_end.gamma
+    value: gamma
+    word: status.word.gamma
+    observed_count: 67
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.a_end.beta
+    value: beta
+    word: status.word.beta
+    observed_count: 60
+    source:
+    - data/synthetic/circuits.csv
+  source:
+  - data/synthetic/circuits.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.circuit.z_end
+  entity: entity.circuit
+  field: field.circuit.z_end
+  value_set: valueset.endpoint_words
+  description: >-
+    Column z_end in circuits.csv. 5 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.circuit.z_end.beta
+    value: beta
+    word: status.word.beta
+    observed_count: 76
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.z_end.gamma
+    value: gamma
+    word: status.word.gamma
+    observed_count: 76
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.z_end.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 75
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.z_end.alpha
+    value: alpha
+    word: status.word.alpha
+    observed_count: 67
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.z_end.modernized
+    value: modernized
+    word: status.word.modernized
+    observed_count: 59
+    source:
+    - data/synthetic/circuits.csv
+  source:
+  - data/synthetic/circuits.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.circuit.service_class
+  entity: entity.circuit
+  field: field.circuit.service_class
+  value_set: valueset.severity_words
+  description: >-
+    Column service_class in circuits.csv. 7 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.circuit.service_class.critical
+    value: critical
+    word: status.word.critical
+    observed_count: 54
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.service_class.gold
+    value: gold
+    word: status.word.gold
+    observed_count: 53
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.service_class.bronze
+    value: bronze
+    word: status.word.bronze
+    observed_count: 52
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.service_class.high
+    value: high
+    word: status.word.high
+    observed_count: 52
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.service_class.low
+    value: low
+    word: status.word.low
+    observed_count: 52
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.service_class.silver
+    value: silver
+    word: status.word.silver
+    observed_count: 47
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.service_class.medium
+    value: medium
+    word: status.word.medium
+    observed_count: 43
+    source:
+    - data/synthetic/circuits.csv
+  source:
+  - data/synthetic/circuits.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.circuit.status
+  entity: entity.circuit
+  field: field.circuit.status
+  value_set: valueset.workflow_words
+  description: >-
+    Column status in circuits.csv. 8 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.circuit.status.failed
+    value: failed
+    word: status.word.failed
+    observed_count: 53
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.status.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 52
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.status.new
+    value: new
+    word: status.word.new
+    observed_count: 51
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.status.in_progress
+    value: in_progress
+    word: status.word.in_progress
+    observed_count: 50
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.status.closed
+    value: closed
+    word: status.word.closed
+    observed_count: 41
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.status.exception
+    value: exception
+    word: status.word.exception
+    observed_count: 39
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.status.manual_hold
+    value: manual_hold
+    word: status.word.manual_hold
+    observed_count: 36
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.status.queued
+    value: queued
+    word: status.word.queued
+    observed_count: 31
+    source:
+    - data/synthetic/circuits.csv
+  source:
+  - data/synthetic/circuits.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.circuit.sla_tier
+  entity: entity.circuit
+  field: field.circuit.sla_tier
+  value_set: valueset.severity_words
+  description: >-
+    Column sla_tier in circuits.csv. 7 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.circuit.sla_tier.medium
+    value: medium
+    word: status.word.medium
+    observed_count: 59
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.sla_tier.critical
+    value: critical
+    word: status.word.critical
+    observed_count: 53
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.sla_tier.high
+    value: high
+    word: status.word.high
+    observed_count: 51
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.sla_tier.low
+    value: low
+    word: status.word.low
+    observed_count: 49
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.sla_tier.silver
+    value: silver
+    word: status.word.silver
+    observed_count: 49
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.sla_tier.gold
+    value: gold
+    word: status.word.gold
+    observed_count: 48
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.sla_tier.bronze
+    value: bronze
+    word: status.word.bronze
+    observed_count: 44
+    source:
+    - data/synthetic/circuits.csv
+  source:
+  - data/synthetic/circuits.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.circuit.orphan_flag
+  entity: entity.circuit
+  field: field.circuit.orphan_flag
+  value_set: valueset.boolean_words
+  description: >-
+    Column orphan_flag in circuits.csv. 2 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.circuit.orphan_flag.true
+    value: 'true'
+    word: status.word.true
+    observed_count: 186
+    source:
+    - data/synthetic/circuits.csv
+  - id: status.circuit.orphan_flag.false
+    value: 'false'
+    word: status.word.false
+    observed_count: 167
+    source:
+    - data/synthetic/circuits.csv
+  source:
+  - data/synthetic/circuits.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.alarm.interface
+  entity: entity.alarm
+  field: field.alarm.interface
+  value_set: valueset.generic_status_words
+  description: >-
+    Column interface in alarms.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.alarm.interface.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 30
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 29
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 29
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 28
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 28
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 26
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 26
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 23
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 22
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 20
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 19
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.interface.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 19
+    source:
+    - data/synthetic/alarms.csv
+  source:
+  - data/synthetic/alarms.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.alarm.severity
+  entity: entity.alarm
+  field: field.alarm.severity
+  value_set: valueset.severity_words
+  description: >-
+    Column severity in alarms.csv. 7 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.alarm.severity.silver
+    value: silver
+    word: status.word.silver
+    observed_count: 57
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.severity.medium
+    value: medium
+    word: status.word.medium
+    observed_count: 53
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.severity.bronze
+    value: bronze
+    word: status.word.bronze
+    observed_count: 52
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.severity.low
+    value: low
+    word: status.word.low
+    observed_count: 50
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.severity.gold
+    value: gold
+    word: status.word.gold
+    observed_count: 48
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.severity.high
+    value: high
+    word: status.word.high
+    observed_count: 48
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.severity.critical
+    value: critical
+    word: status.word.critical
+    observed_count: 45
+    source:
+    - data/synthetic/alarms.csv
+  source:
+  - data/synthetic/alarms.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.alarm.alarm_type
+  entity: entity.alarm
+  field: field.alarm.alarm_type
+  value_set: valueset.generic_status_words
+  description: >-
+    Column alarm_type in alarms.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.alarm.alarm_type.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 32
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 31
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 30
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 28
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 26
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 26
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 25
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 22
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 22
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 20
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 19
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.alarm_type.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 18
+    source:
+    - data/synthetic/alarms.csv
+  source:
+  - data/synthetic/alarms.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.alarm.maintenance_window
+  entity: entity.alarm
+  field: field.alarm.maintenance_window
+  value_set: valueset.generic_status_words
+  description: >-
+    Column maintenance_window in alarms.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.alarm.maintenance_window.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 31
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 29
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 27
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 26
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 25
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 25
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 24
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 24
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 22
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 21
+    source:
+    - data/synthetic/alarms.csv
+  - id: status.alarm.maintenance_window.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 18
+    source:
+    - data/synthetic/alarms.csv
+  source:
+  - data/synthetic/alarms.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.incident.severity
+  entity: entity.incident
+  field: field.incident.severity
+  value_set: valueset.severity_words
+  description: >-
+    Column severity in incidents.csv. 7 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.incident.severity.silver
+    value: silver
+    word: status.word.silver
+    observed_count: 65
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.severity.high
+    value: high
+    word: status.word.high
+    observed_count: 57
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.severity.low
+    value: low
+    word: status.word.low
+    observed_count: 54
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.severity.bronze
+    value: bronze
+    word: status.word.bronze
+    observed_count: 50
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.severity.medium
+    value: medium
+    word: status.word.medium
+    observed_count: 47
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.severity.gold
+    value: gold
+    word: status.word.gold
+    observed_count: 41
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.severity.critical
+    value: critical
+    word: status.word.critical
+    observed_count: 39
+    source:
+    - data/synthetic/incidents.csv
+  source:
+  - data/synthetic/incidents.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.incident.status
+  entity: entity.incident
+  field: field.incident.status
+  value_set: valueset.workflow_words
+  description: >-
+    Column status in incidents.csv. 8 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.incident.status.manual_hold
+    value: manual_hold
+    word: status.word.manual_hold
+    observed_count: 51
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.status.in_progress
+    value: in_progress
+    word: status.word.in_progress
+    observed_count: 48
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.status.queued
+    value: queued
+    word: status.word.queued
+    observed_count: 47
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.status.new
+    value: new
+    word: status.word.new
+    observed_count: 46
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.status.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 41
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.status.exception
+    value: exception
+    word: status.word.exception
+    observed_count: 41
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.status.failed
+    value: failed
+    word: status.word.failed
+    observed_count: 41
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.status.closed
+    value: closed
+    word: status.word.closed
+    observed_count: 38
+    source:
+    - data/synthetic/incidents.csv
+  source:
+  - data/synthetic/incidents.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.incident.root_cause
+  entity: entity.incident
+  field: field.incident.root_cause
+  value_set: valueset.generic_status_words
+  description: >-
+    Column root_cause in incidents.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.incident.root_cause.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 36
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 34
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 33
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 28
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 27
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 25
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 25
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 24
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 24
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 23
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 20
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 20
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 18
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.root_cause.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 16
+    source:
+    - data/synthetic/incidents.csv
+  source:
+  - data/synthetic/incidents.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.incident.automation_used
+  entity: entity.incident
+  field: field.incident.automation_used
+  value_set: valueset.boolean_words
+  description: >-
+    Column automation_used in incidents.csv. 2 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.incident.automation_used.false
+    value: 'false'
+    word: status.word.false
+    observed_count: 187
+    source:
+    - data/synthetic/incidents.csv
+  - id: status.incident.automation_used.true
+    value: 'true'
+    word: status.word.true
+    observed_count: 166
+    source:
+    - data/synthetic/incidents.csv
+  source:
+  - data/synthetic/incidents.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.service_order.service_type
+  entity: entity.service_order
+  field: field.service_order.service_type
+  value_set: valueset.generic_status_words
+  description: >-
+    Column service_type in service_orders.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.service_order.service_type.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 32
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 31
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 30
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 29
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 28
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 27
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 27
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 26
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 25
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 22
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 20
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 20
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 18
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.service_type.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 18
+    source:
+    - data/synthetic/service_orders.csv
+  source:
+  - data/synthetic/service_orders.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.service_order.qualification_status
+  entity: entity.service_order
+  field: field.service_order.qualification_status
+  value_set: valueset.workflow_words
+  description: >-
+    Column qualification_status in service_orders.csv. 8 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.service_order.qualification_status.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 55
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.qualification_status.manual_hold
+    value: manual_hold
+    word: status.word.manual_hold
+    observed_count: 48
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.qualification_status.queued
+    value: queued
+    word: status.word.queued
+    observed_count: 47
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.qualification_status.exception
+    value: exception
+    word: status.word.exception
+    observed_count: 44
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.qualification_status.in_progress
+    value: in_progress
+    word: status.word.in_progress
+    observed_count: 44
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.qualification_status.failed
+    value: failed
+    word: status.word.failed
+    observed_count: 41
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.qualification_status.closed
+    value: closed
+    word: status.word.closed
+    observed_count: 40
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.qualification_status.new
+    value: new
+    word: status.word.new
+    observed_count: 34
+    source:
+    - data/synthetic/service_orders.csv
+  source:
+  - data/synthetic/service_orders.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.service_order.provisioning_status
+  entity: entity.service_order
+  field: field.service_order.provisioning_status
+  value_set: valueset.workflow_words
+  description: >-
+    Column provisioning_status in service_orders.csv. 8 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.service_order.provisioning_status.queued
+    value: queued
+    word: status.word.queued
+    observed_count: 51
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.provisioning_status.manual_hold
+    value: manual_hold
+    word: status.word.manual_hold
+    observed_count: 50
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.provisioning_status.in_progress
+    value: in_progress
+    word: status.word.in_progress
+    observed_count: 48
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.provisioning_status.exception
+    value: exception
+    word: status.word.exception
+    observed_count: 44
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.provisioning_status.failed
+    value: failed
+    word: status.word.failed
+    observed_count: 42
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.provisioning_status.new
+    value: new
+    word: status.word.new
+    observed_count: 42
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.provisioning_status.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 39
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.provisioning_status.closed
+    value: closed
+    word: status.word.closed
+    observed_count: 37
+    source:
+    - data/synthetic/service_orders.csv
+  source:
+  - data/synthetic/service_orders.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.service_order.rollback_status
+  entity: entity.service_order
+  field: field.service_order.rollback_status
+  value_set: valueset.workflow_words
+  description: >-
+    Column rollback_status in service_orders.csv. 8 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.service_order.rollback_status.queued
+    value: queued
+    word: status.word.queued
+    observed_count: 54
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.rollback_status.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 49
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.rollback_status.failed
+    value: failed
+    word: status.word.failed
+    observed_count: 45
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.rollback_status.in_progress
+    value: in_progress
+    word: status.word.in_progress
+    observed_count: 45
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.rollback_status.new
+    value: new
+    word: status.word.new
+    observed_count: 44
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.rollback_status.closed
+    value: closed
+    word: status.word.closed
+    observed_count: 40
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.rollback_status.manual_hold
+    value: manual_hold
+    word: status.word.manual_hold
+    observed_count: 39
+    source:
+    - data/synthetic/service_orders.csv
+  - id: status.service_order.rollback_status.exception
+    value: exception
+    word: status.word.exception
+    observed_count: 37
+    source:
+    - data/synthetic/service_orders.csv
+  source:
+  - data/synthetic/service_orders.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.ai_invocation.use_case
+  entity: entity.ai_invocation
+  field: field.ai_invocation.use_case
+  value_set: valueset.generic_status_words
+  description: >-
+    Column use_case in ai_invocations.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.ai_invocation.use_case.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 30
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 30
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 29
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 29
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 27
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 26
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 26
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 24
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 24
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 19
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.use_case.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 17
+    source:
+    - data/synthetic/ai_invocations.csv
+  source:
+  - data/synthetic/ai_invocations.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.ai_invocation.model
+  entity: entity.ai_invocation
+  field: field.ai_invocation.model
+  value_set: valueset.generic_status_words
+  description: >-
+    Column model in ai_invocations.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.ai_invocation.model.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 35
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 33
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 30
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 28
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 27
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 24
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 24
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 24
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 21
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 21
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.model.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 20
+    source:
+    - data/synthetic/ai_invocations.csv
+  source:
+  - data/synthetic/ai_invocations.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.ai_invocation.recommendation_risk
+  entity: entity.ai_invocation
+  field: field.ai_invocation.recommendation_risk
+  value_set: valueset.generic_status_words
+  description: >-
+    Column recommendation_risk in ai_invocations.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column. 1 cell holds a number instead of a word.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.ai_invocation.recommendation_risk.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 35
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 28
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 28
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 27
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 27
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 26
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 23
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 20
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.recommendation_risk.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 13
+    source:
+    - data/synthetic/ai_invocations.csv
+  source:
+  - data/synthetic/ai_invocations.csv
+  - docs/02-baseline/data-quality-baseline.md
+  off_vocabulary_values:
+  - value: '1.42'
+    observed_count: 1
+    note: A number in a word column. Defect F19. Row AI_-00019, file line 355.
+    source:
+    - data/synthetic/ai_invocations.csv
+    - docs/02-baseline/defect-list.md
+- id: status.ai_invocation.approval_required
+  entity: entity.ai_invocation
+  field: field.ai_invocation.approval_required
+  value_set: valueset.generic_status_words
+  description: >-
+    Column approval_required in ai_invocations.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.ai_invocation.approval_required.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 33
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 30
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 30
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 29
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 29
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 27
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 24
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 20
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 19
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.approval_required.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 18
+    source:
+    - data/synthetic/ai_invocations.csv
+  source:
+  - data/synthetic/ai_invocations.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.ai_invocation.guardrail_status
+  entity: entity.ai_invocation
+  field: field.ai_invocation.guardrail_status
+  value_set: valueset.generic_status_words
+  description: >-
+    Column guardrail_status in ai_invocations.csv. 14 distinct words and 1 blank cell. The repo defines no allowed list for this column.
+  allowed_list_defined_by_repo: false
+  blank_count: 1
+  observed_values:
+  - id: status.ai_invocation.guardrail_status.degraded
+    value: degraded
+    word: status.word.degraded
+    observed_count: 31
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.requires_review
+    value: requires_review
+    word: status.word.requires_review
+    observed_count: 30
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.high_risk
+    value: high_risk
+    word: status.word.high_risk
+    observed_count: 29
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.legacy
+    value: legacy
+    word: status.word.legacy
+    observed_count: 29
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.not_enforced
+    value: not_enforced
+    word: status.word.not_enforced
+    observed_count: 27
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.internal
+    value: internal
+    word: status.word.internal
+    observed_count: 26
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.manual
+    value: manual
+    word: status.word.manual
+    observed_count: 26
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.rejected
+    value: rejected
+    word: status.word.rejected
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.standard
+    value: standard
+    word: status.word.standard
+    observed_count: 25
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.normal
+    value: normal
+    word: status.word.normal
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.vendor
+    value: vendor
+    word: status.word.vendor
+    observed_count: 22
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.approved
+    value: approved
+    word: status.word.approved
+    observed_count: 21
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.ai_assisted
+    value: ai_assisted
+    word: status.word.ai_assisted
+    observed_count: 20
+    source:
+    - data/synthetic/ai_invocations.csv
+  - id: status.ai_invocation.guardrail_status.pending
+    value: pending
+    word: status.word.pending
+    observed_count: 20
+    source:
+    - data/synthetic/ai_invocations.csv
+  source:
+  - data/synthetic/ai_invocations.csv
+  - docs/02-baseline/data-quality-baseline.md
+- id: status.event.severity
+  entity: entity.event
+  field: field.event.severity
+  value_set: valueset.event_severity_words
+  description: >-
+    Field severity in events.jsonl. Five log levels. No blank. This scale is a log scale. The alarm and incident severity scale is a different set of words. Both hold the word critical.
+  allowed_list_defined_by_repo: false
+  blank_count: 0
+  observed_values:
+  - id: status.event.severity.warn
+    value: warn
+    word: status.word.warn
+    observed_count: 619
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.severity.error
+    value: error
+    word: status.word.error
+    observed_count: 608
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.severity.info
+    value: info
+    word: status.word.info
+    observed_count: 604
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.severity.debug
+    value: debug
+    word: status.word.debug
+    observed_count: 600
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.severity.critical
+    value: critical
+    word: status.word.critical
+    observed_count: 569
+    source:
+    - data/synthetic/events.jsonl
+  source:
+  - data/synthetic/events.jsonl
+  - docs/01-discovery/data-and-integration-map.md
+- id: status.event.actor
+  entity: entity.event
+  field: field.event.actor
+  values_are: persona ids
+  description: Field actor in events.jsonl. Every value is one of the seven persona names. No blank.
+  allowed_list_defined_by_repo: true
+  allowed_list_source:
+  - docs/domain-specific-spec.md
+  blank_count: 0
+  observed_values:
+  - id: status.event.actor.automation_service
+    value: automation_service
+    ref: persona.automation_service
+    observed_count: 444
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.actor.network_engineer
+    value: network_engineer
+    ref: persona.network_engineer
+    observed_count: 440
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.actor.noc_operator
+    value: noc_operator
+    ref: persona.noc_operator
+    observed_count: 435
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.actor.vendor_account
+    value: vendor_account
+    ref: persona.vendor_account
+    observed_count: 424
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.actor.field_engineer
+    value: field_engineer
+    ref: persona.field_engineer
+    observed_count: 422
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.actor.customer_support
+    value: customer_support
+    ref: persona.customer_support
+    observed_count: 420
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.actor.ai_agent
+    value: ai_agent
+    ref: persona.ai_agent
+    observed_count: 415
+    source:
+    - data/synthetic/events.jsonl
+  source:
+  - data/synthetic/events.jsonl
+  - docs/domain-specific-spec.md
+- id: status.event.business_entity
+  entity: entity.event
+  field: field.event.business_entity
+  values_are: entity ids
+  description: >-
+    Field business_entity in events.jsonl. Every value is one of the six CSV table names. The event names a table. It does not name a row.
+  allowed_list_defined_by_repo: true
+  allowed_list_source:
+  - docs/domain-specific-spec.md
+  - data/manifest.json
+  blank_count: 0
+  observed_values:
+  - id: status.event.business_entity.devices
+    value: devices
+    ref: entity.device
+    observed_count: 525
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.business_entity.ai_invocations
+    value: ai_invocations
+    ref: entity.ai_invocation
+    observed_count: 511
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.business_entity.circuits
+    value: circuits
+    ref: entity.circuit
+    observed_count: 511
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.business_entity.alarms
+    value: alarms
+    ref: entity.alarm
+    observed_count: 505
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.business_entity.service_orders
+    value: service_orders
+    ref: entity.service_order
+    observed_count: 480
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.business_entity.incidents
+    value: incidents
+    ref: entity.incident
+    observed_count: 468
+    source:
+    - data/synthetic/events.jsonl
+  source:
+  - data/synthetic/events.jsonl
+  - docs/01-discovery/data-and-integration-map.md
+- id: status.event.event_type
+  entity: entity.event
+  field: field.event.event_type
+  values_are: concept ids
+  description: >-
+    Field event_type in events.jsonl. Every value is one of the four business flow names from the domain spec. The event records the flow name. No code runs the flow.
+  allowed_list_defined_by_repo: true
+  allowed_list_source:
+  - docs/domain-specific-spec.md
+  blank_count: 0
+  observed_values:
+  - id: status.event.event_type.topology_lookup_to_ai_recommendation
+    value: Topology lookup to AI recommendation
+    ref: concept.flow_topology_lookup_to_ai_recommendation
+    observed_count: 782
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.event_type.approved_remediation_to_validation
+    value: Approved remediation to validation
+    ref: concept.flow_approved_remediation_to_validation
+    observed_count: 771
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.event_type.customer_order_to_provisioning
+    value: Customer order to provisioning
+    ref: concept.flow_customer_order_to_provisioning
+    observed_count: 741
+    source:
+    - data/synthetic/events.jsonl
+  - id: status.event.event_type.alarm_storm_to_incident_correlation
+    value: Alarm storm to incident correlation
+    ref: concept.flow_alarm_storm_to_incident_correlation
+    observed_count: 706
+    source:
+    - data/synthetic/events.jsonl
+  source:
+  - data/synthetic/events.jsonl
+  - docs/01-discovery/business-flow-reconstruction.md
+code_values:
+- id: status.code.guardrail_status.not_enforced
+  value: not_enforced
+  word: status.word.not_enforced
+  description: >-
+    The live summary returns guardrail_status not_enforced on every call. The function does not check the prompt before it returns. 27 CSV rows also hold this word in guardrail_status.
+  source:
+  - apps/api/services/ai_gateway.py
+  - docs/01-discovery/ai-subsystem-discovery.md
+- id: status.code.model.local_sim_v1
+  value: local-sim-v1
+  description: >-
+    The model name the live gateway returns and the audit line stores. Zero rows in ai_invocations.csv use it.
+  source:
+  - apps/api/services/ai_gateway.py
+  - apps/api/main.py
+  - docs/01-discovery/data-and-integration-map.md
+- id: status.code.health.ok
+  value: ok
+  description: GET /health returns status ok. The call writes no audit line.
+  source:
+  - apps/api/main.py
+- id: status.code.error.forbidden
+  value: forbidden
+  description: >-
+    A role outside the five-name list receives the body error forbidden with HTTP 200 and no audit line. That is defect F14.
+  source:
+  - apps/api/main.py
+  - docs/02-baseline/defect-list.md
+- id: status.code.audit_action.record_read
+  value: record.read
+  description: The audit action written after an allowed record read. Details hold record_id and role.
+  source:
+  - apps/api/main.py
+  - apps/api/services/audit.py
+- id: status.code.audit_action.ai_summary
+  value: ai.summary
+  description: >-
+    The audit action written after every summary call. Details hold record_id and model. No actor, no correlation id, no approval id.
+  source:
+  - apps/api/main.py
+  - apps/api/services/audit.py
+  - docs/02-baseline/defect-list.md
+- id: status.code.recommendation.review_and_approve_before_action
+  value: Review and approve before action
+  description: The one fixed recommendation sentence the live gateway returns for every row.
+  source:
+  - apps/api/services/ai_gateway.py
+  - docs/02-baseline/ai-qualification.md
+- id: status.code.role_header_default.operator
+  value: operator
+  ref: role.operator
+  description: >-
+    The value used when a call sends no X-User-Role header. That default allows the read. That is defect F15.
+  source:
+  - apps/api/main.py
+  - docs/02-baseline/defect-list.md
+collisions:
+- id: collision.gold_bronze_as_severity
+  name: gold and bronze used as incident severity
+  description: >-
+    The words gold, silver, and bronze are service-class words. In this data they also fill the severity column of incidents and alarms, next to critical, high, medium, and low. A count grouped by severity places gold next to critical. Incidents: gold 41, bronze 50. Alarms: gold 48, bronze 52. INC-00002 on incidents.csv line 3 has severity gold. The repo states no allowed severity list.
+  words:
+  - status.word.gold
+  - status.word.bronze
+  - status.word.silver
+  fields:
+  - status.incident.severity
+  - status.alarm.severity
+  - status.circuit.service_class
+  - status.circuit.sla_tier
+  defect_refs:
+  - F09
+  resolution: >-
+    Open. The owner of the severity list is Unknown. This file records the words. It does not pick a cutoff.
+  source:
+  - data/synthetic/incidents.csv
+  - data/synthetic/alarms.csv
+  - docs/02-baseline/data-quality-baseline.md
+  - docs/02-baseline/defect-list.md
+- id: collision.status_words_in_hostname_and_vendor
+  name: status words inside hostname and vendor
+  description: >-
+    The first device row REC-0001 has hostname legacy and vendor requires_review. Those are status words, not a host name or a supplier name. The same 14-word pool fills 16 columns across the six files: hostname, vendor, device_type, firmware, owner_team, credential_profile, interface, alarm_type, maintenance_window, root_cause, service_type, use_case, model, recommendation_risk, approval_required, and guardrail_status. A report grouped by vendor groups status words. The API matches a record id against every cell, so a request for the id legacy would return a device row whose hostname is legacy.
+  words:
+  - status.word.legacy
+  - status.word.requires_review
+  fields:
+  - status.device.hostname
+  - status.device.vendor
+  - status.device.device_type
+  - status.device.firmware
+  - status.device.owner_team
+  - status.device.credential_profile
+  - status.alarm.interface
+  - status.alarm.alarm_type
+  - status.alarm.maintenance_window
+  - status.incident.root_cause
+  - status.service_order.service_type
+  - status.ai_invocation.use_case
+  - status.ai_invocation.model
+  - status.ai_invocation.recommendation_risk
+  - status.ai_invocation.approval_required
+  - status.ai_invocation.guardrail_status
+  defect_refs:
+  - F17
+  - F22
+  resolution: >-
+    Open. Which words are legal in hostname and vendor is Unknown. Rule rule.record_lookup_matches_key_only stops the id-in-any-cell match.
+  source:
+  - data/synthetic/devices.csv
+  - docs/01-discovery/data-and-integration-map.md
+  - docs/02-baseline/data-quality-baseline.md
+  - docs/02-baseline/defect-list.md
+  - apps/api/services/domain_service.py
+- id: collision.rec_0001_first_key_in_six_tables
+  name: REC-0001 is the first key in six tables
+  description: >-
+    The first data row of devices.csv, circuits.csv, alarms.csv, incidents.csv, service_orders.csv, and ai_invocations.csv all use REC-0001 as the key. The other keys in each file use a different prefix: DEV-, CIR-, ALA-, INC-, ORD-, and AI_-. A join on REC-0001 joins six different objects. The API reads only devices.csv, so GET /records/REC-0001 returns the device row. The prefix REC- matches no entity prefix.
+  fields:
+  - field.device.device_id
+  - field.circuit.circuit_id
+  - field.alarm.alarm_id
+  - field.incident.incident_id
+  - field.service_order.order_id
+  - field.ai_invocation.ai_call_id
+  defect_refs:
+  - F21
+  resolution: >-
+    Open. Whether the shared text is a seed accident is Unknown. The id form for each entity is recorded on the key field in entities.yaml.
+  source:
+  - docs/01-discovery/data-and-integration-map.md
+  - docs/02-baseline/defect-list.md
+  - docs/01-discovery/brownfield-risk-register.md
+- id: collision.clinician_role_in_telecom_api
+  name: clinician is an API role in a telecom system
+  description: >-
+    apps/api/main.py accepts X-User-Role clinician on GET /records/{record_id}. A clinician is a health-care job. The telecom persona list in docs/domain-specific-spec.md does not contain it. A caller with that role can read a device row, including mgmt_ip and credential_profile. Why the word is on the list is Unknown.
+  roles:
+  - role.clinician
+  defect_refs:
+  - F03
+  resolution: >-
+    access-semantics.yaml lists role.clinician under removed_roles. Stage S04-03 removes it from the allow list.
+  source:
+  - apps/api/main.py
+  - docs/domain-specific-spec.md
+  - docs/02-baseline/defect-list.md
+  - docs/01-discovery/brownfield-risk-register.md
+other_overlaps:
+- id: collision.token_count_vs_token_estimate
+  name: token_count in the CSV, token_estimate on the live body
+  description: >-
+    ai_invocations.csv stores token_count. The live summary returns token_estimate. They are two names for a token figure. The gateway does not write the CSV, so the two never meet.
+  fields:
+  - field.ai_invocation.token_count
+  source:
+  - docs/01-discovery/ai-subsystem-discovery.md
+  - apps/api/services/ai_gateway.py
+- id: collision.model_column_vs_live_model
+  name: model column holds status words, live model is local-sim-v1
+  description: >-
+    The model column in ai_invocations.csv holds the 14 generic status words. Zero rows hold local-sim-v1. The live gateway returns local-sim-v1 on every call.
+  fields:
+  - status.ai_invocation.model
+  source:
+  - docs/01-discovery/data-and-integration-map.md
+  - apps/api/services/ai_gateway.py
+- id: collision.critical_in_two_scales
+  name: critical in the alarm scale and the event log scale
+  description: >-
+    critical is one of seven alarm and incident severity words. critical is also one of five event log levels. A query on the word critical mixes the two scales.
+  words:
+  - status.word.critical
+  fields:
+  - status.alarm.severity
+  - status.incident.severity
+  - status.event.severity
+  source:
+  - data/synthetic/alarms.csv
+  - data/synthetic/events.jsonl
+- id: collision.legacy_as_endpoint_and_status
+  name: legacy as an endpoint word and a status word
+  description: >-
+    legacy fills mgmt_ip, a_end, and z_end next to alpha, beta, gamma, and modernized. legacy also fills 16 word columns next to approved and pending.
+  words:
+  - status.word.legacy
+  fields:
+  - status.device.mgmt_ip
+  - status.circuit.a_end
+  - status.circuit.z_end
+  - status.device.hostname
+  source:
+  - data/synthetic/devices.csv
+  - data/synthetic/circuits.csv
+- id: collision.mgmt_ip_holds_words
+  name: mgmt_ip holds words, not addresses
+  description: >-
+    Every filled mgmt_ip cell is one of alpha, beta, gamma, legacy, or modernized. None is a network address. The field still leaves the API in every allowed read and enters the prompt. The forbidden-field rule applies to the column, whatever it holds.
+  fields:
+  - status.device.mgmt_ip
+  source:
+  - data/synthetic/devices.csv
+  - docs/02-baseline/defect-list.md
