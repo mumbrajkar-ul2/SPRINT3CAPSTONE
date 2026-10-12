@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/semantic-layer/1.1.0/semantic-layer.schema.json",
-  "title": "Semantic layer 1.1.0",
+  "$id": "https://example.invalid/semantic-layer/1.1.1/semantic-layer.schema.json",
+  "title": "Semantic layer 1.1.1",
   "description": "One schema for the seven YAML files under semantic-layer/. The top-level key file picks the branch. Every item has an id in dot form and a source list. An item with proposed true must name an owner. An item with deprecated true must name replaced_by, and the reverse holds too.",
   "oneOf": [
     { "$ref": "#/$defs/entities_file" },

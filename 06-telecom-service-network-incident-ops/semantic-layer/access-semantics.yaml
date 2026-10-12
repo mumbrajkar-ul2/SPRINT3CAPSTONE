@@ -1,9 +1,9 @@
-# access-semantics.yaml -- semantic layer 1.1.0
+# access-semantics.yaml -- semantic layer 1.1.1
 # Who may do what, to which records, for what reason, and at what risk.
 # Five value lists with ids: actions, resources, purposes, scopes, risks.
 # Stage S04-03 writes the policy input model from these five lists. Stage S04-06 reads them in Rego.
 # Stage S05R (1.1.0) added one resource, one OPA item, and corrected the sentences that described the state before S04-06.
-version: "1.1.0"
+version: "1.1.1"
 file: access-semantics
 description: >-
   The seven telecom personas and what each may do. Every persona entry maps to actions, resources, a purpose, a

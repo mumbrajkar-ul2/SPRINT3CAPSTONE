@@ -1,7 +1,7 @@
-# business-rules.yaml -- semantic layer 1.1.0
+# business-rules.yaml -- semantic layer 1.1.1
 # Rules the system must keep. Each rule says what happens today and which stage will enforce it.
 # No rule here sets a severity cutoff, an SLA threshold, or a target number.
-version: "1.1.0"
+version: "1.1.1"
 file: business-rules
 description: >-
   The rules this system must keep. Each rule has a stable id, the entities and fields it touches, what the code

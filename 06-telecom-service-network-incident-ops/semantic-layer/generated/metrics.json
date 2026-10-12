@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "file": "metrics",
   "description": "Measures that later stages compute and report. Each metric names the fields it reads, how it is worked out in words, and what the data shows today. No metric has a target value. A PROPOSED bound from the baseline is recorded as a note with Owner: Team-Force. It is not a target.",
   "source": [
@@ -131,7 +131,7 @@
         "field.event.latency_ms"
       ],
       "live_source": "Before stage S04-09, the live gateway waited time.sleep(0.01) and returned. It recorded no latency on the body or the audit row. Now (S05R, 1.1.0): the body field latency_ms and the audit row key latency_ms hold the milliseconds of the model call when the model ran. The model is a stub, so the figure is SIMULATED.",
-      "today": "events.jsonl holds latency_ms on every line. Before stage S04-09, no live call recorded it. Now (S05R, 1.1.0): every live call that reached the model records it. The percentile to report is deferred to Team-Force.",
+      "today": "events.jsonl holds latency_ms on every line. Before stage S04-09, no live call recorded it. Now (S05R, 1.1.0): every live call that reached the model records it. Report the 95th percentile (p95): 95 of every 100 calls finish at or under that time. Team-Force decided this in ADR 0002 on 2026-10-12 (D-16). It names a method and sets no target, so target stays null.",
       "target": null,
       "source": [
         "data/synthetic/events.jsonl",

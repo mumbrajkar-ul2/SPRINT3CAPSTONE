@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S03 — Semantic layer (Execution Plan Phase 3; product path step 1, D3) |
-| Date / version | 2026-10-12, semantic layer `1.1.0`. Written in S03 on 2026-10-10 and revised in S05R. |
+| Date / version | 2026-10-12, semantic layer `1.1.1`. Written in S03 on 2026-10-10 and revised in S05R. One sentence changed in ADR 0002. |
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | PASS. Every id with a glossary prefix has one row below. `tests/test_semantic_layer.py` checks that the Term and Id columns match the YAML. |
 | Evidence sources | The seven YAML files in this folder; `docs/domain-specific-spec.md`; `docs/01-discovery/`; `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/02-baseline/ai-qualification.md`; `apps/api/main.py`; `apps/api/services/ai_gateway.py`; `policy/opa/access.rego`; `data/synthetic/` |
@@ -208,7 +208,7 @@ Measures computed from stored fields. No metric has a target.
 | `quarantine rate` | `metric.quarantine_rate` | The share of batch rows held aside as bad. The batch now prints a `quarantined` count. The count is not stored yet. |
 | `retry count` | `metric.retry_count` | How many times an order build was tried again. 32 to 4995 in the data. The maximum is Unknown. |
 | `audit completeness` | `metric.audit_completeness` | How much of a full decision record an audit row holds. The required-field list is PROPOSED. |
-| `recommendation latency` | `metric.recommendation_latency` | How long a model call takes in milliseconds. Since stage S04-09 a live call that reaches the model records it. |
+| `recommendation latency` | `metric.recommendation_latency` | How long a model call takes in milliseconds. Since stage S04-09 a live call that reaches the model records it. Report the 95th percentile (p95), decided in ADR 0002 on 2026-10-12. |
 | `SLA breach risk` | `metric.sla_breach_risk` | A stored score on each incident. 352 values between 0 and 1. One is 1.42. The range is PROPOSED. Owner: Team-Force. |
 | `alarm storm size` | `metric.alarm_storm_size` | How many alarms share one storm batch. The largest in the file is 2. What counts as a storm is Unknown. |
 | `AI outcome count` | `metric.ai_outcome_count` | How many calls ended in each of the four outcomes. The audit key `outcome` holds the word on a summary call. EXECUTE never appears. PROPOSED. |

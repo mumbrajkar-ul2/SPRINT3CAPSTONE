@@ -5841,3 +5841,120 @@ I wrote the decision guide to `06-telecom-service-network-incident-ops/docs/02-b
 **Part 3.** A short order for deciding: D-03, D-06, D-16, D-08, TA-15, D-12, D-13.
 
 Because the YAML is frozen after S05R, any change or any new id needs an ADR under `docs/ADR/`. If you send me your answers, I can record them, write the ADR, and update `playbook/STATUS.md`.
+## 2026-10-12 16:13
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Proceed with the recommended decisions in S05R_Decisions.md
+
+### Assistant
+
+I recorded every recommended decision. One YAML sentence changed, so the semantic layer is now version `1.1.1`.
+
+**What I wrote**
+
+| File | What it holds |
+|---|---|
+| `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md` (new) | The answer to each of D-01 to D-20, the 12 PROPOSED bundles, TA-15, and the numbers N-01 to N-06. |
+| `docs/04-secrets/rotation-log.md` (new) | The place for rotation records (D-12). It has columns and no entries. No rotation has been recorded. It never holds a secret value. |
+| `docs/02-baseline/S05R_Decisions.md` | All 33 `Your decision:` lines are filled with the recommended answer. The Status line says "Decided". |
+| `semantic-layer/metrics.yaml` and `glossary.md` | `metric.recommendation_latency` now says to report p95 (D-16). `target` stays `null`. |
+| `semantic-layer/` version | `1.1.0` became `1.1.1` in the 7 YAML files, the schema, the glossary, the README, and the test constant. `generated/` is rebuilt. |
+| `semantic-layer-revision.md`, `Project_Acronyms.md`, `playbook/STATUS.md` | One line each that points to ADR 0002. |
+
+**The 20 deferred items**
+
+| Result | Items |
+|---|---|
+| Decided | D-03, D-06, D-08, D-12, D-16 |
+| Closed | D-13 |
+| Kept deferred, each with a named trigger | D-01, D-02, D-04, D-05, D-07, D-09, D-10, D-11, D-14, D-15, D-17, D-18, D-19, D-20 |
+
+**PROPOSED items.** All 120 are accepted, in bundles P-01 to P-11. P-06 and P-10 carry a note. The 35 access rows are accepted, and TA-15 is accepted as written. The numbers N-01 to N-06 are accepted with the notes from the file.
+
+**What waits for stage S07.** D-03, D-06, and D-08 are decided, and each needs code. S07 is the first stage that edits code. Until then the code does not match them. S07 adds each new YAML id under its own ADR.
+- D-03: the approval record gets `decision` (yes or no) and `approver` (a persona id).
+- D-06: `record_id` becomes the 16th audit row key.
+- D-08: a short list of command phrases: reboot, restart, shut down, delete, clear config, push config, apply.
+
+**One choice I made.** I kept `proposed: true` on all 120 items. The operating contract uses that flag for "not in the inherited repo". It records where the item came from. ADR 0002 is the written acceptance. I changed the matching sentence in `S05R_Decisions.md` to say this.
+
+**Checks (all run on 2026-10-12)**
+
+| Check | Result |
+|---|---|
+| `build.py` and `build.py --check` | Pass, version 1.1.1 |
+| Semantic-layer tests | 41 passed |
+| Full run (`tests`, `policy/tests`, `semantic-layer/tests`) | 333 passed |
+| Security stage | 195 passed |
+
+I did not rerun `scripts\evidence.ps1`. The files in `evidence/` still show the S05R run at version `1.1.0`. Say so if you want them refreshed.
+
+## 2026-10-12 16:25
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Create another version of @06-telecom-service-network-incident-ops/docs/02-baseline/S05R_Decisions.md called S05R_Decisions_Taken.md that captures the decision taken along with reasoning in a table
+
+### Assistant
+
+I created `06-telecom-service-network-incident-ops/docs/02-baseline/S05R_Decisions_Taken.md`. It is a shorter version of `S05R_Decisions.md`. Each item is one table row with the decision taken and the reasoning.
+
+| Part | What the table holds |
+|---|---|
+| Count of decisions | 5 decided now, 1 closed, 14 kept deferred, 120 PROPOSED items accepted, 35 access rows accepted, 6 numbers accepted. |
+| Part 1 | D-01 to D-20. Columns: plain words, decision taken, reasoning, what happens next. |
+| Part 2 | Bundles P-01 to P-11, the access matrix (P-12), and TA-15, each with the decision and the reasoning. |
+| Part 3 | The numbers N-01 to N-06, each with the decision and where the number came from. |
+| Part 4 | What changed: the p95 sentence, version `1.1.1`, the rotation log, and ADR 0002. |
+
+The reasoning in each row comes from the "Why" text in `S05R_Decisions.md`. I did not add new reasons. I kept one worked example for D-03. The original file is unchanged.
+
+## 2026-10-12 16:31
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Does S06-prd.md need to be updated based on recent changes in terms of INPUTS or prompt text?
+
+### Assistant
+
+Yes. `S06-prd.md` needs a few updates, because three things changed after S05R. I have not edited anything yet.
+
+1. **The version source is out of step.** The S06 prompt says to copy the version from `semantic-layer-revision.md`, whose header still says `1.1.0`. The layer is now `1.1.1`. `playbook/S08-second-model.md` (line 29) compares the README, `semantic-layer-revision.md`, and the PRD header, and stops if they differ. Fix: change the revision file header to name `1.1.1` and ADR 0002, and change the S06 and S08 prompts to read the version from `semantic-layer/README.md` and `generated/manifest.json`.
+2. **"Stage S05R is the last YAML change before this PRD" is no longer true.** ADR 0002 changed the YAML after S05R. Lines 3, 9, and 78 should say "at the current version (`1.1.1`, ADR 0002)".
+3. **The Inputs list is missing the new decision files.** Add `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`, `docs/02-baseline/S05R_Decisions_Taken.md`, `semantic-layer/README.md`, and `docs/04-secrets/rotation-log.md`.
+4. **The "Locked facts" row is stale.** `apps/api/main.py` now also has `GET /audit/{correlation_id}`. The routes `/ai/recommend`, `/approvals/{id}`, and `/alarms/storms/{storm_batch_id}` are still missing. Add the locked facts: 15 audit row keys, 35 access rows, three audit action words. Write "S04-09 hardens it" in the past tense.
+5. **The prompt needs one new required step** that states the decisions and limits: D-07 login scope (Unknown today), D-03, D-06, D-08 (built in S07), D-05 (the audit log mixes test and real rows), the short phrase list limit, P-02 (four scopes need data the CSV files do not hold), P-10 (three rules have `enforced_today: false`), and the 14 deferred items as open items.
+
+Do not change the four flows, verbs, and outcomes, the route list, the two required "will not implement" sentences, the completion gate, or the final response list.
+
+I offered to apply updates 1 to 5, change the revision file header and the S08 line, and add a row to `playbook/STATUS.md`.
+
+## 2026-10-12 16:40
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+apply the above recommended updates
+
+### Assistant
+
+I applied the updates. Nothing was run, because only playbook and record files changed.
+
+| File | Change |
+|---|---|
+| `playbook/S06-prd.md` | The intro, the inputs, and the version rule now use the current version, read from `semantic-layer/README.md` (`1.1.1`). Inputs added: ADR 0002, `S05R_Decisions_Taken.md`, and `rotation-log.md`. The route list names the four routes that exist today and the three that do not. A new step 6 states the decisions and limits. A new term needs a new ADR after S05R reruns. The locked facts now name the audit route, the 15 audit row keys, the 35 access rows, the three audit action words, and the version source. The lifecycle linkage names ADR 0002 as the last YAML change. |
+| `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-revision.md` | The header names `1.1.1` as the current version. The rest of the file stays the S05R record at `1.1.0`. |
+| `playbook/S08-second-model.md` | Three wording changes. The version check now compares the README, the revision file header, and the PRD header. It stops if the tree changed after the last ADR. |
+| `playbook/STATUS.md` | One playbook-change row. |
+
+I checked one fact while editing. The three audit action words are `audit.read`, `audit.not_found`, and `audit.id_refused`, from `apps/api/main.py` and the S05R playbook. I had first written them wrongly in my own draft and corrected the row.
+
+I left `S03R`, `S05R`, and the `README.md` row D7 as they were. They still say "S05R version" in a few places. That wording is harmless, because S08 now checks the version against the README.

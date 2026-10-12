@@ -5,9 +5,9 @@
 | Stage | S05R follow-up. A decision guide for the items that stage S05R left open. |
 | Date / version | 2026-10-12, v1.0. Based on semantic layer `1.1.0`. |
 | Author | Cursor agent (Claude Sonnet 5.5) for Mangesh (FDE) |
-| Status | Waiting for decisions. Nothing in this file changes the YAML, the code, or a test. |
+| Status | Decided on 2026-10-12 and recorded in `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`. Every decision below is the recommendation, as Mangesh (FDE) asked. One YAML sentence changed (D-16), so the layer is now `1.1.1`. D-03, D-06, and D-08 are decided here and built in stage S07. |
 | Evidence sources | `docs/02-baseline/semantic-layer-revision.md` (sections 2 and 11, the deferred list D-01 to D-20); `semantic-layer/*.yaml` at version `1.1.0` (every item with `proposed: true`, found by script on 2026-10-12: 120 items); `docs/` design files named in each item; `apps/api/services/audit.py`, `audit_query.py`, `ai_gateway.py`, `breaker.py`; `policy/opa/policy_data.json`; `docs/08-observability/slo-proposal.md`; `docs/11-reliability/retry-and-circuit-breaker-strategy.md` |
-| Assumptions | (1) Team-Force is the owner of every open choice (`docs/00-contract/operating-contract.md` row 10). Mangesh (FDE) decides for Team-Force. (2) A recommendation here is advice. The owner decides. (3) After S05R, any change to the YAML needs an ADR under `docs/ADR/`. So accepting an item is recorded in this file first. The YAML flag `proposed: true` changes only through an ADR. |
+| Assumptions | (1) Team-Force is the owner of every open choice (`docs/00-contract/operating-contract.md` row 10). Mangesh (FDE) decides for Team-Force. (2) A recommendation here is advice. The owner decides. (3) After S05R, any change to the YAML needs an ADR under `docs/ADR/`. So accepting an item is recorded in this file and in ADR 0002. The YAML flag `proposed: true` marks an item that is not in the inherited repo. It stays after acceptance. |
 | Unresolved issues | The letters of MAESTRO (D-20) are Unknown. Whether a login system is in scope (D-07) is Unknown. A real model is not in use, so every time and cost number is from a stub. |
 | Residual risks | A recommendation to accept a number can make a proposal look measured. Each number below says where it came from. |
 
@@ -23,11 +23,11 @@ Part 2 has the PROPOSED items. There are 120 in the YAML. They are grouped into 
 
 Part 3 is a short list of what to decide first.
 
-Each item has a line `Your decision:`. Write Accept, Change, or Reject there, with a note if you want one.
+Each item has a line `Your decision:`. The lines are filled in with the recommended answers (ADR 0002, 2026-10-12).
 
 **What "deferred" means.** The design asked for a new term. S05R did not add it, because no code, test, or policy file uses it yet. Adding it now would describe something that does not exist.
 
-**What "PROPOSED" means.** S05R wrote the item into the YAML. Team-Force has not accepted it. It carries `owner: Team-Force`. Accepting an item removes doubt about it. Rejecting an item means it should come out of the YAML, under an ADR.
+**What "PROPOSED" means.** S05R wrote the item into the YAML. The item is not in the inherited repo. It carries `owner: Team-Force`. Accepting an item removes doubt about it, and the flag stays to show where the item came from. Rejecting an item means it should come out of the YAML, under an ADR.
 
 **Recommendation words.**
 
@@ -82,7 +82,7 @@ Each item has a line `Your decision:`. Write Accept, Change, or Reject there, wi
 
 **Why.** S09 will show which checks the evidence pack needs. Ids written now would be a guess. If the guess is wrong, a rename needs an ADR.
 
-Your decision:
+Your decision: Keep deferred. Names for the release checks are added at stage S09. (ADR 0002, 2026-10-12)
 
 ## D-02. Audit entries for granting and using a waiver
 
@@ -98,7 +98,7 @@ Your decision:
 
 **Why.** The two ids would describe a behaviour that does not exist. Nothing in the demo flow needs a waiver.
 
-Your decision:
+Your decision: Keep deferred. Waiver audit entries are added only if a waiver feature is built. (ADR 0002, 2026-10-12)
 
 ## D-03. A record of who said yes or no to an AI recommendation
 
@@ -116,7 +116,7 @@ Your decision:
 
 **Why.** The demo (D6) must end in a human decision. The approval record is the center of that flow. Naming the fields before S07 starts avoids rework. Suggested fields: `decision` with the values yes and no, and `approver` with a persona id. The approver for a live change is `persona.network_engineer` (confirmed 2026-10-10). The approver for a next-action sentence is `persona.noc_operator`.
 
-Your decision:
+Your decision: Decided. The approval record gets `decision` (yes or no) and `approver` (a persona id). Stage S07 builds it and adds the ids under a new ADR. (ADR 0002, 2026-10-12)
 
 ## D-04. A narrower permission to read one audit case
 
@@ -132,7 +132,7 @@ Your decision:
 
 **Why.** A narrower scope matters when more people need audit access. Today that is one role. Revisit when an auditor persona or a customer-facing audit view is planned.
 
-Your decision:
+Your decision: Keep deferred (B). `scope.all_records` stays for the admin. (ADR 0002, 2026-10-12)
 
 ## D-05. Four more facts on the audit row
 
@@ -149,7 +149,7 @@ Your decision:
 
 **Why.** Final action answers "what actually happened". S07 is the first stage that can change anything, so S07 is the first time the field has a value. The route and method can be read from the request path. The test-versus-real flag helps counting, and the log already holds test rows mixed with real ones (the earlier gap report counted 240 lines). That mix is a known limit. Record it in the PRD.
 
-Your decision:
+Your decision: Keep deferred, except final action. Final action is built at stage S07. (ADR 0002, 2026-10-12)
 
 ## D-06. The device or record id on the audit row
 
@@ -168,7 +168,7 @@ Your decision:
 
 **Why.** This is the cheapest gap to close and the one a defence question is most likely to hit ("which record did this person read?"). The reason list is useful, and it can follow. Note that a record id may be a device id. It is not on the forbidden list, so it is safe to store.
 
-Your decision:
+Your decision: Decided (B). Stage S07 adds `record_id` to the audit row. The reasons list comes later. (ADR 0002, 2026-10-12)
 
 ## D-07. The name of the person who made a call
 
@@ -184,7 +184,7 @@ Your decision:
 
 **Why.** A login system is a large piece of work. Whether it is in scope is Unknown. The audit design already lists "caller identity" on the cannot-prove list (`status.code.cannot_prove.caller_identity`), so the gap is stated. Decide the scope question when you write the PRD (S06).
 
-Your decision:
+Your decision: Keep deferred. Waits until a login system is in scope. (ADR 0002, 2026-10-12)
 
 ## D-08. A full list of command phrases to catch in AI text
 
@@ -200,7 +200,7 @@ Your decision:
 
 **Why.** Stage S07 shows the text to a person. A person who trusts a recommendation could run a command it names. The code never runs a command, and that is the strongest protection. A short list adds a second layer for little work. Keep the list in one place and mark it PROPOSED. A short list will miss some phrases. Say so in the PRD.
 
-Your decision:
+Your decision: Decided. Stage S07 writes a short PROPOSED list: reboot, restart, shut down, delete, clear config, push config, apply. (ADR 0002, 2026-10-12)
 
 ## D-09. Catching instructions hidden inside an allowed field
 
@@ -216,7 +216,7 @@ Your decision:
 
 **Why.** With a stub model, the text goes nowhere. The risk starts with a real model. When that day comes, add a simple check first, such as a length limit and a ban on certain characters, then add the failmode id.
 
-Your decision:
+Your decision: Keep deferred. Waits for real data or a real model. (ADR 0002, 2026-10-12)
 
 ## D-10. A version number for the prompt wording
 
@@ -232,7 +232,7 @@ Your decision:
 
 **Why.** The hash is stronger than a label, because a label can be forgotten when the wording changes. A label helps people read reports. Add it if the wording starts changing often.
 
-Your decision:
+Your decision: Keep deferred. Waits until the prompt wording changes. (ADR 0002, 2026-10-12)
 
 ## D-11. How many seconds the model may take
 
@@ -248,7 +248,7 @@ Your decision:
 
 **Why.** The only model today is a stub that waits 10 milliseconds. Any number is a guess. Measure a real model first. Then write the number and change the test in one ADR.
 
-Your decision:
+Your decision: Keep deferred. The YAML timeout stays `null` until a real model is measured. (ADR 0002, 2026-10-12)
 
 ## D-12. Where a password rotation is written down
 
@@ -264,7 +264,7 @@ Your decision:
 
 **Why.** This is a lab, and a markdown log is enough to show the habit. It answers the defence question "how do you know the old secret is gone?" Say in the PRD that production would use a secret manager.
 
-Your decision:
+Your decision: Decided (A). The log is `docs/04-secrets/rotation-log.md`. It has no entries and never holds a secret value. (ADR 0002, 2026-10-12)
 
 ## D-13. A role for who owns environment settings
 
@@ -280,7 +280,7 @@ Your decision:
 
 **Why.** Operating contract row 10 already makes Team-Force the owner of open choices. A persona is a person who uses the system. A settings owner is a team job, so no new id is needed. The personas stay at the locked seven.
 
-Your decision:
+Your decision: Closed (B). No new role id. Team-Force owns environment settings. (ADR 0002, 2026-10-12)
 
 ## D-14. A measure of how often the model path is shut off
 
@@ -296,7 +296,7 @@ Your decision:
 
 **Why.** The metric has no data source today. The breaker keeps its state in memory only. Define the metric together with a place to store the state.
 
-Your decision:
+Your decision: Keep deferred. Waits for a dashboard. (ADR 0002, 2026-10-12)
 
 ## D-15. Lists of model names and risk levels
 
@@ -312,7 +312,7 @@ Your decision:
 
 **Why.** A list of one model name is no list. The risk levels need a rule for what each level means, and nobody has written that rule. Grouping by risk is a nice view and no stage needs it yet.
 
-Your decision:
+Your decision: Keep deferred. Waits for a real model. (ADR 0002, 2026-10-12)
 
 ## D-16. Which percentile to report for model delay
 
@@ -329,7 +329,7 @@ Your decision:
 
 **Why.** The SLO proposal already uses 95 of 100. The FinOps report already shows a p95 (14 ms over 17 model calls on the stub). One percentile everywhere keeps reports consistent. This choice sets a method. It sets no target number, so `target` stays `null`.
 
-Your decision:
+Your decision: Decided. Report p95. Written into `metric.recommendation_latency` and the glossary. The layer is now version `1.1.1`. `target` stays `null`. (ADR 0002, 2026-10-12)
 
 ## D-17. Extra alarm fields allowed in a prompt
 
@@ -345,7 +345,7 @@ Your decision:
 
 **Why.** The allow list is a safety control. Widen it with a design in hand, and check each field against the forbidden list. Customer ids stay out.
 
-Your decision:
+Your decision: Keep deferred. Waits for the batch summary design. (ADR 0002, 2026-10-12)
 
 ## D-18. Four more fields on the audit row for cost grouping
 
@@ -361,7 +361,7 @@ Your decision:
 
 **Why.** Without a cache flag, a cached answer would be counted as a held call or a model call. That would make the cost numbers wrong. The other three can wait for the cost dashboard.
 
-Your decision:
+Your decision: Keep deferred. Each field is added when its feature is built. (ADR 0002, 2026-10-12)
 
 ## D-19. A saved place for the count of damaged rows
 
@@ -377,7 +377,7 @@ Your decision:
 
 **Why.** The dashboard (S09) decides where it reads from. Pick the store then, so the batch and the dashboard agree.
 
-Your decision:
+Your decision: Keep deferred. Waits for the stage S09 dashboard. (ADR 0002, 2026-10-12)
 
 ## D-20. The MAESTRO list
 
@@ -393,7 +393,7 @@ Your decision:
 
 **Why.** The name is in the repo, so a reader will ask. Copy the list from the source and cite it. Do not write it from memory.
 
-Your decision:
+Your decision: Keep deferred. Option A (copy the course list) when the course material is at hand. (ADR 0002, 2026-10-12)
 
 ---
 
@@ -433,7 +433,7 @@ The items in P-01 to P-11 add up to 120.
 
 **Why.** The brief locks them. Changing one would break the access rows and the glossary.
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-02. Eight purposes and four scopes (12 items)
 
@@ -445,7 +445,7 @@ Your decision:
 
 **Why.** The access matrix rows use these words. The policy tests pass with them. **Inference:** four scopes need data that the CSV files do not hold (for example, which site an engineer belongs to). That is a limit to write in the PRD. It is no reason to remove the words.
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-03. Four AI uses and their approver jobs (4 items)
 
@@ -464,7 +464,7 @@ None of these gives a model execute agency. The live change is done by workflow 
 
 **Why.** Each job matches the role's duty. The network engineer owns config changes. The NOC operator owns triage. The incident summary also carries a stale-topology block that S05R added: stale data holds the summary. That follows policy row B5 and is the safer choice.
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-04. Five reasons a call goes to a person (5 items)
 
@@ -476,7 +476,7 @@ Your decision:
 
 **Why.** Each one names behaviour the code already has (breaker, policy reasons, validation). Naming them makes logs and tests agree.
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-05. The prompt allow list and the answer shape (2 items)
 
@@ -486,7 +486,7 @@ Your decision:
 
 **Why.** The customer id was on the never list for incidents and circuits only. The same field on orders had no rule. Forbidding it is the safer direction and costs no feature.
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-06. Six metrics (6 items)
 
@@ -496,7 +496,7 @@ Your decision:
 
 **Why.** The names say what to measure. No target number is set, so nothing here is a promise. Note that `metric.audit_completeness` cannot be worked out until `record_id` is on the audit row (D-06).
 
-Your decision:
+Your decision: Accept with a note. `metric.audit_completeness` waits for `record_id` (D-06). (ADR 0002, 2026-10-12)
 
 ## P-07. The 15 keys of the audit row (15 items)
 
@@ -508,7 +508,7 @@ Your decision:
 
 **Why.** A test (`test_audit_row_fields_are_the_keys_the_code_writes`) fails if these ids and the code disagree. They mirror the code.
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-08. The eight inputs of the AI action policy (8 items)
 
@@ -518,7 +518,7 @@ Your decision:
 
 **Why.** They are the names the Rego file and the Python copy already read. `change_plan_ok` has one open point: what "validated" means is Unknown. No route sets it, so no live change can pass the fourth gate today. That is the safe state.
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-09. Forty-seven status codes the code writes (47 items)
 
@@ -547,7 +547,7 @@ Your decision:
 - **Runbook levels (4).** `stopped`, `degraded`, `data_fault`, `watch` are new names for how bad an incident is. They carry no number. They fill a gap that the reliability design named (OQ-7). Accept them if the names read well to an operator.
 - **Model call queue states (3).** They name a queue that no code builds (scaling item `SR-04`). Accepting them is harmless. Remove them if you decide not to build the queue.
 
-Your decision:
+Your decision: Accept. Runbook level names accepted if they read well to an operator. Queue states removed if the queue is never built. (ADR 0002, 2026-10-12)
 
 ## P-10. Seven new rules (7 items)
 
@@ -567,7 +567,7 @@ Your decision:
 
 **Why.** The rules match tests or code. The note: three rules say `false` because nothing runs them in a live flow. Stage S07 should connect `dedupe.py` to the alarm intake, or the PRD should say the rules are designs only.
 
-Your decision:
+Your decision: Accept with a note. Stage S07 connects `dedupe.py` to the alarm intake, or the PRD says three rules are designs only. (ADR 0002, 2026-10-12)
 
 ## P-11. Concepts, collisions, one resource, and three policy items (7 items)
 
@@ -582,7 +582,7 @@ Your decision:
 
 **Why.** These are naming items with no behaviour. Two things to know. `concept.waiver` describes something that is not built (see D-02). `resource.model_call_queue` names a queue that is not built (see P-09).
 
-Your decision:
+Your decision: Accept. (ADR 0002, 2026-10-12)
 
 ## P-12. The 35 access matrix rows (data, outside the 120)
 
@@ -600,8 +600,8 @@ Your decision:
 
 **Why.** A network engineer planning a change may need the management address. One role, one purpose. A second point to know: the record route today returns the whole device row to every allowed role (`SB-06`). TA-15 states who should see the two fields. The route does not enforce that yet. Closing `SB-06` is a code change for a later stage.
 
-Your decision (matrix):
-Your decision (TA-15):
+Your decision (matrix): Accept. (ADR 0002, 2026-10-12)
+Your decision (TA-15): Accept as written (A). (ADR 0002, 2026-10-12)
 
 ---
 
@@ -640,6 +640,10 @@ Everything else can stay as it is until the trigger in the summary table.
 
 ## What happens after you decide
 
-- An Accept needs no action. This file records it.
-- A Change or a Reject, and any of the "Decide now" items that add an id, needs an ADR under `docs/ADR/`, because the YAML is frozen after S05R. The code changes in D-03, D-06, and D-08 also need a stage that edits code. S07 is the first one.
-- If you tell me your answers, I can write the ADR, record the decisions in this file, and update `playbook/STATUS.md`.
+All decisions were made on 2026-10-12 and recorded in `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`.
+
+- An Accept needs no action. This file and the ADR record it.
+- D-16 changed one sentence in the YAML, so the layer is now `1.1.1`. `build.py --check` and 41 semantic-layer tests pass.
+- D-12 created `docs/04-secrets/rotation-log.md`, with no entries.
+- D-03, D-06, and D-08 are decided and need code. Stage S07 is the first stage that edits code. S07 adds each new YAML id under a new ADR.
+- The 14 items that stay deferred each wait for the trigger in the summary table.

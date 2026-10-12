@@ -1,8 +1,8 @@
-# metrics.yaml -- semantic layer 1.1.0
+# metrics.yaml -- semantic layer 1.1.1
 # Measures the system can compute from stored fields. Each metric names its source fields.
 # target is null on every metric. The repo states no target, and no owner has approved one.
 # Stage S05R (1.1.0) added four metrics and corrected sentences that described the audit row and the gateway before S04-08 and S04-09.
-version: "1.1.0"
+version: "1.1.1"
 file: metrics
 description: >-
   Measures that later stages compute and report. Each metric names the fields it reads, how it is worked out in
@@ -120,7 +120,7 @@ metrics:
       milliseconds of the model call when the model ran. The model is a stub, so the figure is SIMULATED.
     today: >-
       events.jsonl holds latency_ms on every line. Before stage S04-09, no live call recorded it. Now (S05R, 1.1.0):
-      every live call that reached the model records it. The percentile to report is deferred to Team-Force.
+      every live call that reached the model records it. Report the 95th percentile (p95): 95 of every 100 calls finish at or under that time. Team-Force decided this in ADR 0002 on 2026-10-12 (D-16). It names a method and sets no target, so target stays null.
     target: null
     source: [data/synthetic/events.jsonl, apps/api/services/ai_gateway.py, docs/01-discovery/ai-subsystem-discovery.md]
 

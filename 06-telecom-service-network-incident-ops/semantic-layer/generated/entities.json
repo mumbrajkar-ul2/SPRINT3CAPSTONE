@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "file": "entities",
   "description": "The seven entities of this system. Six are CSV tables named in docs/domain-specific-spec.md. The seventh is the event log events.jsonl. Each field says what the cells hold today and whether the running API reads it. The API reads devices.csv only. It returns the whole device row.",
   "source": [
