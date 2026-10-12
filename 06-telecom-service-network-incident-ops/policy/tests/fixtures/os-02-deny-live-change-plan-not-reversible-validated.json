@@ -1,0 +1,17 @@
+{
+  "os-02-deny-live-change-plan-not-reversible-validated": {
+    "name": "os-02-deny-live-change-plan-not-reversible-validated",
+    "area": "operational_safety",
+    "input": {
+      "persona": "persona.automation_service",
+      "action": "action.execute",
+      "risk": "risk.live_network_change",
+      "approval_id": "APR-EXAMPLE-0001",
+      "audit_row_written": true,
+      "change_plan_ok": false
+    },
+    "expected": {
+      "decision": "deny"
+    }
+  }
+}

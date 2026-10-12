@@ -1,0 +1,29 @@
+{
+  "ai-03-recommend-only-summary": {
+    "name": "ai-03-recommend-only-summary",
+    "area": "ai_action",
+    "input": {
+      "persona": "persona.noc_operator",
+      "action": "action.summarize",
+      "resource": "resource.incident",
+      "risk": "risk.recommendation",
+      "policy_result": "allow",
+      "approval_required": false,
+      "approval_id": null,
+      "audit_row_written": true,
+      "change_plan_ok": false,
+      "record_found": true,
+      "forbidden_field_in_prompt": false,
+      "stale_topology_flag": false,
+      "output_schema_ok": true,
+      "timeout_hit": false,
+      "policy_version": "0.1.0-proposed"
+    },
+    "expected": {
+      "outcome": "RECOMMEND_ONLY",
+      "reasons": [
+        "ai_use.incident_summary"
+      ]
+    }
+  }
+}

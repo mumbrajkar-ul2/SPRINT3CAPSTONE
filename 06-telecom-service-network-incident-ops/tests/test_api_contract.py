@@ -9,7 +9,8 @@ def test_health_contract():
     assert r.json()['status'] == 'ok'
 
 def test_ai_summary_has_minimum_contract():
-    r = client.post('/ai/summarize/REC-0001')
+    # S04-06: the route now needs a role header that the policy allows.
+    r = client.post('/ai/summarize/REC-0001', headers={'X-User-Role': 'operator'})
     assert r.status_code == 200
     body = r.json()
     assert 'summary' in body

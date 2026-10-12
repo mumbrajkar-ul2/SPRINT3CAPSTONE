@@ -370,7 +370,10 @@ def test_model_today_matches_code(docs):
     assert mt["guardrail_status"] == "not_enforced"
     code = (REPO / "apps" / "api" / "services" / "ai_gateway.py").read_text(encoding="utf-8")
     assert 'MODEL_VERSION = "local-sim-v1"' in code
-    assert '"guardrail_status": "not_enforced"' in code
+    # S04-09 replaced the gateway. The live body no longer returns not_enforced.
+    # The YAML model_today block still records the state before S04-09. Stage S05R
+    # updates that block, so the old value stays asserted on the YAML side above.
+    assert '"guardrail_status": "not_enforced"' not in code
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,18 @@
+{
+  "ac-03-deny-clinician-reads-device": {
+    "name": "ac-03-deny-clinician-reads-device",
+    "area": "access",
+    "input": {
+      "role": "role.clinician",
+      "action": "action.read",
+      "resource": "resource.device",
+      "purpose": "purpose.incident_triage",
+      "scope": "scope.all_records",
+      "risk": "risk.read_only"
+    },
+    "expected": {
+      "decision": "deny",
+      "matrix_row": null
+    }
+  }
+}

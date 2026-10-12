@@ -1,0 +1,17 @@
+{
+  "os-01-allow-live-change-with-all-checks": {
+    "name": "os-01-allow-live-change-with-all-checks",
+    "area": "operational_safety",
+    "input": {
+      "persona": "persona.automation_service",
+      "action": "action.execute",
+      "risk": "risk.live_network_change",
+      "approval_id": "APR-EXAMPLE-0001",
+      "audit_row_written": true,
+      "change_plan_ok": true
+    },
+    "expected": {
+      "decision": "allow"
+    }
+  }
+}

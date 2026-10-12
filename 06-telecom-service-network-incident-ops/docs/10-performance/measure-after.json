@@ -1,0 +1,247 @@
+{
+  "label": "REAL (this machine, this run)",
+  "run_at": "2026-10-11T19:07:32",
+  "python": "3.13.5",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu_count": 8,
+  "policy_engine": "python",
+  "rounds_per_timing": 5,
+  "timings": [
+    {
+      "name": "load_record existing id",
+      "calls": 1000,
+      "rounds": 5,
+      "wall_s_median": 0.0003,
+      "per_call_ms_median": 0.0003,
+      "per_call_ms_min": 0.0003,
+      "per_call_ms_max": 0.0021,
+      "note": "reads devices.csv on every call"
+    },
+    {
+      "name": "load_record missing id",
+      "calls": 1000,
+      "rounds": 5,
+      "wall_s_median": 0.0003,
+      "per_call_ms_median": 0.0003,
+      "per_call_ms_min": 0.0003,
+      "per_call_ms_max": 0.0003,
+      "note": "reads devices.csv, scans every row, returns row 1"
+    },
+    {
+      "name": "load_record existing id, 8 threads",
+      "calls": 1000,
+      "rounds": 5,
+      "wall_s_median": 0.0153,
+      "per_call_ms_median": 0.0153,
+      "per_call_ms_min": 0.0134,
+      "per_call_ms_max": 0.0162,
+      "note": "1000 calls shared by 8 threads. Per-call is wall time divided by 1000."
+    },
+    {
+      "name": "read devices.csv into rows (no search)",
+      "calls": 1000,
+      "rounds": 5,
+      "wall_s_median": 1.7738,
+      "per_call_ms_median": 1.7738,
+      "per_call_ms_min": 1.6403,
+      "per_call_ms_max": 2.5198,
+      "note": "the part of load_record that is repeated"
+    },
+    {
+      "name": "group alarms by storm_batch_id",
+      "calls": 100,
+      "rounds": 5,
+      "wall_s_median": 0.1602,
+      "per_call_ms_median": 1.6018,
+      "per_call_ms_min": 1.4407,
+      "per_call_ms_max": 1.7326,
+      "note": "reads alarms.csv, counts by storm_batch_id"
+    },
+    {
+      "name": "group alarms by dedupe_key",
+      "calls": 100,
+      "rounds": 5,
+      "wall_s_median": 0.146,
+      "per_call_ms_median": 1.4601,
+      "per_call_ms_min": 1.4461,
+      "per_call_ms_max": 1.516,
+      "note": "reads alarms.csv, counts by dedupe_key"
+    },
+    {
+      "name": "replay events.jsonl (3000 lines, no-op handler)",
+      "calls": 20,
+      "rounds": 5,
+      "wall_s_median": 0.238,
+      "per_call_ms_median": 11.8993,
+      "per_call_ms_min": 11.7315,
+      "per_call_ms_max": 12.0987,
+      "note": "one call is the whole file",
+      "per_line_us_median": 3.966
+    },
+    {
+      "name": "shutil.which('opa') (inside every policy call)",
+      "calls": 200,
+      "rounds": 5,
+      "wall_s_median": 1.1691,
+      "per_call_ms_median": 5.8455,
+      "per_call_ms_min": 5.6165,
+      "per_call_ms_max": 6.8441,
+      "note": "searches every PATH folder. Cost depends on the machine"
+    },
+    {
+      "name": "policy.check_record_read (python engine)",
+      "calls": 200,
+      "rounds": 5,
+      "wall_s_median": 0.0024,
+      "per_call_ms_median": 0.0119,
+      "per_call_ms_min": 0.0085,
+      "per_call_ms_max": 0.0454,
+      "note": "one access decision"
+    },
+    {
+      "name": "ai_gateway.call_model (stub)",
+      "calls": 100,
+      "rounds": 5,
+      "wall_s_median": 1.0612,
+      "per_call_ms_median": 10.6116,
+      "per_call_ms_min": 10.5045,
+      "per_call_ms_max": 10.7113,
+      "note": "sleeps 0.01 s inside the stub"
+    },
+    {
+      "name": "ai_gateway.summarize_record (whole call)",
+      "calls": 100,
+      "rounds": 5,
+      "wall_s_median": 1.2901,
+      "per_call_ms_median": 12.9013,
+      "per_call_ms_min": 12.7445,
+      "per_call_ms_max": 13.1298,
+      "note": "policy twice, prompt, hash, thread pool, stub, output check"
+    },
+    {
+      "name": "route GET /health",
+      "calls": 200,
+      "rounds": 5,
+      "wall_s_median": 0.7138,
+      "per_call_ms_median": 3.5691,
+      "per_call_ms_min": 3.5043,
+      "per_call_ms_max": 5.0056,
+      "note": "no file read, no audit row"
+    },
+    {
+      "name": "route GET /records/{id}",
+      "calls": 200,
+      "rounds": 5,
+      "wall_s_median": 1.161,
+      "per_call_ms_median": 5.8048,
+      "per_call_ms_min": 5.7253,
+      "per_call_ms_max": 6.2132,
+      "note": "policy, load_record, one audit row"
+    },
+    {
+      "name": "route POST /ai/summarize/{id}",
+      "calls": 100,
+      "rounds": 5,
+      "wall_s_median": 2.9038,
+      "per_call_ms_median": 29.0379,
+      "per_call_ms_min": 28.789,
+      "per_call_ms_max": 31.3921,
+      "note": "policy, load_record, gateway, one audit row"
+    },
+    {
+      "name": "audit.write_event (one row)",
+      "calls": 1000,
+      "rounds": 5,
+      "wall_s_median": 0.594,
+      "per_call_ms_median": 0.594,
+      "per_call_ms_min": 0.5882,
+      "per_call_ms_max": 0.6373,
+      "note": "opens the log, appends one line, closes it"
+    }
+  ],
+  "load_record_peak_alloc_kib_one_call": 0.5,
+  "anyio_default_thread_limit_for_sync_routes": 40,
+  "data_facts": {
+    "devices_rows": 354,
+    "alarms_rows": 354,
+    "service_orders_rows": 354,
+    "events_lines": 3000,
+    "file_bytes": {
+      "devices.csv": 41883,
+      "alarms.csv": 41006,
+      "service_orders.csv": 24418,
+      "events.jsonl": 792328
+    },
+    "storm_batch_id_distinct_non_blank": 350,
+    "storm_batch_id_blank_rows": 1,
+    "largest_storm_size": 2,
+    "storm_size_histogram": {
+      "1": 347,
+      "2": 3
+    },
+    "largest_storm_ids": [
+      "STO-00005",
+      "STO-00013",
+      "STO-00019"
+    ],
+    "dedupe_key_distinct_non_blank": 350,
+    "dedupe_key_blank_rows": 1,
+    "dedupe_key_largest_group": 2,
+    "retry_count_rows_numeric": 353,
+    "retry_count_rows_not_numeric": 1,
+    "retry_count_sum": 943094,
+    "retry_count_min": 32,
+    "retry_count_max": 4995,
+    "retry_count_rows_at_or_above_1000": 294,
+    "events_by_flow": {
+      "Topology lookup to AI recommendation": 782,
+      "Approved remediation to validation": 771,
+      "Customer order to provisioning": 741,
+      "Alarm storm to incident correlation": 706
+    }
+  },
+  "scenarios": {
+    "label": "EDUCATIONAL",
+    "assumption": "One load_record call per alarm, per event, or per retry. No route does this today.",
+    "load_record_per_call_ms_used": 0.0003,
+    "one_thread_capacity_calls_per_minute": 200000000,
+    "storm": [
+      {
+        "multiplier_N": 1,
+        "alarms_in_storm": 2,
+        "seconds_one_thread": 0.0,
+        "fits_in_one_minute_one_thread": true
+      },
+      {
+        "multiplier_N": 10,
+        "alarms_in_storm": 20,
+        "seconds_one_thread": 0.0,
+        "fits_in_one_minute_one_thread": true
+      },
+      {
+        "multiplier_N": 100,
+        "alarms_in_storm": 200,
+        "seconds_one_thread": 0.0,
+        "fits_in_one_minute_one_thread": true
+      },
+      {
+        "multiplier_N": 1000,
+        "alarms_in_storm": 2000,
+        "seconds_one_thread": 0.0,
+        "fits_in_one_minute_one_thread": true
+      }
+    ],
+    "replay": {
+      "events": 3000,
+      "calls_per_minute_if_done_in_one_minute": 3000,
+      "seconds_one_thread_if_each_event_reads_a_record": 0.0
+    },
+    "retries": {
+      "sum_retry_count": 943094,
+      "seconds_one_thread_if_each_retry_reads_a_record": 0.3,
+      "calls_per_minute_if_spread_over_24h": 654.9,
+      "calls_per_minute_if_spread_over_1h": 15718.2
+    },
+    "storm_largest_N_that_fits_one_minute": 100000000
+  }
+}

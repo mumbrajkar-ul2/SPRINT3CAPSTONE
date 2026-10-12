@@ -1,0 +1,6 @@
+commit=unknown
+date_utc=2026-10-11T20:41:20Z
+runner=local
+os=Linux 6.18.40.1-microsoft-standard-WSL2
+python_for_venv=Python 3.11.17
+opa=Version: 1.21.1

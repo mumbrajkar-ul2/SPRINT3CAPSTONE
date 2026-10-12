@@ -1,0 +1,19 @@
+{
+  "ac-05-deny-automation-service-executes-without-approval": {
+    "name": "ac-05-deny-automation-service-executes-without-approval",
+    "area": "access",
+    "input": {
+      "role": "persona.automation_service",
+      "action": "action.execute",
+      "resource": "resource.device",
+      "purpose": "purpose.scheduled_automation",
+      "scope": "scope.assigned_incident",
+      "risk": "risk.live_network_change",
+      "approval_id": null
+    },
+    "expected": {
+      "decision": "deny",
+      "matrix_row": "TA-24"
+    }
+  }
+}

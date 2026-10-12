@@ -1,0 +1,30 @@
+{
+  "ai-04-hold-recommendation-for-review": {
+    "name": "ai-04-hold-recommendation-for-review",
+    "area": "ai_action",
+    "input": {
+      "persona": "persona.noc_operator",
+      "action": "action.recommend",
+      "resource": "resource.incident",
+      "risk": "risk.recommendation",
+      "policy_result": "allow",
+      "approval_required": true,
+      "approval_id": null,
+      "audit_row_written": true,
+      "change_plan_ok": false,
+      "record_found": true,
+      "forbidden_field_in_prompt": false,
+      "stale_topology_flag": false,
+      "output_schema_ok": true,
+      "timeout_hit": false,
+      "policy_version": "0.1.0-proposed"
+    },
+    "expected": {
+      "outcome": "HOLD_FOR_REVIEW",
+      "reasons": [
+        "ai_use.next_action_recommendation",
+        "ai_use.configuration_suggestion"
+      ]
+    }
+  }
+}

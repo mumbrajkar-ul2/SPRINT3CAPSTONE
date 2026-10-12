@@ -1,0 +1,19 @@
+{
+  "du-04-deny-noc-operator-response-sensitive-fields": {
+    "name": "du-04-deny-noc-operator-response-sensitive-fields",
+    "area": "data_use",
+    "input": {
+      "persona": "persona.noc_operator",
+      "destination": "response",
+      "fields": [
+        "field.device.device_id",
+        "field.device.mgmt_ip",
+        "field.device.credential_profile"
+      ]
+    },
+    "expected": {
+      "decision": "deny",
+      "matrix_row": null
+    }
+  }
+}

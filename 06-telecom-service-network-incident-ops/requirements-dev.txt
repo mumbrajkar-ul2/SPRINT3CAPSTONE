@@ -1,0 +1,22 @@
+# Tools that the CI pipeline and `make evidence` use. They are not needed to run the app.
+# Install order: requirements.txt first, then this file.
+#   python -m pip install -r requirements.txt -r requirements-dev.txt
+#
+# Stage S04-07 Half B. PROPOSED. Owner: Team-Force.
+# Each version is the newest on the package index on 2026-10-11 (docs/07-cicd/dependency-risk-register.md DR-17 to DR-20).
+# Packages these tools pull in are not pinned here (no lockfile). evidence/pip-freeze.txt records what each run used.
+
+# Needed by semantic-layer/build.py and semantic-layer/tests (docs/07-cicd/dependency-risk-register.md DR-09).
+jsonschema==4.26.0
+
+# Lint (stage 2).
+ruff==0.17.0
+
+# Static scan (stage 9).
+bandit==1.9.4
+
+# Dependency scan (stage 8).
+pip-audit==2.10.1
+
+# SBOM (stage 7). The command is `cyclonedx-py`.
+cyclonedx-bom==7.5.0

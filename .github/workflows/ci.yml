@@ -1,0 +1,81 @@
+# CI for 06-telecom-service-network-incident-ops.
+#
+# Stage S04-07 Half B. PROPOSED. Owner: Team-Force.
+# This file sits at the git root, because GitHub reads workflows only from here (docs/07-cicd/pipeline-improvement-plan.md CI-01).
+# Every step runs in the project folder through the default working directory below.
+#
+# One step per pipeline stage. Each stage writes its files into evidence/ (scripts/evidence.sh).
+# Every stage after the first runs even when an earlier stage failed, so evidence/ is as complete as it can be.
+# A failed stage still fails the job. No step uses continue-on-error, and no scan is switched off.
+# The last step uploads evidence/ as a workflow artifact.
+name: workshop-ci
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+env:
+  OPA_VERSION: "1.21.1"
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 06-telecom-service-network-incident-ops
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+
+      # opa runs the 30 Rego tests and 2 Rego-versus-Python tests (CI-12). The version is the one S04-06 passed on.
+      # The checksum file comes from the same release page. It catches a damaged download, not a replaced release.
+      - name: Install opa
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/opa_linux_amd64_static" "https://github.com/open-policy-agent/opa/releases/download/v${OPA_VERSION}/opa_linux_amd64_static"
+          curl -fsSL -o "$RUNNER_TEMP/opa_linux_amd64_static.sha256" "https://github.com/open-policy-agent/opa/releases/download/v${OPA_VERSION}/opa_linux_amd64_static.sha256"
+          (cd "$RUNNER_TEMP" && sha256sum -c opa_linux_amd64_static.sha256)
+          sudo install -m 0755 "$RUNNER_TEMP/opa_linux_amd64_static" /usr/local/bin/opa
+          opa version
+
+      - name: "Stage 0 prepare"
+        run: bash scripts/evidence.sh prepare
+      - name: "Stage 1 install"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh install
+      - name: "Stage 2 lint (ruff)"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh lint
+      - name: "Stage 3 unit and characterization tests"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh tests
+      - name: "Stage 4 semantic-layer tests"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh semantic_layer
+      - name: "Stage 5 policy tests (pytest and opa test)"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh policy
+      - name: "Stage 6 security tests (secret-pattern test)"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh security
+      - name: "Stage 7 SBOM (CycloneDX)"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh sbom
+      - name: "Stage 8 dependency scan (pip-audit)"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh pip_audit
+      - name: "Stage 9 static scan (bandit)"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh bandit
+      - name: "Stage 10 source checksums"
+        if: ${{ !cancelled() }}
+        run: bash scripts/evidence.sh checksums
+
+      # Stage 12. The path is from the workspace root, because `uses` steps ignore working-directory.
+      - name: "Stage 12 upload evidence"
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-${{ github.sha }}
+          path: 06-telecom-service-network-incident-ops/evidence/
+          if-no-files-found: error

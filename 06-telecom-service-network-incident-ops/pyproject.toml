@@ -1,6 +1,9 @@
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests"]
+testpaths = ["tests", "policy/tests"]
+markers = [
+    "security: scans committed files for secret values and secret patterns, and runs the AI guardrail tests",
+]
 
 [project]
 name = "06-telecom-service-network-incident-ops"

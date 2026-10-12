@@ -1,0 +1,11 @@
+install=0
+lint=1
+tests=0
+semantic_layer=0
+opa=0
+policy=0
+security=0
+sbom=0
+pip_audit=1
+bandit=1
+checksums=0

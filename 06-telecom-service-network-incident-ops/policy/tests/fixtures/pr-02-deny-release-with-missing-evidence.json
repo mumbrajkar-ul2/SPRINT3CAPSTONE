@@ -1,0 +1,18 @@
+{
+  "pr-02-deny-release-with-missing-evidence": {
+    "name": "pr-02-deny-release-with-missing-evidence",
+    "area": "production_readiness",
+    "input": {
+      "evidence_sections_missing": [
+        "policy_as_code_evidence",
+        "ci_cd_and_supply_chain_evidence"
+      ],
+      "policy_tests_result": "not_run",
+      "secret_pattern_test_result": "pass",
+      "ci_run_seen": false
+    },
+    "expected": {
+      "decision": "deny"
+    }
+  }
+}

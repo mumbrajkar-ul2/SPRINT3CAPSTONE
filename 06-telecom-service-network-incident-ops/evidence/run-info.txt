@@ -1,0 +1,8 @@
+commit=5f4a6185ab0aeaee8c0e7a20fe8ddc6fe68cd395
+date_utc=2026-10-11T20:32:21Z
+runner=local
+os=Microsoft Windows NT 10.0.26200.0
+python_for_venv=Python 3.13.5
+python_in_venv=Python 3.13.5
+opa=not on PATH
+opa_image=openpolicyagent/opa:1.21.1

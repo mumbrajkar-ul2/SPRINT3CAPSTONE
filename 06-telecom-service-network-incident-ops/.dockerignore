@@ -1,0 +1,11 @@
+.venv
+.git
+**/__pycache__
+**/*.pyc
+.pytest_cache
+logs
+**/node_modules
+.env
+.env.local
+generated-env.txt
+**/.terraform

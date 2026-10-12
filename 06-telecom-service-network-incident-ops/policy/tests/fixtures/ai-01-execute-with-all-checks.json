@@ -1,0 +1,29 @@
+{
+  "ai-01-execute-with-all-checks": {
+    "name": "ai-01-execute-with-all-checks",
+    "area": "ai_action",
+    "input": {
+      "persona": "persona.automation_service",
+      "action": "action.execute",
+      "resource": "resource.device",
+      "risk": "risk.live_network_change",
+      "policy_result": "allow",
+      "approval_required": true,
+      "approval_id": "APR-EXAMPLE-0001",
+      "audit_row_written": true,
+      "change_plan_ok": true,
+      "record_found": true,
+      "forbidden_field_in_prompt": false,
+      "stale_topology_flag": false,
+      "output_schema_ok": true,
+      "timeout_hit": false,
+      "policy_version": "0.1.0-proposed"
+    },
+    "expected": {
+      "outcome": "EXECUTE",
+      "reasons": [
+        "ai_use.remediation_execution"
+      ]
+    }
+  }
+}

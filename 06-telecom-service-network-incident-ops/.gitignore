@@ -1,0 +1,53 @@
+# .gitignore for 06-telecom-service-network-incident-ops
+# Written in stage S04-05 follow-up. PROPOSED. Owner: Team-Force.
+# A line here only affects files git does not track yet.
+# Files already tracked need "git rm --cached <path>" to leave the repo.
+
+# --- Python virtual environments and caches ---
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# --- Runtime output written by the app and the tests ---
+# apps/api/services/audit.py appends to logs/audit.log on every audited call.
+logs/
+
+# --- Settings and secrets ---
+# Keep .env.example. It holds names and the placeholder CHANGE_ME only.
+.env
+.env.*
+!.env.example
+
+# --- Terraform ---
+# Keep infra/terraform/.terraform.lock.hcl. It pins the provider version.
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+*.tfvars.json
+generated-env.txt
+
+# --- Node and Playwright (apps/web) ---
+node_modules/
+apps/web/dist/
+.angular/
+playwright-report/
+test-results/
+
+# --- Editors and operating systems ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

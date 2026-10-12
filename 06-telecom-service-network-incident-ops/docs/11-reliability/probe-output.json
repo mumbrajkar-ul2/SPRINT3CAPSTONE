@@ -1,0 +1,304 @@
+{
+  "meta": {
+    "run_at": "2026-10-11T19:27:30",
+    "python": "3.13.5",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpus": 8
+  },
+  "results": {
+    "D1_alarms": {
+      "rows": 354,
+      "last_seen_before_first_seen": 166,
+      "unreadable_timestamp_rows": [
+        "ALA-BAD1"
+      ],
+      "ALA-00002_file_line": 3,
+      "blank_dedupe_key_rows": 1,
+      "dedupe_keys_seen_more_than_once": {
+        "DED-00005": 2,
+        "DED-00013": 2,
+        "DED-00019": 2
+      },
+      "dedupe_key_and_storm_batch_both_equal_more_than_once": {
+        "DED-00005|STO-00005": 2,
+        "DED-00013|STO-00013": 2,
+        "DED-00019|STO-00019": 2
+      },
+      "alarm_ids_seen_more_than_once": {
+        "ALA-00004": 2,
+        "ALA-00013": 2,
+        "ALA-00019": 2
+      }
+    },
+    "D2_service_orders": {
+      "rows": 354,
+      "retry_count_numeric_rows": 353,
+      "retry_count_blank_rows": [
+        "SER-BAD1"
+      ],
+      "retry_count_sum": 943094,
+      "retry_count_at_or_above_1000": 294,
+      "order_ids_seen_more_than_once": {
+        "ORD-00004": 2,
+        "ORD-00013": 2,
+        "ORD-00019": 2
+      },
+      "order_id_and_retry_count_both_equal_more_than_once": {
+        "ORD-00013|3061": 2,
+        "ORD-00019|3246": 2
+      },
+      "rows_with_same_order_id_and_different_retry_count": 1
+    },
+    "D3_events": {
+      "lines": 3000,
+      "field_names": [
+        "actor",
+        "business_entity",
+        "correlation_id",
+        "cost_units",
+        "event_id",
+        "event_type",
+        "latency_ms",
+        "payload_hash",
+        "severity"
+      ],
+      "has_a_sequence_field": false,
+      "distinct_event_id": 3000,
+      "correlation_id_filled": 1008,
+      "correlation_id_blank_or_null": 1992,
+      "distinct_payload_hash": 3000,
+      "payload_hash_seen_more_than_once": 0,
+      "chains_with_two_lines_sharing_a_payload_hash": 0,
+      "ids_with_more_than_one_line": 288
+    },
+    "D4_devices_stale_flag": {
+      "false": 161,
+      "true": 192,
+      "<blank>": 1
+    },
+    "P1_missing_correlation_id": {
+      "status": 200,
+      "response_header_is_uuid": true,
+      "sent_value_kept": "demo-123",
+      "blank_value_replaced_by_uuid": true,
+      "health_writes_an_audit_row": false
+    },
+    "P1b_record_read_audit_row_has_correlation_id": {
+      "rows": 1,
+      "correlation_id_filled": true
+    },
+    "P2_ai_timeout": {
+      "status": 202,
+      "outcome": "HOLD_FOR_REVIEW",
+      "reasons": [
+        "failmode.schema_failure",
+        "failmode.timeout"
+      ],
+      "summary": null,
+      "recommendation": null,
+      "elapsed_ms": 116,
+      "health_status": 200,
+      "record_read_status": 200,
+      "audit_actions": [
+        "policy.hold",
+        "record.read"
+      ],
+      "audit_outcome": "HOLD_FOR_REVIEW"
+    },
+    "P3_model_connection_refused": {
+      "status": 202,
+      "outcome": "HOLD_FOR_REVIEW",
+      "reasons": [
+        "failmode.schema_failure"
+      ],
+      "summary": null
+    },
+    "P4_five_identical_summarize_calls": {
+      "status_codes": [
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "model_calls": 5,
+      "audit_rows": 5,
+      "audit_rows_with_that_correlation_id": 5,
+      "alarm_incident_or_order_writers_in_apps": 0
+    },
+    "P5_thread_use_while_the_model_hangs": {
+      "summaries_sent": 50,
+      "route_thread_limit": 40,
+      "model_wait_s": 3.0,
+      "timeout_s": 1.5,
+      "health_idle_ms_max": 9.4,
+      "record_read_idle_ms_max": 11.3,
+      "health_during_hang": [
+        [
+          200,
+          823
+        ],
+        [
+          200,
+          826
+        ],
+        [
+          200,
+          828
+        ]
+      ],
+      "record_read_during_hang": [
+        [
+          200,
+          836
+        ],
+        [
+          200,
+          835
+        ],
+        [
+          200,
+          829
+        ]
+      ],
+      "summary_status_counts": {
+        "202": 50
+      },
+      "process_threads_before": 3,
+      "process_threads_during": 138,
+      "process_threads_just_after_all_returned": 76,
+      "process_threads_3s_later": 1
+    },
+    "P6_policy_engine_unavailable": {
+      "opa_on_path": false,
+      "record_read_status": 403,
+      "record_read_body": {
+        "error": "forbidden"
+      },
+      "summary_status": 403,
+      "summary_body": {
+        "error": "forbidden"
+      },
+      "health_status": 200,
+      "decision": {
+        "allow": false,
+        "matrix_rows": [],
+        "reasons": [
+          "policy_engine_error"
+        ]
+      },
+      "audit_actions": [
+        "policy.deny",
+        "policy.deny"
+      ],
+      "audit_row_has_the_reason": false
+    },
+    "P7_devices_csv_missing": {
+      "record_read_status": 500,
+      "record_read_body": "Internal Server Error",
+      "record_read_has_correlation_header": false,
+      "summary_status": 500,
+      "model_calls": 0,
+      "health_status": 200,
+      "audit_rows_written": 0
+    },
+    "P7b_devices_csv_has_header_only": {
+      "record_read_status": 200,
+      "record_read_body": {
+        "error": "missing"
+      },
+      "summary_status": 403,
+      "summary_outcome": "BLOCK",
+      "summary_reasons": [
+        "failmode.missing_id"
+      ]
+    },
+    "P8_audit_log_unwritable": {
+      "record_read_status": 500,
+      "record_read_body_has_device_data": false,
+      "summary_status": 500,
+      "summary_body_has_summary_text": false,
+      "model_calls_before_the_failure": 1,
+      "health_status": 200,
+      "has_correlation_header_on_500": false
+    },
+    "P9_concurrent_audit_writes_3_rounds_8_threads": [
+      {
+        "rows_expected": 2000,
+        "lines_in_file": 1893,
+        "lines_that_do_not_parse": 2,
+        "distinct_rows_recovered": 1891,
+        "rows_lost": 109
+      },
+      {
+        "rows_expected": 2000,
+        "lines_in_file": 1931,
+        "lines_that_do_not_parse": 2,
+        "distinct_rows_recovered": 1929,
+        "rows_lost": 71
+      },
+      {
+        "rows_expected": 2000,
+        "lines_in_file": 1919,
+        "lines_that_do_not_parse": 4,
+        "distinct_rows_recovered": 1915,
+        "rows_lost": 85
+      }
+    ],
+    "P10_stale_topology_flag": {
+      "true": {
+        "device": "DEV-00003",
+        "record_read_status": 200,
+        "record_read_shows_flag_value": "true",
+        "summary_status": 403,
+        "summary_outcome": "BLOCK",
+        "summary_reasons": [
+          "failmode.stale_topology_true",
+          "rule.stale_topology_blocks_recommendation"
+        ],
+        "summary_text": null
+      },
+      "false": {
+        "device": "DEV-00002",
+        "record_read_status": 200,
+        "record_read_shows_flag_value": "false",
+        "summary_status": 200,
+        "summary_outcome": "RECOMMEND_ONLY",
+        "summary_reasons": [
+          "ai_use.incident_summary"
+        ],
+        "summary_text": "SIMULATED probe summary"
+      },
+      "blank": {
+        "device": "DEV-BAD1",
+        "record_read_status": 200,
+        "record_read_shows_flag_value": "",
+        "summary_status": 202,
+        "summary_outcome": "HOLD_FOR_REVIEW",
+        "summary_reasons": [
+          "failmode.stale_topology_blank"
+        ],
+        "summary_text": null
+      }
+    },
+    "P11a_etl_blank_short_long_rows": {
+      "exit_code": 0,
+      "stdout": "{'processed': 6, 'malformed': 1, 'sample': True}",
+      "stderr_last_line": "",
+      "rows_written": 6,
+      "rows_that_are_bad": 3
+    },
+    "P11b_etl_line_that_is_not_utf8": {
+      "exit_code": 1,
+      "stdout": "",
+      "stderr_last_line": "UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 588: invalid start byte",
+      "rows_written": 7
+    },
+    "P11c_etl_file_missing": {
+      "exit_code": 1,
+      "stdout": "",
+      "stderr_last_line": "FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\mange\\\\AppData\\\\Local\\\\Temp\\\\tmphewjvgof\\\\etl_tree\\\\data\\\\synthetic\\\\devices.csv'"
+    },
+    "Z_repo_audit_log_bytes_changed": 0
+  }
+}

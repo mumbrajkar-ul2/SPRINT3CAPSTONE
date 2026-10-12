@@ -1,0 +1,428 @@
+{
+  "_comment": "One copy of the tables that access.rego, ai_action.rego, and apps/api/services/policy.py all read. Rows TA-01 to TA-34 are copied from docs/03-identity/target-access-matrix.md. Every grant is PROPOSED. Owner: Team-Force (operating-contract.md row 10).",
+  "access_matrix": {
+    "_comment": "persona_of: live API role ids that stand for a persona. mapping_label is Inference in access-semantics.yaml api_roles_today. role.admin and role.clinician have no persona, so they match no row. denied_actions: the denied list for each persona in access-semantics.yaml. A row that matches is still refused when its action is on this list.",
+    "persona_of": {
+      "role.operator": "persona.noc_operator",
+      "role.engineer": "persona.network_engineer",
+      "role.ai_agent": "persona.ai_agent"
+    },
+    "denied_actions": {
+      "persona.noc_operator": [
+        "action.execute"
+      ],
+      "persona.network_engineer": [
+        "action.execute"
+      ],
+      "persona.field_engineer": [
+        "action.approve",
+        "action.execute",
+        "action.write"
+      ],
+      "persona.customer_support": [
+        "action.approve",
+        "action.execute",
+        "action.write",
+        "action.recommend"
+      ],
+      "persona.automation_service": [
+        "action.approve"
+      ],
+      "persona.vendor_account": [
+        "action.approve",
+        "action.execute",
+        "action.write",
+        "action.recommend"
+      ],
+      "persona.ai_agent": [
+        "action.approve",
+        "action.execute",
+        "action.write"
+      ]
+    },
+    "grants": [
+      {
+        "row": "TA-01",
+        "role": "persona.noc_operator",
+        "action": "action.read",
+        "resource": "resource.device",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-02",
+        "role": "persona.noc_operator",
+        "action": "action.read",
+        "resource": "resource.alarm",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-03",
+        "role": "persona.noc_operator",
+        "action": "action.read",
+        "resource": "resource.incident",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-04",
+        "role": "persona.noc_operator",
+        "action": "action.read",
+        "resource": "resource.circuit",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-05",
+        "role": "persona.noc_operator",
+        "action": "action.summarize",
+        "resource": "resource.incident",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-06",
+        "role": "persona.noc_operator",
+        "action": "action.summarize",
+        "resource": "resource.device",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-07",
+        "role": "persona.noc_operator",
+        "action": "action.recommend",
+        "resource": "resource.incident",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-08",
+        "role": "persona.noc_operator",
+        "action": "action.recommend",
+        "resource": "resource.device",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-09",
+        "role": "persona.noc_operator",
+        "action": "action.approve",
+        "resource": "resource.ai_invocation",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.decision"
+      },
+      {
+        "row": "TA-10",
+        "role": "persona.noc_operator",
+        "action": "action.write",
+        "resource": "resource.incident",
+        "purpose": "purpose.incident_triage",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.decision"
+      },
+      {
+        "row": "TA-11",
+        "role": "persona.network_engineer",
+        "action": "action.read",
+        "resource": "resource.device",
+        "purpose": "purpose.network_change_planning",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-12",
+        "role": "persona.network_engineer",
+        "action": "action.read",
+        "resource": "resource.circuit",
+        "purpose": "purpose.network_change_planning",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-13",
+        "role": "persona.network_engineer",
+        "action": "action.read",
+        "resource": "resource.alarm",
+        "purpose": "purpose.network_change_planning",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-14",
+        "role": "persona.network_engineer",
+        "action": "action.read",
+        "resource": "resource.incident",
+        "purpose": "purpose.network_change_planning",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-15",
+        "role": "persona.network_engineer",
+        "action": "action.read",
+        "resource": "resource.sensitive_device_fields",
+        "purpose": "purpose.network_change_planning",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-16",
+        "role": "persona.network_engineer",
+        "action": "action.recommend",
+        "resource": "resource.device",
+        "purpose": "purpose.network_change_planning",
+        "scope": "scope.all_records",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-17",
+        "role": "persona.network_engineer",
+        "action": "action.approve",
+        "resource": "resource.approval",
+        "purpose": "purpose.network_change_planning",
+        "scope": "scope.all_records",
+        "risk": "risk.decision"
+      },
+      {
+        "row": "TA-18",
+        "role": "persona.field_engineer",
+        "action": "action.read",
+        "resource": "resource.device",
+        "purpose": "purpose.field_repair",
+        "scope": "scope.one_site",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-19",
+        "role": "persona.field_engineer",
+        "action": "action.read",
+        "resource": "resource.alarm",
+        "purpose": "purpose.field_repair",
+        "scope": "scope.one_site",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-20",
+        "role": "persona.customer_support",
+        "action": "action.read",
+        "resource": "resource.circuit",
+        "purpose": "purpose.customer_enquiry",
+        "scope": "scope.one_customer",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-21",
+        "role": "persona.customer_support",
+        "action": "action.read",
+        "resource": "resource.service_order",
+        "purpose": "purpose.customer_enquiry",
+        "scope": "scope.one_customer",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-22",
+        "role": "persona.customer_support",
+        "action": "action.read",
+        "resource": "resource.incident",
+        "purpose": "purpose.customer_enquiry",
+        "scope": "scope.one_customer",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-23",
+        "role": "persona.automation_service",
+        "action": "action.read",
+        "resource": "resource.device",
+        "purpose": "purpose.scheduled_automation",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-24",
+        "role": "persona.automation_service",
+        "action": "action.execute",
+        "resource": "resource.device",
+        "purpose": "purpose.scheduled_automation",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.live_network_change"
+      },
+      {
+        "row": "TA-25",
+        "role": "persona.automation_service",
+        "action": "action.execute",
+        "resource": "resource.circuit",
+        "purpose": "purpose.scheduled_automation",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.live_network_change"
+      },
+      {
+        "row": "TA-26",
+        "role": "persona.vendor_account",
+        "action": "action.read",
+        "resource": "resource.device",
+        "purpose": "purpose.vendor_support",
+        "scope": "scope.own_vendor_devices",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-27",
+        "role": "persona.vendor_account",
+        "action": "action.read",
+        "resource": "resource.alarm",
+        "purpose": "purpose.vendor_support",
+        "scope": "scope.own_vendor_devices",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-28",
+        "role": "persona.ai_agent",
+        "action": "action.read",
+        "resource": "resource.device",
+        "purpose": "purpose.ai_assistance",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-29",
+        "role": "persona.ai_agent",
+        "action": "action.read",
+        "resource": "resource.alarm",
+        "purpose": "purpose.ai_assistance",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-30",
+        "role": "persona.ai_agent",
+        "action": "action.read",
+        "resource": "resource.incident",
+        "purpose": "purpose.ai_assistance",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.read_only"
+      },
+      {
+        "row": "TA-31",
+        "role": "persona.ai_agent",
+        "action": "action.summarize",
+        "resource": "resource.incident",
+        "purpose": "purpose.ai_assistance",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-32",
+        "role": "persona.ai_agent",
+        "action": "action.summarize",
+        "resource": "resource.device",
+        "purpose": "purpose.ai_assistance",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-33",
+        "role": "persona.ai_agent",
+        "action": "action.recommend",
+        "resource": "resource.incident",
+        "purpose": "purpose.ai_assistance",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-34",
+        "role": "persona.ai_agent",
+        "action": "action.recommend",
+        "resource": "resource.device",
+        "purpose": "purpose.ai_assistance",
+        "scope": "scope.assigned_incident",
+        "risk": "risk.recommendation"
+      }
+    ]
+  },
+  "ai_action_tables": {
+    "_comment": "Value lists for ai_action.rego. policy_version is PROPOSED. Owner: Team-Force. resources_for and risk_for are the resources and risks on the grants in access-semantics.yaml.",
+    "policy_version": "0.1.0-proposed",
+    "ai_actions": [
+      "action.summarize",
+      "action.recommend",
+      "action.execute"
+    ],
+    "resources_for": {
+      "action.summarize": [
+        "resource.incident",
+        "resource.device"
+      ],
+      "action.recommend": [
+        "resource.incident",
+        "resource.device"
+      ],
+      "action.execute": [
+        "resource.device",
+        "resource.circuit"
+      ]
+    },
+    "risk_for": {
+      "action.summarize": "risk.recommendation",
+      "action.recommend": "risk.recommendation",
+      "action.execute": "risk.live_network_change"
+    },
+    "known_callers": [
+      "persona.noc_operator",
+      "persona.network_engineer",
+      "persona.field_engineer",
+      "persona.customer_support",
+      "persona.automation_service",
+      "persona.vendor_account",
+      "persona.ai_agent",
+      "role.admin",
+      "role.operator",
+      "role.clinician",
+      "role.engineer",
+      "role.ai_agent"
+    ],
+    "required_keys": [
+      "persona",
+      "action",
+      "resource",
+      "risk",
+      "policy_result",
+      "approval_required",
+      "approval_id",
+      "audit_row_written",
+      "change_plan_ok",
+      "record_found",
+      "forbidden_field_in_prompt",
+      "stale_topology_flag",
+      "output_schema_ok",
+      "timeout_hit",
+      "policy_version"
+    ],
+    "outcome_for_action": {
+      "action.summarize": "RECOMMEND_ONLY",
+      "action.recommend": "HOLD_FOR_REVIEW",
+      "action.execute": "EXECUTE"
+    },
+    "reasons_for_action": {
+      "action.summarize": [
+        "ai_use.incident_summary"
+      ],
+      "action.recommend": [
+        "ai_use.next_action_recommendation",
+        "ai_use.configuration_suggestion"
+      ],
+      "action.execute": [
+        "ai_use.remediation_execution"
+      ]
+    }
+  }
+}

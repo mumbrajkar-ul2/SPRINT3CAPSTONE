@@ -1,0 +1,18 @@
+{
+  "ac-02-allow-ai-agent-recommends-incident": {
+    "name": "ac-02-allow-ai-agent-recommends-incident",
+    "area": "access",
+    "input": {
+      "role": "persona.ai_agent",
+      "action": "action.recommend",
+      "resource": "resource.incident",
+      "purpose": "purpose.ai_assistance",
+      "scope": "scope.assigned_incident",
+      "risk": "risk.recommendation"
+    },
+    "expected": {
+      "decision": "allow",
+      "matrix_row": "TA-33"
+    }
+  }
+}

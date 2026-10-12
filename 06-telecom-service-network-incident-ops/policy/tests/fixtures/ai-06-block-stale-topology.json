@@ -1,0 +1,30 @@
+{
+  "ai-06-block-stale-topology": {
+    "name": "ai-06-block-stale-topology",
+    "area": "ai_action",
+    "input": {
+      "persona": "persona.noc_operator",
+      "action": "action.recommend",
+      "resource": "resource.device",
+      "risk": "risk.recommendation",
+      "policy_result": "allow",
+      "approval_required": true,
+      "approval_id": null,
+      "audit_row_written": true,
+      "change_plan_ok": false,
+      "record_found": true,
+      "forbidden_field_in_prompt": false,
+      "stale_topology_flag": true,
+      "output_schema_ok": null,
+      "timeout_hit": false,
+      "policy_version": "0.1.0-proposed"
+    },
+    "expected": {
+      "outcome": "BLOCK",
+      "reasons": [
+        "failmode.stale_topology_true",
+        "rule.stale_topology_blocks_recommendation"
+      ]
+    }
+  }
+}

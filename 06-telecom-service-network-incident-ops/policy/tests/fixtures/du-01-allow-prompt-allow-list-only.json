@@ -1,0 +1,22 @@
+{
+  "du-01-allow-prompt-allow-list-only": {
+    "name": "du-01-allow-prompt-allow-list-only",
+    "area": "data_use",
+    "input": {
+      "persona": "persona.ai_agent",
+      "destination": "prompt",
+      "fields": [
+        "field.device.device_id",
+        "field.device.hostname",
+        "field.device.vendor",
+        "field.device.stale_topology_flag",
+        "field.alarm.alarm_id",
+        "field.alarm.severity"
+      ]
+    },
+    "expected": {
+      "decision": "allow",
+      "reasons": []
+    }
+  }
+}

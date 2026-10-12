@@ -1,65 +1,78 @@
+**Model:** Claude Sonnet 5.5
 
-*** Introduction of S03F and S05R STAGES for RECURRING ***
-CURSOR:
-I've written `playbook/S03F-semantic-layer-fixes.md` and linked it from every file that describes the review loop. Nothing under `semantic-layer/` was changed; applying those fixes is S03F's job.
+### User
 
-One change from what I said last turn. I said S03F would write an ADR (a short written decision record) for each fix once the version is above `1.0.0`. Instead, S03F always keeps the version, and it stops running once the PRD cites that version. After that, a change goes through S05R with an ADR. The reason is S08: it checks that the semantic-layer version matches the PRD header and the S05R revision file. Changing the tree after S06 without raising the version would break that check.
+what is the intent of running S04-03 through S04-12 steps? to modernize the code with each stage? or prepare .md files that incorporate the modernization aspects that will be applied to the code through the creation of the prd in S06?
 
-**What S03F does:**
-- It reads the numbered "Fixes required" list from the newest review file. That is `semantic-layer-review.md`, or `semantic-layer-revision.md` once S05R has run.
-- It applies only those fixes and keeps the version. Then it rebuilds, runs the tests, and runs the S03 glossary done test.
-- It records each round as "Round N" in a new file, `docs/02-baseline/semantic-layer-fixes.md`. S03R overwrites its review file on every run, so this file keeps the history.
-- The only part you edit is the "Decisions for this round" block at the top of the prompt. If a fix needs a choice that isn't recorded there, S03F skips that fix and reports BLOCKED.
+### Assistant
 
-**Files updated:**
-- **`playbook/README.md`:**
-  - A new S03F row in the stage table. The S03R and S06 "Depends on" cells now include S03F.
-  - How-to step 6 now says how to clear a failed review.
-  - A paragraph on S03F in the review section.
-  - A new line in the D3 checklist item.
-- **`playbook/README(the failure list).md`:** the same paragraph and checklist line, so the copy you attach to review chats matches.
-- **`playbook/S03R-semantic-layer-review.md`:** fixes must be numbered. Any fix you must decide is marked "Choice needed". The done test and the lifecycle section now point to S03F.
-- **`playbook/S05R-semantic-layer-revision.md`:** when its rerun S03R rows fail, it now writes a numbered fix list. The loop then runs S03F and S03R before S06.
-- **`Execution Plan.md`:**
-  - the phase diagram label
-  - the stage list
-  - the review paragraph
-  - the Phase 3 lifecycle and gate
-  - the Phase 5R steps
-- **`Project_Intent.md`** and its Appendix E excerpt: one paragraph on the fix loop.
-- **`Telecom Application Modernization.md`:** the semantic-layer row names S03F.
-- **`docs/02-baseline/semantic-layer-review.md`:** the fix list now points to S03F. Fix 4 is marked "Choice needed" with options A and B.
-- **`playbook/STATUS.md`:** the S03R note now says "run S03F", and there is a new row for this playbook change.
+It is both, but not in the order you describe. The project documents say each S04 stage produces documents first and then a small code change. The PRD in S06 is written after those code changes, and it does not carry them.
 
-I left `operating-contract.md` alone, because its row 7 already covers your review of each change. S06 and S08 also stay as they are, because S03F keeps the version they cite.
+**What each S04 stage does**
 
-This turn is added to `transcript/chat_transcript.md`.
+`Execution Plan.md` (Phase 4, lines 269 to 276) splits every stage into two gated halves:
 
-**Next step:** open a new chat and attach the S03F inputs. Fill the Decisions block with your choice for fix 4, for example `Fix 4: Option A.` 
+- Half A (analyse and design). It writes the documents under `docs/NN-<challenge>/`. No code changes. The stage needs PASS or CONDITIONAL PASS before Half B starts.
+- Half B (implement and prove). It makes the code change that Half A named. It adds a test and records before and after evidence. The plan says code changes stay "small and reviewable".
+
+So S04-03 through S04-12 do modernize the existing code, a little at a time. S04-10 is one example: Half A wrote the six documents. Half B changed `domain_service.py` and `policy.py` and added 18 tests.
+
+**What the documents are for**
+
+Half A documents also feed later stages. The plan says each stage "feeds Phase 5, Phase 5R, Phase 6, and Phase 9":
+
+- S05R. Any term a design needs that the semantic layer lacks goes in as an "Open question for S03" line. S05R folds these into the YAML and raises the version.
+- S06 (the PRD). Its input list names design files from S04, for example `target-access-matrix.md`, `ai-action-policy-design.md`, and `degraded-mode-design.md`. The plan says the PRD "can then require controls that already have a design".
+
+**What S06 and S07 do**
+
+- S06 writes `docs/prd/prd.md` and `traceability.md`. The PRD says what the governed application must do. It lists routes to build (such as `/alarms/storms/{id}`, `/ai/recommend/{id}`, `/approvals/{id}`, and `/audit/{correlation_id}`) and routes it will not build. S06 itself changes no code.
+- S07 builds the application "only from the PRD". It adds new capability on top of the code that S04 already hardened.
+
+**Where your two readings fit**
+
+| Your reading | Verdict |
+|---|---|
+| Modernize the code with each stage | True for Half B of each S04 stage. The change is small. |
+| Prepare `.md` files that the PRD uses to apply the modernization in S06 | Half true. The `.md` files feed the PRD, but the code change is not deferred to S06. S06 writes requirements, and S07 builds the new flow. |
+
+There is one exception. S04-03 through S04-12 harden the controls (access, secrets, policy, logging, AI limits, speed, failure handling). The new product flow (the storm view, the recommend route, the approval route) is built in S07, not in Phase 4.
 
 
-*** will S03R, S03F and S05R stages need to be iterated multiple times? ***
-CURSOR:
-Yes, they can repeat. The playbook does not limit how many times. Each stage repeats for a different reason.
+## 2026-10-11 19:50
 
-**S03R and S03F repeat until the review passes.** One round is: run S03F, then run S03R again in a fresh chat. Expect one or two rounds this time. The seven fixes are small, and each one names its files and lines. A second round happens in two cases:
-- The new reviewer finds something the first reviewer missed. This can happen because a fresh chat has no memory of the earlier review.
-- A fix creates a new problem. For example, a new glossary row might not match the YAML.
+**Model:** Claude Sonnet 5.5
 
-**S05R normally runs once.** It runs after S05-14 and raises the version, for example to `1.1.0`. Two things can bring it back:
-- **Its own rerun S03R rows fail.** Then S03F and S03R run again at the S05R version. S05R itself does not run again.
-- **S06 finds a term the YAML lacks.** `S06-prd.md` says to stop, write an "Open question for S03" line, and run S05R again. Each S05R run raises the version, for example to `1.2.0`. The S03R rows are checked again, and S03F runs if any fail.
+### User
 
-The longest realistic path looks like this:
-1. Two S03F and S03R rounds before S04.
-2. One S05R run, perhaps followed by one more S03F round.
-3. One more S05R run if the PRD finds a missing term.
+what is the difference between the hardening that takes place in the S04-03 through S04-12 versus the new capabilities that S07 adds? What did we not do the hardening and new capabilities all at once as part of S06-S07 using the analysis and design outputs (of all the Half As) done in S04-03 through S04-12?
 
-After S06 cites a version, S03F stops running. Every later change goes through S05R with an ADR.
+### Assistant
 
-**Nothing in the playbook stops the loop.** A reviewer could find small issues round after round. You could add a cap to S03F, for example: "If round 3 still has a FAIL, stop. The owner decides whether to accept the remaining FAIL rows as named risks or change the check." That decision would go in `STATUS.md` and in the review file's header.
+The plan does not state one reason for the split. The reasons below come from its rules and from what happened in S04-10.
 
-Do you want me to add that cap to S03F and the README?
+**The difference**
 
-This turn is added to `transcript/chat_transcript.md`.
+| | S04-03 to S04-12 Half B (hardening) | S07 (new capability) |
+|---|---|---|
+| What it changes | The code that already exists: `main.py`, `domain_service.py`, `ai_gateway.py`, `audit.py`, `access.rego` | New code under the PRD's route list |
+| Size | "Small and reviewable", one challenge at a time | The whole governed demo flow (topology lookup plus alarm-storm dedupe) |
+| Source | The Half A design for that one challenge | The PRD and the S05R YAML version only |
+| Output | A code fix, a test, and before and after evidence | The application, which the tests then run against |
+| Example (S04-10) | Load `devices.csv` once and cache the policy program lookup. `GET /records` went from about 14 ms to about 6 ms. | A storm view that groups alarms by `storm_batch_id`, which no current route does |
 
+**Why not do both in S06 and S07**
+
+1. The Half B tests are inputs to S07. The phase table in `Execution Plan.md` (line 94) lists "Phase 4 Half B tests" as an input to Phase 7. Line 106 says the second model's app runs the same tests as the first. Without Half B, those tests would not exist when S07 starts.
+2. Half B checks whether a Half A design works. In S04-10, Half A named the CSV read as the main cost. Half B's measurement showed the policy program lookup cost more on each route. Half B also found that matching ids on `device_id` alone changes what `load_record` returns for ids like `SIT-00002`. A PRD written straight from Half A would have required the wrong fix. The plan says the PRD can require only controls that already have a design, and Half B shows that the design holds against real code.
+3. A failure in a combined build has many possible causes. If S07 hardened and built together, a failing test could come from the design, the PRD wording, the model's build, or the old code. Hardening first removes the old code from that list.
+4. The second model needs a fixed starting point. S08 gives another model the same PRD and the same YAML, then compares results. That comparison only means something if both builds start from the same hardened baseline. S05R also has to fold every "Open question for S03" line into the YAML before the PRD cites it.
+5. The playbook requires the evidence. The final checklist item D4 asks for a Half A design and Half B evidence for every Phase 4 challenge. A combined S07 would leave no per-challenge before and after record.
+6. Changes stay small. Line 274 says a characterization test that locks a defect is replaced in the same commit that fixes it. That rule needs one defect fixed at a time.
+
+**The line is not perfectly clean**
+
+- S04-06 Half B adds `ai_action.rego`, which is new policy code.
+- S05-14 Half B adds a `/audit/{correlation_id}` route before S07 begins.
+
+So the working boundary is this: Phase 4 and 5 add or change only what a single control needs. S07 builds the product flow that uses those controls.

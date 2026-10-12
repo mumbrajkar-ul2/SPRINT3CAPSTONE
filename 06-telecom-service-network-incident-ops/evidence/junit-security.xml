@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="3.869" timestamp="2026-10-11T13:32:40.332891-07:00" hostname="LAPTOP-H53VF6SA"><testcase classname="tests.security.test_secret_patterns" name="test_repo_has_no_secret_patterns" time="2.782" /></testsuite></testsuites>

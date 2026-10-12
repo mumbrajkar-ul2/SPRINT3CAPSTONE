@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S2Q — Cost envelope revised after AI qualification (first issue S0B, Execution Plan Phase 0B; spine stage 0C) |
-| Date / version | 2026-10-10, v1.1. First issue 2026-10-09, v1.0. |
+| Date / version | 2026-10-11, v1.2. Revised 2026-10-10, v1.1. First issue 2026-10-09, v1.0. |
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | REVISED-S2Q. Eight capabilities have hosted-model cost 0 because their pick uses no model. Three GenAI capabilities keep an Unknown price. |
 | Evidence sources | `data/synthetic/ai_invocations.csv`; `data/synthetic/events.jsonl`; `data/manifest.json`; `apps/api/services/ai_gateway.py`; `docs/00-setup/replay-log.md` sections 1.4, 1.5, and 2.7; `Project_Intent.md` 4.3 and Appendix B; `docs/02-baseline/ai-qualification.md` |
@@ -198,6 +198,7 @@ The four `event_type` sums stay as they were. They are SIMULATED lab figures. Th
 |---|---|---|
 | 2026-10-09 | v1.0 | Provisional envelope. Measured figures from the CSV, the JSONL file, the manifest, and the replay. Status PROVISIONAL. |
 | 2026-10-10 | v1.1 | Status REVISED-S2Q. Hosted-model cost set to 0 by assignment for the eight capabilities whose pick uses no model. Hosted-model price left Unknown for incident summary, next-action recommendation, and configuration suggestion. SIMULATED sums 845675 and 6736.4198 kept, with their honesty labels. No price, currency, or cutoff added. |
+| 2026-10-11 | v1.2 | Stage S04-12 Half A. Status stays REVISED-S2Q. No figure in this file changed. The FinOps baseline recounted every measured figure and all match: 354 CSV rows, 353 integer `token_count` values, 845675 tokens, 3000 event lines, 6736.4198 `cost_units`, and the four `event_type` sums. Two things differ from this file. The live gateway now gives a token estimate of 90 for the first device row, because stage S04-09 changed the prompt. The 64 in this file stays as the S00 replay figure for the old prompt. The CSV mean of 2395.7 tokens per call is 26.6 times the live 90. New figures live in `docs/12-finops/`: cost per flow, retry count 943094 with an EDUCATIONAL what-if, and tokens by status word. The Unknown row "Money cost of retries" stays Unknown for money. No price, currency, or cutoff added. The EDUCATIONAL rate used there, 1.0 unit per 1000 tokens, is PROPOSED. Owner: Team-Force. It is not a price. |
 
 ## Lifecycle
 

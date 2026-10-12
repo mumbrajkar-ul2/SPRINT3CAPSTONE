@@ -1,0 +1,30 @@
+{
+  "ai-08-block-forbidden-field-in-prompt": {
+    "name": "ai-08-block-forbidden-field-in-prompt",
+    "area": "ai_action",
+    "input": {
+      "persona": "persona.noc_operator",
+      "action": "action.recommend",
+      "resource": "resource.device",
+      "risk": "risk.recommendation",
+      "policy_result": "allow",
+      "approval_required": true,
+      "approval_id": null,
+      "audit_row_written": true,
+      "change_plan_ok": false,
+      "record_found": true,
+      "forbidden_field_in_prompt": true,
+      "stale_topology_flag": false,
+      "output_schema_ok": null,
+      "timeout_hit": false,
+      "policy_version": "0.1.0-proposed"
+    },
+    "expected": {
+      "outcome": "BLOCK",
+      "reasons": [
+        "failmode.forbidden_field_in_prompt",
+        "rule.forbidden_fields_never_enter_prompt"
+      ]
+    }
+  }
+}

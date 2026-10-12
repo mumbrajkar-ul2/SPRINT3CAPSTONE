@@ -1,0 +1,15 @@
+{
+  "pr-01-allow-release-with-all-evidence": {
+    "name": "pr-01-allow-release-with-all-evidence",
+    "area": "production_readiness",
+    "input": {
+      "evidence_sections_missing": [],
+      "policy_tests_result": "pass",
+      "secret_pattern_test_result": "pass",
+      "ci_run_seen": true
+    },
+    "expected": {
+      "decision": "allow"
+    }
+  }
+}

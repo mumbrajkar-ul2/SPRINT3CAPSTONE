@@ -1,0 +1,29 @@
+{
+  "ai-10-block-execute-approval-not-required": {
+    "name": "ai-10-block-execute-approval-not-required",
+    "area": "ai_action",
+    "input": {
+      "persona": "persona.automation_service",
+      "action": "action.execute",
+      "resource": "resource.device",
+      "risk": "risk.live_network_change",
+      "policy_result": "allow",
+      "approval_required": false,
+      "approval_id": "APR-EXAMPLE-0001",
+      "audit_row_written": true,
+      "change_plan_ok": true,
+      "record_found": true,
+      "forbidden_field_in_prompt": false,
+      "stale_topology_flag": false,
+      "output_schema_ok": true,
+      "timeout_hit": false,
+      "policy_version": "0.1.0-proposed"
+    },
+    "expected": {
+      "outcome": "BLOCK",
+      "reasons": [
+        "rule.ai_recommendation_needs_policy_approval_audit_before_state_change"
+      ]
+    }
+  }
+}

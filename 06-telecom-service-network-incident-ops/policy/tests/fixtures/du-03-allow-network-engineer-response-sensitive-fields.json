@@ -1,0 +1,19 @@
+{
+  "du-03-allow-network-engineer-response-sensitive-fields": {
+    "name": "du-03-allow-network-engineer-response-sensitive-fields",
+    "area": "data_use",
+    "input": {
+      "persona": "persona.network_engineer",
+      "destination": "response",
+      "fields": [
+        "field.device.device_id",
+        "field.device.mgmt_ip",
+        "field.device.credential_profile"
+      ]
+    },
+    "expected": {
+      "decision": "allow",
+      "matrix_row": "TA-15"
+    }
+  }
+}
