@@ -5379,3 +5379,19 @@ What I did not decide, on purpose:
 Proof: the next push must print `Image: ubuntu-24.04` and give the same counts (97, 35, 83, 159, and `security gate ok`). Until then `SB-21` is half open.
 
 Recorded in `ci.yml` (with a comment), `remediation-backlog.md` (`SB-21`), `evidence.md` (`EV-09`), and `playbook/STATUS.md`. `tests/ci` gives 14 passed.
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+commit and push
+
+### Assistant
+
+Committed `e4ec045` ("S05-13: pin CI runner to ubuntu-24.04 and record the GitHub proof run (SB-20, SB-21)") with 6 files and pushed it to `origin/main`.
+
+The push started [run 38214470465](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38214470465). It printed `Image: ubuntu-24.04` and `opa_linux_amd64_static: OK`. Stage results: tests 97, semantic-layer 35, policy 83, security 159 with 0 skipped and `security gate ok`. Ruff, pip-audit and bandit exit 1 on real findings, so the run is red as intended. This proves the runner pin. The Node 20 warning on three actions stays open under `SB-21`.
+
+I then recorded the proof in `remediation-backlog.md`, `evidence.md`, and `playbook/STATUS.md`, and committed and pushed that record too.
