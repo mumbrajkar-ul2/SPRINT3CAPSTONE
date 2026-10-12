@@ -19,7 +19,9 @@ env:
 
 jobs:
   evidence:
-    runs-on: ubuntu-latest
+    # S05-13 SB-21. Pinned to the image the proven run used (run 38212456142 printed "Image: ubuntu-24.04").
+    # `ubuntu-latest` moves to Ubuntu 26 on 2026-10-19. Change this label on purpose, with a proof run.
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: 06-telecom-service-network-incident-ops

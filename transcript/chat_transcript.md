@@ -5319,3 +5319,63 @@ When to revisit: if a stage decides that Rego must decide in production, run the
 Risk of this choice: the Python copy is code the team wrote. The agreement tests cover the inputs they use. They do not prove every input.
 
 Nothing in `apps/` changed. I added the measurement and this recommendation to the `SB-20` row in `remediation-backlog.md`. The decision stays with you.
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Run one workflow run on GitHub to prove CI
+
+### Assistant
+
+A run already existed for your latest push, so I did not start a second one. I read it and recorded it.
+
+**Run:** [38212456142](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38212456142), workflow `workshop-ci`, commit `a9b6bc8`, `ubuntu-latest`, Python 3.11.17.
+
+| Check | Result on GitHub |
+|---|---|
+| `opa` install | `opa_linux_amd64_static: OK` (sha256) and `Version: 1.21.1` |
+| Stage 3 tests | 97 passed |
+| Stage 4 semantic-layer | 35 passed |
+| Stage 5 policy | 83 passed, 0 skipped. `opa test`: 30 results, 0 failed |
+| Stage 6 security | 159 passed, 0 skipped, `security gate ok` |
+| Stages 2, 8, 9 | Exit 1 on real findings: ruff 11, pip-audit 9, bandit 2 |
+| Stages 7, 10, 12 | Exit 0. The artifact holds the 13 files. |
+
+The whole run is red only because the three scans exit 1. This is intended. The counts match the Windows run.
+
+The earlier run on commit `a4bc59b` failed `test_engine_name_follows_the_setting` in stage 5. That is the cached `opa` search bug I fixed in Half B. The workflow found a bug that a machine without `opa` could not show.
+
+New finding `SB-21`: GitHub warns that `ubuntu-latest` becomes Ubuntu 26 on 2026-10-19, and that `checkout@v4`, `setup-python@v5` and `upload-artifact@v4` run on deprecated Node 20. I recommend pinning `ubuntu-24.04`. I did not change the workflow.
+
+Recorded in `docs/13-security-validation/evidence.md` section 6, the backlog (`SB-21`, 21 rows open), `docs/07-cicd/evidence.md`, and `playbook/STATUS.md`. `CI-01` is closed. No code changed.
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Decide for me - "pin the runner to ubuntu-24.04 now?" with proper reasoning
+
+### Assistant
+
+**Decision: yes. Pin `runs-on: ubuntu-24.04` now.** I made the one-line change in `.github/workflows/ci.yml`. It is not committed or pushed.
+
+Reasoning:
+
+1. The proven run already used that image. The log of run 38212456142 prints `Image: ubuntu-24.04`. Pinning the label keeps the exact image that gave 97, 35, 83 and 159 passed, 30 of 30 `opa` tests, and 0 skipped. Nothing about the proven result changes.
+2. Without the pin, the label `ubuntu-latest` moves to Ubuntu 26 on 2026-10-19. The next push would run on a different image with no code change. If it failed, nobody could tell whether the code or the image caused it. If it passed, the evidence in the packet would describe an image that no longer exists.
+3. The change costs one line and no new risk. Python 3.11 comes from `setup-python`, and the `opa` binary is a static download, so the image matters little today. That is the reason to pin now: it is cheap, and it stops a surprise later.
+4. A packet that claims reproducible evidence needs a fixed runner. The `run-info.txt` file records the kernel (`6.17.0-1022-azure`), but a reader can only repeat the run if the label is fixed.
+
+What I did not decide, on purpose:
+
+- The Node 20 warning on `checkout@v4`, `setup-python@v5`, and `upload-artifact@v4`. GitHub already runs those actions on Node 24, so the run works today. A version bump changes three actions at once and needs its own proof run. Keeping it separate means a failure points at one cause. It stays open under `SB-21`.
+- When to move to Ubuntu 26. Do that as its own change, with its own run, after the counts match there.
+
+Proof: the next push must print `Image: ubuntu-24.04` and give the same counts (97, 35, 83, 159, and `security gate ok`). Until then `SB-21` is half open.
+
+Recorded in `ci.yml` (with a comment), `remediation-backlog.md` (`SB-21`), `evidence.md` (`EV-09`), and `playbook/STATUS.md`. `tests/ci` gives 14 passed.

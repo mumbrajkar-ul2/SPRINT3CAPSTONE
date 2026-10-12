@@ -33,7 +33,7 @@ Commands ran from `06-telecom-service-network-incident-ops/`. Claim labels: **Ve
 
 Three stages exit 1 (lint, pip_audit, bandit) because the scans found real issues. None is switched off.
 
-**CI.** The workflow already installed `opa` 1.21.1 with a sha256 check. S05-13 Half B leaves that step as it is and renames stage 6 in `ci.yml`. Stage 6 runs `scripts/evidence.sh security`, which now fails on a skipped test. The workflow has not run on GitHub (CI-01 stays open).
+**CI.** The workflow already installed `opa` 1.21.1 with a sha256 check. S05-13 Half B leaves that step as it is and renames stage 6 in `ci.yml`. Stage 6 runs `scripts/evidence.sh security`, which now fails on a skipped test. The workflow ran on GitHub on 2026-10-12 UTC: run [38212456142](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38212456142). It gave the same counts as this Windows run (CI-01 is closed; see `docs/13-security-validation/evidence.md` section 6).
 
 **`make security`.** The Makefile has a target `security` that runs `bash scripts/evidence.sh security`. Make is not installed on this Windows machine, so the target was not run here. The Windows command with the same effect is `powershell -ExecutionPolicy Bypass -File scripts\evidence.ps1 -Stage security`. `tests/ci/test_skip_guard.py::test_makefile_has_a_security_target_that_runs_the_security_stage` checks the target text.
 

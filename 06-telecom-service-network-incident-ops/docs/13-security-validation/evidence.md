@@ -7,8 +7,8 @@
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | CONDITIONAL PASS. `pytest -m security` gives 159 passed and 0 skipped on this machine, with `opa` 1.21.1 on the PATH. Stage 6 of the pipeline now fails on any skipped security test. Three scans still exit 1 on real findings (ruff 11, pip-audit 9 advisories, bandit 2 LOW). None is switched off. 20 backlog rows stay open with an owner (`remediation-backlog.md`). Owner: Team-Force. |
 | Evidence sources | `evidence/junit-security.xml`; `evidence/junit-tests.xml`; `evidence/junit-policy.xml`; `evidence/opa-test.json`; `evidence/ruff.json`; `evidence/pip-audit.json`; `evidence/bandit.json`; `evidence/run-info.txt`; `evidence/exit-codes.txt`; the proof runs below; `scripts/evidence.ps1`; `scripts/check_junit_no_skips.py` |
-| Assumptions | Every output below comes from a command run on 2026-10-11 on one Windows machine (Python 3.13.5). The Linux run and the GitHub run did not happen in this stage. `make` is not installed here, so the `make security` target was not run. |
-| Unresolved issues | The workflow has not run on GitHub (CI-01). Make was not run. With `opa` on the PATH the app is much slower (`SB-20`). |
+| Assumptions | Sections 1 to 5 come from commands run on 2026-10-11 on one Windows machine (Python 3.13.5). Section 6 is the GitHub run of the same code. `make` is not installed on the Windows machine, and the workflow does not call `make`, so the `make security` target was not run. |
+| Unresolved issues | With `opa` on the PATH the app is much slower (`SB-20`). The runner image changes on 2026-10-19 (`SB-21`). The workflow ran on GitHub on 2026-10-12 UTC (section 6). |
 | Residual risks | A passing test shows the control works for the inputs the test uses. Three decisions by Mangesh (FDE) on 2026-10-11 are in effect: narrow `docs/` patterns (`BL-03`), skip guard (`SB-10`), `opa` on the user PATH. |
 
 ## What this file is
@@ -121,7 +121,32 @@ After each proof the file was put back, and `tests/security` gave `13 passed` ag
 | EV-06 | The ruff count is now 11, not 12. | **Verified Fact.** `evidence/ruff.json`. The 2 `ai_gateway.py` findings are no longer in the file. `breaker.py` `SIM114` is new (S04-11). The two findings in `test_secret_patterns.py` moved to line 53. | `BL-10` text said 12. | Low. | High | None. |
 | EV-07 | Each run of the access and characterization tests appends 12 rows to the real `logs/audit.log`. | **Verified Fact.** 240 lines before. 252 after one `pytest -m security` run. `git diff` showed added rows. | The tracked file changes on every run (`BL-09`). | Low. I restored it with `git checkout -- logs/audit.log` after the runs. It has 240 lines. | High | The decision on 2026-10-11 is to leave it tracked. |
 
-## 6. Lifecycle
+## 6. The GitHub workflow run
+
+**Verified Fact.** Run [38212456142](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38212456142) of `workshop-ci` on commit `a9b6bc8` (branch `main`, trigger `push`, 2026-10-12 06:25 UTC, `ubuntu-latest`, Python 3.11.17). The run was started by your push. I did not start a second one. I read its log with `gh run view --log` and downloaded its artifact `evidence-<sha>`.
+
+| Check | Result on GitHub |
+|---|---|
+| `opa` install step | `opa_linux_amd64_static: OK` (sha256 check) and `Version: 1.21.1` |
+| `evidence/run-info.txt` | `runner=github-actions`, `os=Linux 6.17.0-1022-azure`, `opa=Version: 1.21.1` |
+| Stage 3 tests | `97 passed, 76 deselected` |
+| Stage 4 semantic-layer | `35 passed` |
+| Stage 5 policy | `83 passed` (`skipped="0"`). `opa test`: 30 results, 0 failed (`opa-test.json`). |
+| Stage 6 security | `159 passed, 97 deselected` and `security gate ok`. `junit-security.xml`: `skipped="0" tests="159"`. |
+| Stages 2, 8, 9 (ruff, pip-audit, bandit) | Exit 1 on real findings. ruff 11, pip-audit 9 unique advisories (the log says 18 entries), bandit 2. Same counts as the Windows run. |
+| Stages 7, 10, 12 (SBOM, checksums, upload) | Exit 0. The artifact holds 13 files and `README.md`. |
+| Whole run | `conclusion: failure`, because 3 scan stages exit 1. This is the intended result. No scan is switched off. |
+
+**Windows and GitHub give the same counts:** tests 97, semantic-layer 35, policy 83, security 159, ruff 11, bandit 2, pip-audit 9.
+
+**The earlier runs.** Runs [38205764581](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38205764581) (commit `a4bc59b`) and 38205668157 also failed. The first showed one more failure than the three scans: stage 5 `policy/tests/test_policy_python.py::test_engine_name_follows_the_setting`, `assert 'python' == 'opa'`. That is the cached `opa` search described in EV-02. The Half B fix removed it. So the workflow found a real bug that a machine without `opa` could not show.
+
+| Id | Finding | Evidence | Impact | Risk | Confidence | Open questions |
+|---|---|---|---|---|---|---|
+| EV-08 | The workflow runs on GitHub. CI-01 is closed. | **Verified Fact.** The run above. The `opa` download, the `sha256sum` check, `upload-artifact`, and the skip guard all work there. | The pipeline is proven on the runner, not only in Docker. | Low. | High | None. |
+| EV-09 | GitHub warns that `ubuntu-latest` becomes Ubuntu 26 on 2026-10-19, and that the actions `checkout@v4`, `setup-python@v5` and `upload-artifact@v4` run on Node 20, which is deprecated. | **Verified Fact.** The annotations of run 38212456142. | The runner image changes in 8 days. Python 3.11 and the `opa` binary may behave differently. | Medium. The evidence from this run is for the old image. | High | Decision 2026-10-12: pin `ubuntu-24.04` (the image this run used). Backlog row `SB-21`. |
+
+## 7. Lifecycle
 
 Stage S09 copies `evidence/junit-security.xml` into the pack and cites the test names in `abuse-case-evidence.md` for each security claim. The remaining open rows are in `remediation-backlog.md`.
 
