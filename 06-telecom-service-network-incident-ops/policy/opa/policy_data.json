@@ -1,5 +1,5 @@
 {
-  "_comment": "One copy of the tables that access.rego, ai_action.rego, and apps/api/services/policy.py all read. Rows TA-01 to TA-34 are copied from docs/03-identity/target-access-matrix.md. Every grant is PROPOSED. Owner: Team-Force (operating-contract.md row 10).",
+  "_comment": "One copy of the tables that access.rego, ai_action.rego, and apps/api/services/policy.py all read. Rows TA-01 to TA-34 are copied from docs/03-identity/target-access-matrix.md. Row TA-35 is the audit-read row from docs/14-audit/audit-read-access-design.md (S05-14 Half B). Every grant is PROPOSED. Owner: Team-Force (operating-contract.md row 10).",
   "access_matrix": {
     "_comment": "persona_of: live API role ids that stand for a persona. mapping_label is Inference in access-semantics.yaml api_roles_today. role.admin and role.clinician have no persona, so they match no row. denied_actions: the denied list for each persona in access-semantics.yaml. A row that matches is still refused when its action is on this list.",
     "persona_of": {
@@ -346,6 +346,15 @@
         "purpose": "purpose.ai_assistance",
         "scope": "scope.assigned_incident",
         "risk": "risk.recommendation"
+      },
+      {
+        "row": "TA-35",
+        "role": "role.admin",
+        "action": "action.read",
+        "resource": "resource.audit_log",
+        "purpose": "purpose.audit_review",
+        "scope": "scope.all_records",
+        "risk": "risk.read_only"
       }
     ]
   },

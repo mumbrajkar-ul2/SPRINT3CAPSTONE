@@ -75,7 +75,28 @@ test_ai_agent_may_not_execute if {
 	not data.workshop.access.allow with input as changed
 }
 
-# Every one of the 34 rows allows the call it describes.
+# TA-35. S05-14 Half B. The audit-read row. Only role.admin may read the audit log.
+audit_read := {
+	"role": "role.admin",
+	"action": "action.read",
+	"resource": "resource.audit_log",
+	"purpose": "purpose.audit_review",
+	"scope": "scope.all_records",
+	"risk": "risk.read_only",
+}
+
+test_admin_may_read_the_audit_log if {
+	data.workshop.access.allow with input as audit_read
+	data.workshop.access.decision.matrix_rows == ["TA-35"] with input as audit_read
+}
+
+test_operator_may_not_read_the_audit_log if {
+	every role in ["role.operator", "role.engineer", "persona.ai_agent", "role.clinician"] {
+		not data.workshop.access.allow with input as object.union(audit_read, {"role": role})
+	}
+}
+
+# Every one of the 35 rows allows the call it describes.
 row_failures contains grant.row if {
 	some grant in data.access_matrix.grants
 	call := {
@@ -90,8 +111,8 @@ row_failures contains grant.row if {
 	not data.workshop.access.allow with input as call
 }
 
-test_all_34_rows_were_loaded if {
-	count(data.access_matrix.grants) == 34
+test_all_35_rows_were_loaded if {
+	count(data.access_matrix.grants) == 35
 }
 
 test_every_row_allows_its_own_call if {
@@ -115,7 +136,7 @@ access_fixture_failures contains name if {
 }
 
 test_access_fixtures_were_loaded if {
-	count({name | some name, fixture in data.fixtures; fixture.area == "access"}) == 5
+	count({name | some name, fixture in data.fixtures; fixture.area == "access"}) == 7
 }
 
 test_access_fixtures_give_expected_results if {

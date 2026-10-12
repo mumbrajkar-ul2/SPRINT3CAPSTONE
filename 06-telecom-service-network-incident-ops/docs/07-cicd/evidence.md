@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S04-07 — CI/CD and supply chain (Challenge 7), Half B |
-| Date / version | 2026-10-11, v1.0. v1.1 (S05-13 Half B): the section "Update from S05-13 Half B" below gives the current counts. The counts in the sections after it are as of S04-07 Half B and are kept as the record of that run. |
+| Date / version | 2026-10-11, v1.0. v1.1 (S05-13 Half B): the section "Update from S05-13 Half B" below gives those counts. v1.2 (S05-14 Half B, 2026-10-12): the section "Update from S05-14 Half B" gives the current counts. The counts in the sections after them are as of S04-07 Half B and are kept as the record of that run. |
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | PASS. The pipeline wrote all 13 script files and the checklist points at each one. It ran on Windows (`scripts/evidence.ps1`) and on Linux (`scripts/evidence.sh`, and through `make evidence`). Three stages exit 1 because the scans found real issues (ruff 12, pip-audit 9 advisories, bandit 2). Each issue has a backlog row. Whether the workflow runs on GitHub is Unknown. Owner: Team-Force. |
 | Evidence sources | `scripts/evidence.sh`; `scripts/evidence.ps1`; `Makefile`; `requirements-dev.txt`; `.github/workflows/ci.yml` (repo root); `tests/ci/test_evidence_contract.py`; `evidence/` (13 files plus `README.md`); `evidence/linux-py311/` (13 files); `docs/07-cicd/release-evidence-checklist.md`; `docs/07-cicd/pipeline-improvement-plan.md` |
@@ -36,6 +36,23 @@ Three stages exit 1 (lint, pip_audit, bandit) because the scans found real issue
 **CI.** The workflow already installed `opa` 1.21.1 with a sha256 check. S05-13 Half B leaves that step as it is and renames stage 6 in `ci.yml`. Stage 6 runs `scripts/evidence.sh security`, which now fails on a skipped test. The workflow ran on GitHub on 2026-10-12 UTC: run [38212456142](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38212456142). It gave the same counts as this Windows run (CI-01 is closed; see `docs/13-security-validation/evidence.md` section 6).
 
 **`make security`.** The Makefile has a target `security` that runs `bash scripts/evidence.sh security`. Make is not installed on this Windows machine, so the target was not run here. The Windows command with the same effect is `powershell -ExecutionPolicy Bypass -File scripts\evidence.ps1 -Stage security`. `tests/ci/test_skip_guard.py::test_makefile_has_a_security_target_that_runs_the_security_stage` checks the target text.
+
+## Update from S05-14 Half B
+
+**Verified Fact.** S05-14 Half B added the audit route and one access row (TA-35). The stage counts moved as the table shows. The numbers come from these commands on 2026-10-12 on Windows, Python 3.13.5, with `opa` 1.21.1 on the PATH. The first run wrote its junit files to a temporary folder. Then `scripts\evidence.ps1` (all stages, `opa` 1.21.1 on the PATH) ran on 2026-10-12 at 07:51 UTC and rewrote the files in `evidence/`. Its counts match this table: tests 97, semantic_layer 35, policy 87, security 195 with the skip guard passing, `opa-test.json` 32 of 32, ruff 11, bandit 2 LOW, pip-audit 18 entries (9 unique). The exit codes are the same as at S05-13: lint, pip_audit, and bandit exit 1 on real findings, and the other eight stages exit 0. The script's `prepare` step deletes `evidence/linux-py311/`, so that folder was restored from git. It still holds the Linux run from S04-07. Details are in `docs/14-audit/evidence.md`.
+
+| Stage | At S05-13 Half B | Now (S05-14 Half B) | Why it changed |
+|---|---|---|---|
+| tests (`pytest tests -m "not security"`) | 97 passed | **97 passed, 0 skipped** | The 32 new tests are marked `security`, so they run in stage 6. |
+| semantic_layer | 35 passed | 35 passed | No change. |
+| policy (`pytest policy/tests`, `opa test`) | 83 passed. `opa test` 30 of 30 | **87 passed, 0 skipped.** `opa test`: 32 of 32 | Two access fixtures, two new Python tests, and two new Rego tests for TA-35. |
+| security (`pytest -m security`) | 159 passed, 0 skipped | **195 passed, 0 skipped.** The skip guard exits 0. | 32 tests in `tests/audit/test_audit_rebuild.py` and 4 in `policy/tests`. |
+| lint (ruff) | 11 findings | 11 findings | The new code added none. |
+| bandit | 2 LOW | 2 LOW | No change. |
+
+**The skip guard held.** At the start of this stage the shell had no `opa` on the PATH. The two agreement tests skipped, and `scripts/check_junit_no_skips.py` printed `security gate FAILED: 2 security test(s) skipped`. With `C:\Users\mange\tools\opa` on the PATH, all 195 ran and the guard exit code was 0.
+
+**CI.** `.github/workflows/ci.yml` did not change. The workflow installs `opa` 1.21.1, so the GitHub run should show the same counts as the table. That run has not happened yet. **Unknown** until it does.
 
 ## What Half B built
 

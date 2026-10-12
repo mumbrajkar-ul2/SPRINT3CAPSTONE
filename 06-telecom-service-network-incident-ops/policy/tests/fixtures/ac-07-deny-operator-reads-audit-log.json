@@ -1,0 +1,18 @@
+{
+  "ac-07-deny-operator-reads-audit-log": {
+    "name": "ac-07-deny-operator-reads-audit-log",
+    "area": "access",
+    "input": {
+      "role": "role.operator",
+      "action": "action.read",
+      "resource": "resource.audit_log",
+      "purpose": "purpose.audit_review",
+      "scope": "scope.all_records",
+      "risk": "risk.read_only"
+    },
+    "expected": {
+      "decision": "deny",
+      "matrix_row": null
+    }
+  }
+}

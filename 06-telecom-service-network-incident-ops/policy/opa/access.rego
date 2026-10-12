@@ -5,8 +5,9 @@
 # for this purpose, over this scope, at this risk? The answer is allow or deny.
 #
 # The input is the JSON object in docs/03-identity/policy-input-model.md.
-# The allow rows TA-01 to TA-34 live in policy_data.json, in the same folder.
-# They are copied from docs/03-identity/target-access-matrix.md.
+# The allow rows TA-01 to TA-35 live in policy_data.json, in the same folder.
+# TA-01 to TA-34 are copied from docs/03-identity/target-access-matrix.md.
+# TA-35 (role.admin reads resource.audit_log) comes from docs/14-audit/audit-read-access-design.md.
 # Python reads the same JSON file, so the two engines cannot disagree on a row.
 #
 # Every grant is PROPOSED. Owner: Team-Force (operating-contract.md row 10).
@@ -42,7 +43,8 @@ caller := input.role if not data.access_matrix.persona_of[input.role]
 
 # rule.shared_admin_not_least_privilege
 # A row matches only when role, action, resource, purpose, scope, and risk all
-# equal the input. There is no row for role.admin, so an admin matches nothing.
+# equal the input. The only row for role.admin is TA-35 (read the audit log).
+# An admin matches no other row.
 # The old rule policy.opa.admin_any is gone.
 matched_rows contains grant.row if {
 	some grant in data.access_matrix.grants

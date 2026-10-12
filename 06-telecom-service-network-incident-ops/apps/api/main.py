@@ -2,11 +2,19 @@ from typing import Optional
 
 from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
-from apps.api.services import domain_service, ai_gateway, audit, policy
+from apps.api.services import domain_service, ai_gateway, audit, audit_query, policy
 
 app = FastAPI(title="Telecommunications: Service Provisioning, Network & Incident Operations")
 
 RESOURCE_DEVICE = "resource.device"
+RESOURCE_AUDIT_LOG = "resource.audit_log"
+
+# S05-14 Half B. The action words the audit route writes on its own row.
+# policy.deny already exists. The other three are PROPOSED.
+# Open question for S03: the YAML has no id for audit.read, audit.not_found, or audit.id_refused.
+AUDIT_READ = "audit.read"
+AUDIT_NOT_FOUND = "audit.not_found"
+AUDIT_ID_REFUSED = "audit.id_refused"
 
 
 @app.middleware("http")
@@ -27,17 +35,18 @@ def _role_word(value):
     return text or None
 
 
-def _audit(action, request: Request, role, outcome=None, provenance=None):
+def _audit(action, request: Request, role, outcome=None, provenance=None, resource=RESOURCE_DEVICE):
     """Write one audit row. `provenance` holds model, model_version, prompt_hash,
     tokens, latency_ms, and token_estimate_method when a model call ran.
-    Otherwise those stay null."""
+    Otherwise those stay null. `resource` is resource.device unless the caller
+    names another one (the audit route uses resource.audit_log)."""
     word = _role_word(role)
     audit.write_event(
         action,
         correlation_id=request.state.correlation_id,
         actor=audit.actor_for_role(word),
         role=word,
-        resource=RESOURCE_DEVICE,
+        resource=resource,
         outcome=outcome,
         **(provenance or {}),
     )
@@ -98,3 +107,38 @@ def ai_summary(record_id: str, request: Request, x_user_role: Optional[str] = He
     return JSONResponse(
         status_code=status_code, content=result.to_body(request.state.correlation_id)
     )
+
+
+@app.get("/audit/{correlation_id}")
+def audit_case(correlation_id: str, request: Request, x_user_role: str | None = Header(default=None)):
+    # S05-14. Read one case back from the audit log. This route only reads.
+    # Order of checks:
+    #   1. Policy (TA-35). Only role.admin passes. A missing header has no role and is denied.
+    #      The 403 body is the same for an id that exists and an id that does not.
+    #   2. Id length. An id over 128 characters is refused with 400 and is not looked up.
+    #   3. Lookup. No rows for the id gives 404.
+    # Every path writes its own audit row on resource.audit_log. The row is written
+    # after the read, so the chain in the response does not include this request.
+    role_id = policy.role_id_from_header(x_user_role)
+    access = policy.check_audit_read(role_id)
+    if not access["allow"]:
+        _audit("policy.deny", request, x_user_role, resource=RESOURCE_AUDIT_LOG)
+        return JSONResponse(status_code=403, content={"error": "forbidden"})
+    if len(correlation_id) > audit_query.MAX_ID_LENGTH:
+        _audit(AUDIT_ID_REFUSED, request, x_user_role, resource=RESOURCE_AUDIT_LOG)
+        return JSONResponse(
+            status_code=400,
+            content={"error": "id_too_long", "max_length": audit_query.MAX_ID_LENGTH},
+        )
+    case = audit_query.read_case(correlation_id)
+    if not case.rows:
+        _audit(AUDIT_NOT_FOUND, request, x_user_role, resource=RESOURCE_AUDIT_LOG)
+        return JSONResponse(status_code=404, content={"error": "not_found"})
+    body = {
+        "correlation_id": audit_query.withhold_forbidden(correlation_id)[0],
+        "row_count": len(case.rows),
+        "rows": case.rows,
+        "cannot_prove": audit_query.cannot_prove(case),
+    }
+    _audit(AUDIT_READ, request, x_user_role, resource=RESOURCE_AUDIT_LOG)
+    return body

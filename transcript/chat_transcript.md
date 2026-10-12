@@ -5395,3 +5395,268 @@ Committed `e4ec045` ("S05-13: pin CI runner to ubuntu-24.04 and record the GitHu
 The push started [run 38214470465](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38214470465). It printed `Image: ubuntu-24.04` and `opa_linux_amd64_static: OK`. Stage results: tests 97, semantic-layer 35, policy 83, security 159 with 0 skipped and `security gate ok`. Ruff, pip-audit and bandit exit 1 on real findings, so the run is red as intended. This proves the runner pin. The Node 20 warning on three actions stays open under `SB-21`.
 
 I then recorded the proof in `remediation-backlog.md`, `evidence.md`, and `playbook/STATUS.md`, and committed and pushed that record too.
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+before I run Half A for S05-14, does @playbook/S05-14-audit-chain.md have all the required inputs documented and does the prompt need to be revised based on the most recent updates in the project?
+
+### Assistant
+
+**Short answer: no to both. The Inputs list is missing files the stage needs, and the prompt has 4 statements that are out of date or wrong. Half A can run, but Half B as written cannot pass.** I read the playbook file and checked it against the repo. I changed nothing.
+
+**A. Inputs that are missing**
+
+| Missing input | Why the stage needs it |
+|---|---|
+| The challenge guide for Challenge 14. Analysis item 4 says "the challenge guide", but no input names a file. | Item 4 cannot be done without it. Candidates: `How the product spine addresses the 16 challenges - plain speak.md` (section 14) and `docs/00-contract/challenge-to-spine-crosswalk.md`. |
+| The evidence files for identity, secrets, policy, AI, and security: `docs/03-identity/target-access-matrix.md`, `docs/04-secrets/evidence.md`, `docs/06-policy/evidence.md`, `docs/09-ai-guardrails/evidence.md`, `docs/13-security-validation/evidence.md` and `abuse-case-evidence.md`, `security/threat-model.md`, `evidence/junit-security.xml` | Item 4 asks for the stored evidence per control area and where a reviewer finds it. The listed inputs hold none of these. |
+| `docs/08-observability/incident-reconstruction.md`, `trace-design.md`, `evidence.md` | S04-08 already rebuilt one case (`corr-00273`). Item 3 is the same task. |
+| `docs/12-finops/evidence.md` | It adds the 15th key, `token_estimate_method`. |
+| `docs/11-reliability/recovery-evidence.md` | It adds the audit write lock and the 500 responses that carry no correlation id. |
+| `docs/13-security-validation/remediation-backlog.md` (`SB-03`, `SB-12`, `BL-09`) | It lists known audit gaps: header text stored as sent, a plain file with no tamper check, 96 old lines with no `correlation_id`, and a tracked log file. |
+| The YAMLs: `access-semantics.yaml`, `business-rules.yaml`, `ai-context-policy.yaml` | Item 2 maps every field to a YAML id. |
+| `policy/opa/policy_data.json`, `policy/tests/fixtures/` | Half B needs a policy row to read the audit log (see B1). |
+| `tests/observability/test_audit_schema.py`, `tests/ai/test_guardrails.py` | They are the tests that show the stored row shape and the provenance values. |
+
+The "Lifecycle" line in `playbook/README.md` says S05-14 depends on S04-08 and S04-09 only. It should also name S04-03, S04-06, S04-11, S04-12, and S05-13.
+
+**B. Statements in the prompt that are out of date or wrong**
+
+| # | What the prompt says | What is true now |
+|---|---|---|
+| 1 | Half B: the route "requires a role allowed to read audit (from the S04-03 matrix)". | The matrix has no such row. `resource.audit_log` and `purpose.audit_review` exist as ids in `access-semantics.yaml`, but no persona has a grant for them. `policy_data.json` has no audit grant. Every role would get 403. Half B has to add a new row to the Python copy, the Rego copy, the fixtures, and the agreement tests. Who may read the audit log is a business decision for Team-Force. |
+| 2 | Locked fact: the new schema has 14 keys, ending in `outcome`. Inputs say `audit.py` "after S04-08". | The row has 15 keys. The last is `token_estimate_method` (S04-12). The file is after S04-12. |
+| 3 | Before-and-after: the after row is "the same call after S04-09". | The current row after S04-12 is the 15-key row. Use that one. The before row is in `replay-log.md` line 187 and `behaviour-snapshot.md` line 107 (both checked). |
+| 4 | Evidence rule: "the model summary inside [stored rows] is SIMULATED". | Rows store no summary. They store `prompt_hash`, `model`, and an estimated `tokens` value. Label tokens as an estimate (`word_count_x2_EDUCATIONAL`). Label the model name `local-sim-v1` as a stub. |
+
+**C. Things to add to the prompt**
+
+1. Half A, "cannot be proven" list: add log integrity. Today any person with file access can edit or delete lines (`SB-12`). The route cannot prove the chain is complete or unchanged. A list computed only from null fields would miss this.
+2. Half A, gap report: the 96 old lines with 3 keys cannot be found by `correlation_id`. Say so.
+3. Half A, "trace id": the 15 keys have no trace id field. Say which field answers defence question 5 (`correlation_id` is the likely answer) and write an "Open question for S03" line.
+4. Half A, evidence chain: do not take an id from the polluted real log. Run three calls with one chosen `X-Correlation-Id` (a record read, a summary, a denied call) and rebuild from those rows.
+5. Half B, route order: check the policy first, then look up the id. A caller with no permission must get 403 for an id that exists and for one that does not. Otherwise 404 tells them which ids exist.
+6. Half B, tests: mark all of them `@pytest.mark.security`. Add negative tests: 403 writes a `policy.deny` row; a 404 writes its own row; the log file is unchanged except for the route's own row; the response holds no `mgmt_ip`, `credential_profile`, or credential name; a very long id is refused. Use a temporary log file, as `policy/tests` does.
+7. Half B, rules from S05-13: no skipped or failing-by-design security test. Update the counts in `docs/07-cicd/evidence.md` if they change.
+8. Half B, engine: the app now picks `opa` when it is on the PATH, which makes each decision slow (`SB-20`). Say which engine the tests use. `tests/conftest.py` sets the Python copy for everything under `tests/`.
+9. Half A scope: add "Exclude in Half A: any edit to `policy_data.json` or the Rego files". Half B scope: allow those edits for the one new row.
+
+**D. Checked and fine**
+
+- `Project_Intent.md` section 3.3 question 5 matches the prompt.
+- The `docs/14-audit/` folder name matches `playbook/README.md` and `S05R`.
+- The eight provenance questions in item 1 match the eight items in question 5 (the ninth, "what you cannot prove", is item 2).
+- The Done test is clear. One point to add: the route's own row carries the request's own correlation id, unless the caller sends the same id in `X-Correlation-Id`. Say which one the test expects.
+
+Next step: I can apply A, B, and C to `playbook/S05-14-audit-chain.md` and show you the diff before you run Half A. Reply "apply" or tell me which items to leave out.
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+apply
+
+### Assistant
+
+I applied items A, B and C to `playbook/S05-14-audit-chain.md`. I also updated the dependency column for S05-14 in `playbook/README.md`. Half A has not started.
+
+**What changed in the playbook**
+
+- **Inputs.** The list is now grouped. It names the evidence files from S04-03 to S05-13, the challenge guide, the three YAML files, `policy_data.json` and the fixtures, and the two test files that show the stored row shape. `audit.py` is now "after S04-12".
+- **Locked facts.** The row has 15 keys, ending in `token_estimate_method`. Two new rows say that 96 old lines have no `correlation_id` and that no role may read the audit log today.
+- **Half A analysis.**
+  - Item 1 now says the 96 old lines cannot be found by `correlation_id`.
+  - Item 2 asks which field answers "trace id", with an "Open question for S03:" line.
+  - Item 3 builds the chain from three calls that share one chosen `X-Correlation-Id`.
+  - Item 5 compares the S00 row with the current 15-key row.
+  - New item 6 designs one audit-read matrix row. The new artifact is `audit-read-access-design.md`.
+  - The "cannot be proven" list must include log integrity.
+- **Half B work.**
+  - Add the audit-read row to the Python copy, the Rego copy, `policy_data.json`, the fixtures and the agreement tests.
+  - The route checks policy first and looks up the id second.
+  - Every test carries the `security` marker, uses a temporary log, and may not be skipped.
+  - The test list adds a 403 `policy.deny` row, a 404 row, an unchanged-log check, a forbidden-field check, a long-id check, and a `cannot_prove` check.
+  - The prompt says which engine the tests use.
+- **Scope.** Half A may not edit policy files. Half B may edit them for the one new row only.
+- **Completion gate.** BLOCKED now also covers a 404 that comes before the policy check.
+- **Done test.** It states whose id the route's own row carries.
+- **Evidence rules.** Tokens are labelled an estimate (`word_count_x2_EDUCATIONAL`). Rows store `prompt_hash`, not summary text.
+
+**One thing for you to decide later.** The Half B test for a long id says "the limit you set". The prompt does not fix a number. Half A should propose one, and you can accept or change it when you accept Half A.
+
+The playbook is ready. Reply "Run Half A for S05-14" when you want to start.
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+does S05-14 stage have Half-A and Half-B?
+
+### Assistant
+
+Yes. `playbook/S05-14-audit-chain.md` has both halves.
+
+**Half A (design, no code)**
+- Five analysis items plus the new item 6 (audit-read access).
+- It ends with "STOP after Half A. Return the seven-item final response. Wait for 'Half A accepted'."
+- It produces six files under `docs/14-audit/`: `audit-gap-report.md`, `decision-provenance-model.md`, `evidence-chain-one-case.md`, `compliance-evidence-mapping.md`, `before-and-after-audit-example.md` and `audit-read-access-design.md`.
+
+**Half B (code and tests, after you reply "Half A accepted")**
+- Seven work items: the audit-read policy row, `audit_query.py`, the `GET /audit/{correlation_id}` route, `tests/audit/test_audit_rebuild.py`, no skipped tests, the engine note, and a run for the Half A case.
+- It produces the route code, the policy row, the tests and `docs/14-audit/evidence.md`.
+
+Both halves share one completion gate and one seven-item final response format. The response is returned after each half.
+
+## 2026-10-12 00:20
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+INPUTS FOR S05-14 — Auditability and compliance evidence. The user attached the question file (`Project_Intent - section 3.3 question 5.md`), `audit.py`, `main.py`, `policy.py`, `logs/audit.log`, the S00 replay log and behaviour snapshot, the design files (access matrix, policy input model, AI action policy, log schema, trace design, incident reconstruction, model provenance, transformation roadmap), the evidence files from S04-04 to S05-13, the threat model, `junit-security.xml`, the challenge guide and crosswalk, the three YAML files, `policy_data.json`, the policy fixtures, and the two test files for the stored row shape. Prompt: `playbook/S05-14-audit-chain.md` lines 62 to 149 (Half A).
+
+### Assistant
+
+Half A of S05-14 is done. I changed no code. The six design files are under `docs/14-audit/`. I stopped here and am waiting for "Half A accepted".
+
+**1. Stage status: CONDITIONAL PASS.** The chain for one case shows what happened, who acted, and what is unproven, and the audit-read row is designed. `approval_id` and `policy_decision` are null on every stored row.
+
+**2. Key findings**
+- `logs/audit.log` has 240 lines. 96 are the old 3-key shape with no `correlation_id`. 144 are new rows. Every new row has a different `correlation_id`, so the real log holds no case with more than one row. I made one: `s0514-case-0001`, three calls (record read, summary, denied read). The rows went to a temporary file. `logs/audit.log` is unchanged at 240 lines.
+- The old row answered none of the 8 provenance questions in full and 3 in part. The row today answers 2 in full (model and version, trace id), 4 in part, and 2 not at all (approval, final action).
+- Two answers got worse. The new row has no record id. The old row had it. The row also has no reason and no policy version.
+- Two refused summaries, one for a missing id and one for a stale device, wrote the same row. Only the time and the id differ.
+- `policy_decision` is null on 144 of 144 rows. The only sign of the policy result is the `action` word and `outcome`.
+- `correlation_id` is the answer to "trace id". The caller chooses it. A second caller that sends the same id adds a row to the first caller's case. I showed this with an `ai_agent` read.
+- The prompt hash in the chain matched a hash I rebuilt from the current `REC-0001` row.
+- Compliance mapping: 34 duties in 5 areas (identity, secrets, policy, AI, audit). All 40 test names exist in the repo. 37 are in `evidence/junit-security.xml`. 3 are reliability tests that are recorded in `recovery-evidence.md`.
+- Audit-read row proposed: `TA-35`, `role.admin` reads `resource.audit_log` for `purpose.audit_review`, scope `scope.all_records`, risk `risk.read_only`, allow. The operator, the engineer, and the AI agent are not proposed. I also propose 128 characters as the limit on the id in the path.
+
+**3. Major risks**
+- The role is a word the caller types (`SB-09`). With TA-35, any caller who sends `admin` can read any case by id.
+- The log is a plain file. A line can be changed or deleted, and a write failure leaves no row (`SB-12`, `RF-04`). The route cannot prove a case is complete or unchanged.
+- Rows hold text the caller typed, with no length limit (`SB-03`). The route would return it.
+- Two duties in the compliance table fail today and are listed as failures: no default role on `GET /records/{id}` (`SB-01`) and `mgmt_ip` and `credential_profile` in the response (`SB-06`).
+
+**4. Assumptions and unknowns**
+- The "after" rows come from the current code, run with the Python copy of the policy. `opa` was not on the PATH in this shell.
+- The rows are from test and demo calls on this machine, not production traffic. The model is the stub `local-sim-v1`. Its summary text is SIMULATED and is not stored. Token numbers are estimates.
+- Whether authentication is in scope for this packet is Unknown.
+- The choice of `role.admin` for audit read is an Inference. No persona names an audit reviewer. The 128-character limit is an Assumption.
+- Open questions for S03 are in the files: trace id, final action, one id for the policy decision, record id, reasons, policy version, a persona for the audit reviewer, a scope for one case, an audit action status id, the allowed form of a correlation id, and a field that marks test rows.
+
+**5. Artifacts created** (all under `06-telecom-service-network-incident-ops/docs/14-audit/`)
+- `audit-gap-report.md`
+- `decision-provenance-model.md`
+- `evidence-chain-one-case.md`
+- `compliance-evidence-mapping.md`
+- `before-and-after-audit-example.md`
+- `audit-read-access-design.md`
+
+**6. Blocking issues:** none. The docs secret scan and the repo secret scan pass (3 tests).
+
+**7. Recommended next action:** reply "Half A accepted" to start Half B. When you accept, confirm two choices, or change them:
+- The role for `TA-35`. I propose `role.admin`. The alternative is to deny everyone, which leaves the route returning only 403.
+- The id limit. I propose 128 characters.
+
+
+## 2026-10-12 08:05
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Confirmed - 
+The role for TA-35 - role.admin. 
+The id limit - 128 characters.
+Half A Accepted. Proceed with Half B.
+
+### Assistant
+
+Half B is built and tested. `GET /audit/{correlation_id}` rebuilds the Half A case from the stored rows.
+
+**1. Stage status: CONDITIONAL PASS.** The route returns the chain, the tests pass, and no security test is skipped. The status is conditional because `approval_id` is null on every row. The route lists it under `cannot_prove`, as the gate allows.
+
+**2. Key findings**
+- The route runs the checks in this order. Policy first (403). Then the id length (400 over 128 characters). Then the lookup (404). It writes its own audit row on every path, on `resource.audit_log`.
+- The Half A case came back with 3 rows in time order. The prompt hash `e17907…ab61d` matches Half A. After the `ai_agent` call reused the id, a second read returned 4 rows.
+- An operator asking for an id that exists and one that does not got the same 403 body, byte for byte.
+- The real `logs/audit.log` had the same SHA-256 and the same 240 lines before and after the run.
+- All 327 tests pass with 0 skipped. Security tests moved from 159 to 195 (32 new audit tests, 4 new policy tests). `opa test` moved from 30 to 32. Ruff stays at 11 findings and bandit at 2 LOW.
+- I added two things the design did not name. The answer replaces any stored text that holds a forbidden field name or credential name (backlog row `SB-03` lets callers write such text into the log). The route also uses three new action words on its own row: `audit.read`, `audit.not_found`, `audit.id_refused`.
+
+**3. Major risks**
+- The `admin` role is a header word the caller types (`SB-09`). Anyone who sends it can read every case.
+- The admin's own `audit.read` row has `actor` null, because `role.admin` has no persona. A reviewer cannot see which admin read a case.
+- The log is a plain file (`SB-12`). The route cannot prove no line was removed. `log_integrity` says so in every answer.
+- The caller picks the correlation id. A second caller can add a row to a case (shown in the run).
+
+**4. Assumptions and unknowns**
+- Policy engine. Every test under `tests/` uses the Python copy, because `tests/conftest.py` sets `POLICY_ENGINE=python`. The two agreement tests and `opa test` use the Rego copy. The app with `POLICY_ENGINE` unset picks `opa` when it is on the PATH, which is about 15 times slower per decision. Whether production runs `opa` as a long-lived server is Unknown (`SB-20`, still open).
+- At the start of this stage this shell had no `opa` on the PATH. The two agreement tests skipped and the skip guard failed the security stage, as designed. I added `C:\Users\mange\tools\opa` to the PATH for the runs and all tests passed.
+- The junit files from this run went to a temporary folder. The files in `evidence/` are still the S05-13 run.
+- The GitHub run with these counts has not happened. It is Unknown until it does.
+- Four "Open question for S03:" lines are in `docs/14-audit/evidence.md`. They cover the three new action words, `resource.audit_log` with `purpose.audit_review`, the `cannot_prove` item names, and the 128-character rule.
+
+**5. Artifacts created or changed**
+- `06-telecom-service-network-incident-ops/apps/api/services/audit_query.py` (new)
+- `06-telecom-service-network-incident-ops/apps/api/main.py` (new route, `_audit` takes a resource)
+- `06-telecom-service-network-incident-ops/apps/api/services/policy.py` (`check_audit_read`)
+- `06-telecom-service-network-incident-ops/policy/opa/policy_data.json` (row TA-35)
+- `06-telecom-service-network-incident-ops/policy/opa/access.rego` (two comments)
+- `06-telecom-service-network-incident-ops/policy/tests/fixtures/ac-06-allow-admin-reads-audit-log.json` and `ac-07-deny-operator-reads-audit-log.json` (new)
+- `06-telecom-service-network-incident-ops/policy/tests/test_policy_python.py` and `access_test.rego` (counts and new tests)
+- `06-telecom-service-network-incident-ops/tests/audit/test_audit_rebuild.py` (new, 32 tests)
+- `06-telecom-service-network-incident-ops/docs/14-audit/evidence.md` (new)
+- `06-telecom-service-network-incident-ops/docs/07-cicd/evidence.md` (new counts section)
+- `06-telecom-service-network-incident-ops/docs/03-identity/target-access-matrix.md` (note for TA-35)
+
+**6. Blocking issues:** none.
+
+**7. Recommended next action:** Review `docs/14-audit/evidence.md`. Then run `scripts\evidence.ps1` with `opa` on the PATH to refresh the files in `evidence/`, and push so the GitHub run can confirm 195 security tests with 0 skipped. Stage S07 can then fill `approval_id` and the final action.
+
+
+## 2026-10-12 08:20
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Run scripts\evidence.ps1 with opa on the PATH to refresh the files in evidence/
+
+### Assistant
+
+I ran `scripts\evidence.ps1` (all stages) with `opa` 1.21.1 on the PATH. It rewrote the files in `evidence/`. Every stage gave the expected exit code.
+
+| Stage | Exit code | Result |
+|---|---|---|
+| install | 0 | Done. |
+| lint (ruff) | 1 | 11 findings, same as before. |
+| tests | 0 | 97 passed. |
+| semantic_layer | 0 | 35 passed. |
+| policy | 0 | 87 passed, 0 skipped. `opa test`: 32 of 32. |
+| security | 0 | 195 passed, 0 skipped. The skip guard passed. |
+| sbom | 0 | Done. |
+| pip_audit | 1 | 18 entries, 9 unique, same as before. |
+| bandit | 1 | 2 LOW, same as before. |
+| checksums | 0 | `access.rego` and `policy_data.json` now have new hashes. |
+
+The three exit-1 stages are real scan findings. None is switched off. The script exit code was 1 for that reason.
+
+Two side effects, both cleaned up:
+- The script's first step deletes `evidence/linux-py311/`. I restored that folder from git. It still holds the Linux run from S04-07.
+- The test run added rows to the tracked `logs/audit.log` (`BL-09`). I restored it with `git checkout`. It has 240 lines again.
+
+`git status` shows 11 modified files in `evidence/`. `pip-freeze.txt` and `exit-codes.txt` have the same content as before. Nothing is committed.
+
+I updated the two evidence files so they no longer say `evidence/` is stale: `docs/07-cicd/evidence.md` and `docs/14-audit/evidence.md`. The docs secret scan and the CI contract tests pass after the edit.
+
+One thing to know. `run-info.txt` names commit `e88c2e0…`, which is the last commit. The S05-14 work is not committed yet, so that id does not name the code that ran. Commit first and rerun the script if you want the id to match.

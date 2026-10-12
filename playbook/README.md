@@ -39,7 +39,7 @@ Each prompt is built from the eight parts in `Assignment Material/Prompt_Anatomy
 | `S04-11-reliability.md` | Phase 4, Challenge 11 | `docs/11-reliability/`, `tests/reliability/` | S04-09 |
 | `S04-12-finops.md` | Phase 4, Challenge 12 | `docs/12-finops/` | S04-08 |
 | `S05-13-security-validation.md` | Phase 5, Challenge 13 | `docs/13-security-validation/` | all S04 |
-| `S05-14-audit-chain.md` | Phase 5, Challenge 14 | `docs/14-audit/` | S04-08, S04-09 |
+| `S05-14-audit-chain.md` | Phase 5, Challenge 14 | `docs/14-audit/` | S04-03, S04-06, S04-08, S04-09, S04-11, S04-12, S05-13 |
 | `S05R-semantic-layer-revision.md` | Phase 5R | `semantic-layer/` (revised, version raised), `docs/02-baseline/semantic-layer-revision.md` | S05-13, S05-14 |
 | `S06-prd.md` | Phase 6 | `docs/prd/` | S05R PASS, or S03R PASS after an S03F round that fixed S05R rows |
 | `S06R-prd-review.md` | Phase 6 review | `docs/prd/prd-review.md` | S06 |

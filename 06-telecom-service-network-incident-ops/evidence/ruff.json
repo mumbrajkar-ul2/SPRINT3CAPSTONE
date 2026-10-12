@@ -3,7 +3,7 @@
     "cell": null,
     "code": "I001",
     "end_location": {
-      "column": 72,
+      "column": 85,
       "row": 5
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
@@ -11,7 +11,7 @@
       "applicability": "safe",
       "edits": [
         {
-          "content": "from typing import Optional\n\nfrom fastapi import FastAPI, Header, Request\nfrom fastapi.responses import JSONResponse\n\nfrom apps.api.services import ai_gateway, audit, domain_service, policy\n\n",
+          "content": "from typing import Optional\n\nfrom fastapi import FastAPI, Header, Request\nfrom fastapi.responses import JSONResponse\n\nfrom apps.api.services import ai_gateway, audit, audit_query, domain_service, policy\n\n",
           "end_location": {
             "column": 1,
             "row": 7
@@ -39,7 +39,7 @@
     "code": "UP045",
     "end_location": {
       "column": 76,
-      "row": 74
+      "row": 83
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
     "fix": {
@@ -49,11 +49,11 @@
           "content": "str | None",
           "end_location": {
             "column": 76,
-            "row": 74
+            "row": 83
           },
           "location": {
             "column": 63,
-            "row": 74
+            "row": 83
           }
         }
       ],
@@ -61,11 +61,11 @@
     },
     "location": {
       "column": 63,
-      "row": 74
+      "row": 83
     },
     "message": "Use `X | None` for type annotations",
     "name": "non-pep604-annotation-optional",
-    "noqa_row": 74,
+    "noqa_row": 83,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional"
   },

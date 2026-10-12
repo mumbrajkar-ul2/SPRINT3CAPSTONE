@@ -88,8 +88,9 @@ def audit_log(tmp_path, monkeypatch):
 
 
 def test_fixture_counts():
-    assert len(FIXTURES) == 23
-    assert len(ACCESS_FIXTURES) == 5
+    # S05-14 Half B added two access fixtures: ac-06 (allow, TA-35) and ac-07 (deny).
+    assert len(FIXTURES) == 25
+    assert len(ACCESS_FIXTURES) == 7
     assert len(AI_FIXTURES) == 10
     assert len(NOT_EVALUATED) == 8
 
@@ -117,9 +118,32 @@ def test_admin_has_no_blanket_access():
         assert result["matrix_rows"] == []
 
 
+def test_audit_read_is_allowed_for_admin_only():
+    """S05-14 Half B. TA-35 is the one row on resource.audit_log. Only role.admin matches it."""
+    audit_rows = [g for g in policy.ACCESS["grants"] if g["resource"] == "resource.audit_log"]
+    assert [g["row"] for g in audit_rows] == ["TA-35"]
+    allowed = policy.check_audit_read("role.admin")
+    assert allowed["allow"] is True
+    assert allowed["matrix_rows"] == ["TA-35"]
+    for role in ("role.operator", "role.engineer", "persona.ai_agent", "role.clinician", "role.automation_service", None):
+        result = policy.check_audit_read(role)
+        assert result["allow"] is False, role
+        assert result["matrix_rows"] == [], role
+
+
+def test_audit_read_row_allows_only_the_read_action():
+    """role.admin on the audit log may read. Any other action, or any changed field, is a deny."""
+    base = ACCESS_FIXTURES["ac-06-allow-admin-reads-audit-log"]["input"]
+    for action in ("action.summarize", "action.recommend", "action.approve", "action.write", "action.execute"):
+        assert policy.evaluate_access(with_changes(base, action=action))["allow"] is False, action
+
+
 def test_every_matrix_row_is_allowed_with_its_own_fields():
-    """Each of the 34 rows allows the exact call it describes. TA-24 and TA-25 need an approval id."""
-    assert len(policy.ACCESS["grants"]) == 34
+    """Each of the 35 rows allows the exact call it describes. TA-24 and TA-25 need an approval id.
+
+    S05-14 Half B added TA-35, the audit-read row, so the count moved from 34 to 35.
+    """
+    assert len(policy.ACCESS["grants"]) == 35
     for grant in policy.ACCESS["grants"]:
         payload = {name: grant[name] for name in ("role", "action", "resource", "purpose", "scope", "risk")}
         payload["approval_id"] = "APR-EXAMPLE-0001"
@@ -511,6 +535,11 @@ def access_inputs():
             "scope": "scope.all_records",
             "risk": "risk.read_only",
         }
+    # S05-14 Half B: the audit-read call for every live role. Only role.admin may match TA-35.
+    for live_role in ("role.operator", "role.engineer", "role.ai_agent", "role.admin", "role.clinician"):
+        yield with_changes(
+            ACCESS_FIXTURES["ac-06-allow-admin-reads-audit-log"]["input"], role=live_role
+        )
     yield {"action": "action.read"}
 
 

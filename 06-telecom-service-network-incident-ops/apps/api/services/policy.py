@@ -335,6 +335,24 @@ def check_summarize(role_id) -> dict:
     )
 
 
+def check_audit_read(role_id) -> dict:
+    """Access decision for GET /audit/{correlation_id}. TA-35 is the one allow row.
+
+    Stage S05-14 Half B. Only role.admin has a row (docs/14-audit/audit-read-access-design.md).
+    PROPOSED. Owner: Team-Force. A missing or unknown role has no row and is denied.
+    """
+    return evaluate_access(
+        {
+            "role": role_id,
+            "action": "action.read",
+            "resource": "resource.audit_log",
+            "purpose": "purpose.audit_review",
+            "scope": "scope.all_records",
+            "risk": "risk.read_only",
+        }
+    )
+
+
 def stale_topology_flag_of(record: dict):
     """The CSV cell as true, false, or None for a blank or unknown word."""
     word = str(record.get("stale_topology_flag", "")).strip().lower()

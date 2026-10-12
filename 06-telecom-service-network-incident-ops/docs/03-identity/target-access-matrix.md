@@ -87,6 +87,14 @@ Each row is one resource taken from a grant. The purpose, scope, and risk are th
 | TA-33 | `persona.ai_agent` | `action.recommend` | `resource.incident` | `purpose.ai_assistance` | `scope.assigned_incident` | `risk.recommendation` |
 | TA-34 | `persona.ai_agent` | `action.recommend` | `resource.device` | `purpose.ai_assistance` | `scope.assigned_incident` | `risk.recommendation` |
 
+**Row added in S05-14 Half B.** The table above has 34 rows and stays as written. `policy/opa/policy_data.json` now holds one more row, TA-35. TA-35 does not come from the YAML. It comes from `docs/14-audit/audit-read-access-design.md`, and Mangesh (FDE) accepted it on 2026-10-12.
+
+| Row | Role | Action | Resource | Purpose | Scope | Risk |
+|---|---|---|---|---|---|---|
+| TA-35 | `role.admin` | `action.read` | `resource.audit_log` | `purpose.audit_review` | `scope.all_records` | `risk.read_only` |
+
+The role is the live header word `admin`. It has no persona, so it matches only a row whose role is `role.admin`. TA-35 is the only such row. PROPOSED. Owner: Team-Force. Open question for S03: the YAML has no id for `resource.audit_log` or `purpose.audit_review`.
+
 ## Notes copied with the rows
 
 | Rows | Note from the YAML | Label |

@@ -1,0 +1,18 @@
+{
+  "ac-06-allow-admin-reads-audit-log": {
+    "name": "ac-06-allow-admin-reads-audit-log",
+    "area": "access",
+    "input": {
+      "role": "role.admin",
+      "action": "action.read",
+      "resource": "resource.audit_log",
+      "purpose": "purpose.audit_review",
+      "scope": "scope.all_records",
+      "risk": "risk.read_only"
+    },
+    "expected": {
+      "decision": "allow",
+      "matrix_row": "TA-35"
+    }
+  }
+}
