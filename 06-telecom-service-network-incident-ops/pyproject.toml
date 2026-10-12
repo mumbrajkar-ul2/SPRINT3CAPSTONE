@@ -2,7 +2,7 @@
 pythonpath = ["."]
 testpaths = ["tests", "policy/tests"]
 markers = [
-    "security: scans committed files for secret values and secret patterns, and runs the AI guardrail tests",
+    "security: abuse-case and negative tests for access, policy decisions (Python and Rego), AI guardrails, audit rows, and committed secrets. No test with this marker may be skipped or marked to fail.",
 ]
 
 [project]

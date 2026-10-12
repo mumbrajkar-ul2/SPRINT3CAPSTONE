@@ -1,6 +1,6 @@
 {
   "errors": [],
-  "generated_at": "2026-10-11T20:34:00Z",
+  "generated_at": "2026-10-12T06:09:05Z",
   "metrics": {
     ".\\semantic-layer/build.py": {
       "CONFIDENCE.HIGH": 0,
@@ -24,7 +24,7 @@
       "SEVERITY.LOW": 2,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 595,
+      "loc": 1437,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -63,7 +63,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 76,
+      "loc": 73,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -89,7 +89,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 15,
+      "loc": 365,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -102,7 +102,33 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 9,
+      "loc": 89,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "apps\\api\\services\\breaker.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 148,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
+    "apps\\api\\services\\dedupe.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 135,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -115,7 +141,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 15,
+      "loc": 36,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -128,7 +154,7 @@
       "SEVERITY.LOW": 2,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 290,
+      "loc": 299,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -141,7 +167,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 14,
+      "loc": 37,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -167,7 +193,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 17,
+      "loc": 47,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -197,6 +223,19 @@
       "nosec": 0,
       "skipped_tests": 0
     },
+    "scripts\\check_junit_no_skips.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 49,
+      "nosec": 0,
+      "skipped_tests": 0
+    },
     "scripts\\sanity_check.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
@@ -213,7 +252,7 @@
   },
   "results": [
     {
-      "code": "23 import shutil\n24 import subprocess\n25 from pathlib import Path\n",
+      "code": "24 import shutil\n25 import subprocess\n26 from pathlib import Path\n",
       "col_offset": 0,
       "end_col_offset": 17,
       "filename": "apps\\api\\services\\policy.py",
@@ -224,16 +263,16 @@
       },
       "issue_severity": "LOW",
       "issue_text": "Consider possible security implications associated with the subprocess module.",
-      "line_number": 24,
+      "line_number": 25,
       "line_range": [
-        24
+        25
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess",
       "test_id": "B404",
       "test_name": "blacklist"
     },
     {
-      "code": "65     try:\n66         proc = subprocess.run(\n67             command,\n68             input=json.dumps(payload),\n69             capture_output=True,\n70             text=True,\n71             check=False,\n72         )\n73     except OSError as err:\n",
+      "code": "85     try:\n86         proc = subprocess.run(\n87             command,\n88             input=json.dumps(payload),\n89             capture_output=True,\n90             text=True,\n91             check=False,\n92         )\n93     except OSError as err:\n",
       "col_offset": 15,
       "end_col_offset": 9,
       "filename": "apps\\api\\services\\policy.py",
@@ -244,15 +283,15 @@
       },
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
-      "line_number": 66,
+      "line_number": 86,
       "line_range": [
-        66,
-        67,
-        68,
-        69,
-        70,
-        71,
-        72
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92
       ],
       "more_info": "https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",

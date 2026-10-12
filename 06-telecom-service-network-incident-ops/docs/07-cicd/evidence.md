@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S04-07 — CI/CD and supply chain (Challenge 7), Half B |
-| Date / version | 2026-10-11, v1.0 |
+| Date / version | 2026-10-11, v1.0. v1.1 (S05-13 Half B): the section "Update from S05-13 Half B" below gives the current counts. The counts in the sections after it are as of S04-07 Half B and are kept as the record of that run. |
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | PASS. The pipeline wrote all 13 script files and the checklist points at each one. It ran on Windows (`scripts/evidence.ps1`) and on Linux (`scripts/evidence.sh`, and through `make evidence`). Three stages exit 1 because the scans found real issues (ruff 12, pip-audit 9 advisories, bandit 2). Each issue has a backlog row. Whether the workflow runs on GitHub is Unknown. Owner: Team-Force. |
 | Evidence sources | `scripts/evidence.sh`; `scripts/evidence.ps1`; `Makefile`; `requirements-dev.txt`; `.github/workflows/ci.yml` (repo root); `tests/ci/test_evidence_contract.py`; `evidence/` (13 files plus `README.md`); `evidence/linux-py311/` (13 files); `docs/07-cicd/release-evidence-checklist.md`; `docs/07-cicd/pipeline-improvement-plan.md` |
@@ -16,6 +16,26 @@
 This file records what Half B built, every run, what each stage returned, and what the gate result is. The outputs come from real command runs on 2026-10-11. None was typed by hand.
 
 Commands ran from `06-telecom-service-network-incident-ops/`. Claim labels: **Verified Fact**, **Inference**, **Assumption**, **Unknown**.
+
+## Update from S05-13 Half B
+
+**Verified Fact.** These numbers come from `scripts\evidence.ps1` (all stages) run on 2026-10-11 on Windows, Python 3.13.5, with `opa` 1.21.1 on the PATH. The files are in `evidence/`. The output is in `docs/13-security-validation/evidence.md`.
+
+| Stage | At S04-07 Half B | Now (S05-13 Half B) | Why it changed |
+|---|---|---|---|
+| tests (`pytest tests -m "not security"`) | 20 passed | **97 passed, 0 skipped** (`junit-tests.xml`) | S04-08 to S04-12 added tests. S05-13 marks 12 more tests `security`, which moves them to stage 6. S05-13 adds 8 tests to `tests/ci`. |
+| semantic_layer | 35 passed | 35 passed | No change. |
+| policy (`pytest policy/tests`, `opa test`) | 83 passed, 2 skipped on Windows | **83 passed, 0 skipped.** `opa test`: 30 of 30 | `opa` 1.21.1 is on the PATH. |
+| security (`pytest -m security`) | 1 passed | **159 passed, 0 skipped** (`junit-security.xml`) | The marker covers 6 access tests, 83 policy tests, 3 audit-row tests, 3 characterization tests, 51 guardrail tests, 1 secret-pattern test, and 12 new tests. The stage now also fails when any test is skipped (`scripts/check_junit_no_skips.py`). |
+| lint (ruff) | 12 findings | **11 findings** (BL-10) | Exit 1. The 2 `ai_gateway.py` findings are no longer in `ruff.json`. `breaker.py` has 1 new finding (`SIM114`). S05-13 added none. |
+| pip_audit | 9 advisories | 9 advisories (BL-11) | Exit 1. The file lists 18 entries. 9 are unique. |
+| bandit | 2 LOW | 2 LOW (BL-12) | Exit 1. |
+
+Three stages exit 1 (lint, pip_audit, bandit) because the scans found real issues. None is switched off.
+
+**CI.** The workflow already installed `opa` 1.21.1 with a sha256 check. S05-13 Half B leaves that step as it is and renames stage 6 in `ci.yml`. Stage 6 runs `scripts/evidence.sh security`, which now fails on a skipped test. The workflow has not run on GitHub (CI-01 stays open).
+
+**`make security`.** The Makefile has a target `security` that runs `bash scripts/evidence.sh security`. Make is not installed on this Windows machine, so the target was not run here. The Windows command with the same effect is `powershell -ExecutionPolicy Bypass -File scripts\evidence.ps1 -Stage security`. `tests/ci/test_skip_guard.py::test_makefile_has_a_security_target_that_runs_the_security_stage` checks the target text.
 
 ## What Half B built
 

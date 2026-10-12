@@ -3,10 +3,14 @@
 import json
 import uuid
 
+import pytest
 from fastapi.testclient import TestClient
 
 from apps.api.main import app
 from apps.api.services import audit
+
+# Stage S05-13 Half B: every test in this file is part of the security suite.
+pytestmark = pytest.mark.security
 
 client = TestClient(app)
 

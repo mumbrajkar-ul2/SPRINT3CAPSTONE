@@ -121,7 +121,12 @@ function Stage-Policy {
 
 function Stage-Security {
     & $VenvPython -m pytest -m security -q -p no:cacheprovider "--junitxml=$(Join-Path $EV 'junit-security.xml')"
-    $script:Code = $LASTEXITCODE
+    $pytestCode = $LASTEXITCODE
+    # S05-13 SB-10. pytest exits 0 when a test is skipped. A skipped security test fails this stage.
+    # The two Python-versus-Rego tests skip when `opa` is not on the PATH.
+    & $VenvPython scripts/check_junit_no_skips.py (Join-Path $EV 'junit-security.xml')
+    $guardCode = $LASTEXITCODE
+    if ($pytestCode -ne 0) { $script:Code = $pytestCode } else { $script:Code = $guardCode }
 }
 
 function Stage-Sbom {

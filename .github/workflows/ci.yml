@@ -55,7 +55,9 @@ jobs:
       - name: "Stage 5 policy tests (pytest and opa test)"
         if: ${{ !cancelled() }}
         run: bash scripts/evidence.sh policy
-      - name: "Stage 6 security tests (secret-pattern test)"
+      # S05-13. Runs `pytest -m security` and then fails the stage if any security test was skipped.
+      # `opa` is installed by the first step, so the two Python-versus-Rego tests run here.
+      - name: "Stage 6 security tests (pytest -m security, no skips allowed)"
         if: ${{ !cancelled() }}
         run: bash scripts/evidence.sh security
       - name: "Stage 7 SBOM (CycloneDX)"

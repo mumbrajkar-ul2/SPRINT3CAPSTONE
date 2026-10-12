@@ -103,6 +103,13 @@ stage_policy() {
 
 stage_security() {
     "$PY" -m pytest -m security -q -p no:cacheprovider --junitxml="$EV/junit-security.xml"
+    local pytest_code=$?
+    # S05-13 SB-10. pytest exits 0 when a test is skipped. A skipped security test fails this stage.
+    # The two Python-versus-Rego tests skip when `opa` is not on the PATH.
+    "$PY" scripts/check_junit_no_skips.py "$EV/junit-security.xml"
+    local guard_code=$?
+    if [ "$pytest_code" -ne 0 ]; then return "$pytest_code"; fi
+    return "$guard_code"
 }
 
 stage_sbom() {

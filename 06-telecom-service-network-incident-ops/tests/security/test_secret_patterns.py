@@ -37,7 +37,9 @@ def _iter_scanned_files():
             continue
         if path.resolve() == self:
             continue
-        if any(part in SKIP_DIR_NAMES for part in path.parts):
+        # Test the part of the path below REPO only. The full path can hold a folder
+        # named docs or venv above the repo (S05-13 SB-18), which would skip every file.
+        if any(part in SKIP_DIR_NAMES for part in path.relative_to(REPO).parts):
             continue
         if path.suffix in {".pyc", ".pyo", ".png", ".jpg", ".jpeg", ".gif", ".woff", ".woff2"}:
             continue
@@ -79,5 +81,7 @@ def find_secret_pattern_hits():
 
 @pytest.mark.security
 def test_repo_has_no_secret_patterns():
+    # A scan that read no file would also find no hit. Check that it read files first.
+    assert len(list(_iter_scanned_files())) > 50
     hits = find_secret_pattern_hits()
     assert hits == [], hits

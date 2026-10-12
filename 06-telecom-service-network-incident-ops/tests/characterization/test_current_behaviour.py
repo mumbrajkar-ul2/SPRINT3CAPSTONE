@@ -8,6 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 from apps.api.main import app
@@ -29,6 +30,7 @@ def test_missing_id_returns_first_row():
     assert response.json()["device_id"] == "REC-0001"
 
 
+@pytest.mark.security
 def test_clinician_role_is_denied_on_record_read():
     """Replaces test_clinician_role_is_accepted_on_record_read.
 
@@ -50,6 +52,7 @@ def test_clinician_role_is_denied_on_record_read():
     assert response.json() == {"error": "forbidden"}
 
 
+@pytest.mark.security
 def test_ai_summarize_refuses_request_with_no_role_header(tmp_path, monkeypatch):
     """Replaces test_ai_summarize_accepts_request_with_no_role_header.
 
@@ -105,6 +108,7 @@ def test_etl_counts_blank_fields_and_keeps_its_old_count_meaning():
     assert data_names_after == data_names_before
 
 
+@pytest.mark.security
 def test_legacy_script_reads_password_from_environment():
     """Replaces test_legacy_script_holds_password_constant.
 

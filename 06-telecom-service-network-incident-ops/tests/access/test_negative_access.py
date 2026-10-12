@@ -5,9 +5,13 @@ recommend route and no execute route. S04-06 is the stage that enforces them
 in policy. These tests record the target decision and check the live routes.
 """
 
+import pytest
 from fastapi.testclient import TestClient
 
 from apps.api.main import app
+
+# Stage S05-13 Half B: every test in this file is part of the security suite.
+pytestmark = pytest.mark.security
 
 client = TestClient(app)
 

@@ -4979,3 +4979,343 @@ I added two rows to `playbook/STATUS.md`.
 Both rows say they were added on 2026-10-11 from the file headers and the chat record. Nobody logged them when the stages ran. The status words come from the S01 file headers and from the earlier reply that said the first S04-07 Half A kept its PASS.
 
 I changed no other row.
+
+## 2026-10-11 21:53
+
+**Model:** claude-sonnet-5-5 (Claude Sonnet 5.5)
+
+### User
+
+i will commit all changes made to Github since we last committed after successfully completing S03R round 3
+
+proceed
+
+### Assistant
+
+I read "proceed" as a go-ahead to commit and push. The commit is `e8bebb0` on `main`. The push to `origin/main` worked (`5f4a618..e8bebb0`). Nothing is left uncommitted.
+
+What the commit holds: 212 files, 29,978 lines added, 163 removed. It is the work from S04-03 to S04-12 (Half A and Half B), `STATUS.md`, `Project_Acronyms.md`, the transcript, and your moves into `Archive/`.
+
+Checks I ran before committing:
+- `.venv`, `.pytest_cache`, and `.ruff_cache` are ignored and were not added.
+- I removed 11 tracked `__pycache__` files from git. They stay on your disk.
+- No real `.env` file exists. Only `.env.example` was committed.
+- A search for key and token patterns found nothing real. It found the old legacy password `Welcome123`, quoted in documents that describe the S04-04 fix. That value was already in earlier commits. It still needs rotating if it was ever used anywhere.
+- `logs/audit.log` stays tracked, as before.
+
+One error: my commit message says "plus S05-13 and S05-14 playbook updates". Those two files are not in the commit. The message should end after "S04-12 (Half A and Half B)". Fixing it means amending the commit and force-pushing. I did not do that without asking.
+
+Git printed a "credential-manager is not a git command" warning during the push. The push still worked.
+
+## 2026-10-11 21:55
+
+**Model:** claude-sonnet-5-5 (Claude Sonnet 5.5)
+
+### User
+
+fix it
+
+### Assistant
+
+I fixed the commit message and updated GitHub.
+
+- New commit: `a4bc59b`, message "After completing S04-03 to S04-12 (Half A and Half B)". It replaces `e8bebb0`.
+- The files in the commit are the same. Only the message changed.
+- I pushed with `--force-with-lease`. It only overwrites the remote if nobody else pushed since my last push. The push went through.
+
+One file is uncommitted: `transcript/chat_transcript.md`. It holds the last three turns, written after the commit. It will go into your next commit.
+
+## 2026-10-11 21:58
+
+**Model:** claude-sonnet-5-5 (Claude Sonnet 5.5)
+
+### User
+
+does the @playbook/S05-13-security-validation.md cover all the inputs needed and does the prompt cover all aspects for that stage?
+
+### Assistant
+
+Mostly, but not fully. The inputs miss several files the prompt needs. Some prompt lines no longer match the repo. I changed no file.
+
+**Inputs that are missing or stale**
+1. `06-.../.github/workflows/ci.yml` is the wrong path. S04-07 Half B moved the workflow to `SPRINT3CAPSTONE/.github/workflows/ci.yml`. The old path no longer exists.
+2. `docs/09-ai-guardrails/trust-boundary-diagram.md` is not listed. Required analysis item 6 asks for a STRIDE table per boundary from that diagram (`B1` to `B9`). Add `ai-risk-register.md` and `unsafe-output-handling-rules.md` with it.
+3. `PRODUCTION_EVIDENCE_PACK_TEMPLATE.md` is not listed. The gate says every security claim in the evidence pack names a test. The template has a section "Automated Security Validation Evidence".
+4. `scripts/evidence.sh`, `scripts/evidence.ps1`, `Makefile`, `docs/07-cicd/evidence.md`, and the files in `evidence/` are not listed. The scanning checklist needs the real scan outputs. Half B edits the CI and make files.
+5. `tests/ci/test_evidence_contract.py` is not listed. It checks the evidence file names, including `junit-security.xml`.
+6. The `semantic-layer/` YAML files are not listed. The plan table has a "YAML rule id" column.
+7. `tests/observability/test_audit_schema.py` and `docs/08-observability/log-schema.md` are not listed. The abuse case "audit row missing correlation_id" needs them. `docs/02-baseline/defect-list.md` is also missing, for the old default role.
+
+**Prompt lines that no longer match the repo**
+- **The marker already exists.** `pyproject.toml` has `security`, but its description names only secrets and guardrails. `tests/ai` and `tests/security` carry the mark. `tests/access` (6 tests) and `policy/tests` (37 tests) do not. Half B step 1 should say "update the description and mark those two folders".
+- **The CI stage already exists.** Stage 6 in `ci.yml` runs `pytest -m security` and writes `evidence/junit-security.xml`. The prompt asks for a new stage that writes `evidence/security-tests.xml`. That duplicates the stage and breaks the file-name check. Also, the `tests` stage runs `-m "not security"`. Marking more tests moves them out of that stage, so the counts in earlier evidence change.
+- **`make security` is correct.** The Makefile has no such target.
+- **Skipped tests clash with the gate.** Two tests in `policy/tests/test_policy_python.py` skip when the `opa` program is missing. It is missing on this machine. The gate says BLOCKED if any security test is skipped. The prompt does not say whether those two count.
+- **The "insecure default" abuse case has no deny to prove.** A call with no role header still maps to `operator` by your S04-03 decision (`test_missing_role_header_keeps_operator_default`). That row, and the "no role header" row, belong in the backlog.
+
+**Aspects the prompt does not cover**
+- **Sensitive data in logs.** The objective names it. No abuse-case row checks that `mgmt_ip`, `credential_profile`, or a password stays out of `audit.log`.
+- **Policy bypass.** No row covers a caller sending `approval_required` as false (finding `AA-01`).
+- **The three failing scans.** ruff (12), pip-audit (9 advisories), and bandit (2 LOW) exit 1 on real findings. The gate does not say whether that makes the stage CONDITIONAL PASS.
+- **MAESTRO.** The threat model asks for STRIDE/MAESTRO. The prompt asks only for STRIDE, and the MAESTRO letters are Unknown here.
+
+**Covered well:** the six test areas in the objective, eleven named abuse cases, the Half B steps, the evidence labels, and the seven-item final response.
+
+I can patch the playbook file with the input fixes, the Half B wording, and the missing rows. Tell me how to treat the two skipped `opa` tests, and I will write that in too.
+
+## 2026-10-11 22:02
+
+**Model:** claude-sonnet-5-5 (Claude Sonnet 5.5)
+
+### User
+
+explain in layman terms- "How should the two skipped opa tests be treated?"
+
+### Assistant
+
+**What the two tests do.** The project writes its access rules twice. One copy is in Python. The other copy is in files that end in `.rego`, which a program called `opa` reads. Two tests run both copies on the same inputs and check that they give the same answer. One input set has 82,959 AI cases.
+
+**Why they skip.** The `opa` program is not installed on this machine. A test that needs it cannot run, so pytest marks it "skipped". A skip is not a pass and not a fail. It means the test did not run.
+
+**Why it matters for S05-13.** The stage says it is BLOCKED if any security test is skipped. It also says the final run must have no skipped test. If you mark `policy/tests` as security tests, these two skips fall inside that rule.
+
+**Your choices**
+1. **Make `opa` available so the two tests run.** Install the `opa` program on this machine, or run it in Docker, as you did in S04-06. Add an install step to the CI workflow. All security tests then run and none skip. This is the only choice that keeps the stage rule as written.
+2. **Leave those two tests out of the security group.** The security run then has no skips. The cost is that nothing in CI checks that the Python copy and the `.rego` copy agree. Write that gap in the remediation backlog with an owner.
+3. **Accept the skip.** The stage would be BLOCKED by its own rule, so this choice would also mean changing the rule.
+
+**My recommendation: choice 1.** The two copies of the rules can drift apart over time. These two tests are what catches that. In S04-06 they passed with Docker OPA: 98 passed and 30 of 30 Rego tests. Choice 2 is the fallback if you do not want to add `opa` to CI.
+
+Tell me the number (1, 2, or 3) and I will write it into the S05-13 playbook file.
+
+## 2026-10-11 22:04
+
+**Model:** claude-sonnet-5-5 (Claude Sonnet 5.5)
+
+### User
+
+1 - Make opa available so the two tests run. Install it on this machine, or run it in Docker as you did in S04-06. Add an install step to the CI workflow. All security tests then run and none skip. This is the only choice that keeps the stage rule as written.
+
+### Assistant
+
+I wrote choice 1 into `playbook/S05-13-security-validation.md`, with the other fixes from my earlier review. I did not install `opa` or change any code. That is Half B work.
+
+**What changed in the playbook file**
+- **Inputs:** the `ci.yml` path now points to the repo root. I added the scan outputs, the Makefile and evidence scripts, the contract test, the trust boundary diagram, the policy and baseline files, the three YAML files, and the evidence pack template.
+- **Prompt:** four more abuse cases. They are `approval_required` sent as false, sensitive fields in `audit.log`, the Python and Rego copies disagreeing, and the second no-header row. The "exists" column now has a third value, backlog. The no-header and insecure-default rows are backlog, because the `operator` default stays. The scanning item records the last scan results and says a failing scan with a backlog row gives CONDITIONAL PASS. The STRIDE table covers `B1` to `B9`. The MAESTRO letters stay an open question.
+- **Half B:** the marker already exists, so step 1 updates its description and marks `tests/access/` and `policy/tests/`. Step 3 is your choice. `opa` must be on the PATH of the pytest process. CI installs a pinned version. A Docker command run by hand does not satisfy the test. Step 4 keeps the existing CI stage and the file name `evidence/junit-security.xml`, and adds `make security`.
+- **Gate and done test:** both now name the `opa` install and the real file name.
+
+**Also logged:** two rows in `playbook/STATUS.md`, one for your decision and one for the playbook change.
+
+**One thing to know:** S04-06 ran the Rego tests through Docker OPA. I did not check how that run put `opa` where pytest could see it. Half A of S05-13 should confirm this before Half B relies on it.
+
+## 2026-10-11 22:06
+
+**Model:** claude-sonnet-5-5 (Claude Sonnet 5.5)
+
+### User
+
+patch the S05-13 playbook file with the input fixes, the Half B wording and the missing rows in case you have not done it already
+
+### Assistant
+
+I had already done it in the last turn. I checked the file again and found each patch in place. I made no new edit.
+
+| Patch | Where in `S05-13-security-validation.md` |
+|---|---|
+| Input fixes | Line 15 (`ci.yml` at the repo root), lines 16 to 29 (the added inputs, including the scan outputs, the trust boundary diagram, and the evidence pack template) |
+| Missing abuse-case rows | Line 43 (`approval_required` as false, sensitive fields in `audit.log`, Python versus Rego), and the "backlog" value for the "exists" column |
+| STRIDE and MAESTRO wording | Line 49 |
+| Half B wording | Lines 56 to 60 (the `opa` choice, the CI stage that already exists, `junit-security.xml`, `make security`) |
+| Locked facts | Lines 78 to 81 (marker, CI stage, scan results) |
+| Gate, expected output, and done test | Lines 100, 116, and 127 |
+
+No old file name `security-tests.xml` remains in the file.
+
+## 2026-10-11
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+INPUTS FOR S05-13 — Automated security validation. Attached: `tests/access`, `tests/security`, `tests/ai`, `policy/tests`, the scan plan, guardrail test pack, negative access test plan, `security/threat-model.md`, `ci.yml`, `pyproject.toml`, `Makefile`, the evidence scripts, the scan outputs, the trust boundary diagram, the YAML files, the defect list, the evidence pack template, and `playbook/S05-13-security-validation.md` lines 33 to 109. Run Half A only.
+
+### Assistant
+
+**1. Stage status: CONDITIONAL PASS (Half A).** Every abuse case has a test or a test design, and every STRIDE threat has a status. Open backlog rows have an owner (Team-Force). No code changed.
+
+**2. Key findings**
+
+- The plan has 27 rows. 20 already have a test, 4 need a new test (`NG-01` to `NG-04`), and 3 are backlog (`SB-01` no role header, `SB-02` default role in code, `SB-10` no CI check for a skipped test).
+- 19 of the 20 tests passed on 2026-10-11. The 20th is the Python-versus-Rego pair. Both tests skipped because `opa` is not on this machine. The last pass is the S04-06 Docker run (30 of 30 Rego tests, 82,959 AI inputs agree).
+- `GET /records/{id}` with no role header still returns the row as `operator`. `POST /ai/summarize/{id}` already denies the same call.
+- Header text is stored in `logs/audit.log` unchanged. A 5000-character id and a `password=...` string both went in whole.
+- The model answer is checked for one command sentence only. It is not checked for `mgmt_ip` or credential names.
+- Five scans plus ruff. Three are red on real findings: ruff 12, pip-audit 9 advisories, bandit 2 LOW. None is switched off.
+- `evidence/junit-security.xml` is stale. It shows 1 test. 52 tests carry the `security` marker today.
+- The secret scan skips `docs/`. A trial run on `docs/` gives 4 hits, and none is a secret.
+- STRIDE for B1 to B9: 51 threats. 28 covered by test, 2 covered by scan (finding still open), 21 open.
+
+**3. Major risks**
+
+- The role is a word the caller types. Every access test proves the policy for a stated role. None proves the caller holds that role (`SB-09`).
+- The Rego copy is the policy of record. It has no pass on this machine until `opa` is installed (`BL-07`, `SB-10`).
+- Nothing fails the build when a security test skips.
+- The audit log is a plain file with no tamper check. 96 old lines have no `correlation_id`.
+
+**4. Assumptions and unknowns**
+
+- Assumption: Team-Force owns every open row. The "stage that should fix it" column is PROPOSED.
+- Assumption: the 2 skipped `opa` tests are not yet marked `security`. Half B marks them and makes `opa` available (your decision, choice 1). If you count them as security tests today, the gate reads BLOCKED until Half B.
+- Unknown: whether the packet wants authentication.
+- Unknown: whether the app runs the code that the 9 pip-audit advisories describe. Nobody has read the advisory text.
+- Unknown: the rotation store for credentials.
+- Open question for S03: MAESTRO letters. They are not mapped and not expanded.
+- Open question for S03: no rule id for "no committed secret", "audit log has no forbidden field", and "Python and Rego copies agree".
+
+**5. Artifacts created** (under `06-telecom-service-network-incident-ops/`)
+
+- `docs/13-security-validation/security-test-suite-plan.md`
+- `docs/13-security-validation/negative-tests.md`
+- `docs/13-security-validation/scanning-checklist.md`
+- `docs/13-security-validation/abuse-case-evidence.md`
+- `docs/13-security-validation/remediation-backlog.md` (25 rows)
+- `security/threat-model.md` (extended, starter text kept)
+- `playbook/STATUS.md` (one row added)
+- `transcript/chat_transcript.md` (this turn)
+
+**6. Blocking issues**
+
+- None for Half A.
+- Half B depends on `opa` being installable on this Windows machine. Not yet checked.
+
+**7. Recommended next action**
+
+Read the six files. Then reply "Half A accepted" and give two decisions:
+
+1. `BL-03`: how to scan `docs/` for secrets. (a) Narrow the patterns for `docs/` to real key formats. (b) List the 4 reviewed lines as exceptions with a reason. (c) Reword the 3 lines in `docs/04-secrets/evidence.md`. Recommended: (a).
+2. `SB-10`: add a check to `scripts/evidence.sh` and `evidence.ps1` that fails when `junit-security.xml` shows any skipped test. Recommended: yes.
+
+Half B has not started.
+
+## 2026-10-11
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+my choice: 1 - a, 2 - yes. Is there anything else to address or confirm before running Half-B?
+
+### Assistant
+
+Your two choices and two answers I asked for are recorded in `playbook/STATUS.md`.
+
+1. `BL-03`: narrow the secret patterns for `docs/` to real key formats.
+2. `SB-10`: add a check that fails the run when `junit-security.xml` shows any skipped test.
+3. `opa` 1.21.1 goes into `C:\Users\mange\tools\opa`, with a sha256 check, and that folder is added to your user PATH.
+4. `BL-09`: `logs/audit.log` stays tracked. `evidence.md` records that it changes on each run.
+
+Checks I made (read-only): `opa`, `docker`, `winget` and `choco` are not on the PATH in this shell. The GitHub release file `opa_windows_amd64.exe` and its `.sha256` both answer HTTP 200, so the download works from here.
+
+Items that need no decision from you (listed so nothing surprises you in Half B):
+
+- The CI workflow already installs `opa` 1.21.1 with a sha256 check (`ci.yml` lines 33 to 39). Half B checks that it runs before stage 6. It adds no second install step.
+- Marking whole files with `@pytest.mark.security` moves 12 tests out of the `tests` stage (101 to 89). Stage 5 runs `policy/tests` with no marker filter, so those 83 tests run in two stages. That is on purpose.
+- The `SB-10` check also fails on any machine that has no `opa`. That matches your choice 1.
+- Narrowing the `docs/` patterns (choice 1a) adds a new scan test. It must pass on today's `docs/` and must fail on a planted value.
+- The 4 `NG` tests write rows to `logs/audit.log` or read it. I restore the file after my runs, as I did in Half A.
+
+Open: reply "Half A accepted" and Half B starts.
+
+## 2026-10-11
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Half A Accepted
+
+### Assistant
+
+**1. Stage status: CONDITIONAL PASS (Half B).** `pytest -m security` gives 159 passed and 0 skipped, with `opa` 1.21.1 on the PATH. Three scans still exit 1 on real findings. 20 backlog rows stay open with an owner.
+
+**2. Key findings**
+
+- `opa` 1.21.1 is installed in `C:\Users\mange\tools\opa` and on your user PATH. The sha256 of the download matches the published file.
+- The security run grew from 52 to 159 tests. Both Python-versus-Rego tests now run and pass. At Half A they skipped.
+- 12 new tests are under `tests/security/`. Each fails when its control is removed (proof runs in `evidence.md` section 4).
+- Stage 6 of the pipeline now fails when any security test is skipped (`scripts/check_junit_no_skips.py`). With `opa` off the PATH it exited 1 and named both skipped tests.
+- Full pipeline on Windows: tests 97 passed, semantic_layer 35, policy 83 plus `opa test` 30 of 30, security 159.
+- New finding `SB-20`: with `opa` on the PATH the app starts one `opa eval` program per decision. A record read takes a median 150 ms against 10 ms with the Python copy. A summary takes 401 ms against 26 ms. A timing test in `tests/reliability` failed 4 of 4 reruns until `tests/conftest.py` set the Python copy for route tests.
+- A policy test passed only when `opa` was missing. The cached `opa` search kept "not found" after another test emptied the PATH. Fixed in `policy/tests/test_policy_python.py`.
+- Closed: `SB-10`, `SB-11`, `SB-18`, `BL-03`, `BL-07`. Decided: `BL-09` (file stays tracked). Added: `SB-20`.
+
+**3. Major risks**
+
+- `SB-20`: the policy of record is slow in the app when `POLICY_ENGINE` is unset and `opa` is present.
+- `tests/access/test_negative_access.py::test_missing_role_header_keeps_operator_default` is now counted as a security test, and it passes because the gap `SB-01` is still open.
+- The `docs/` scan finds real key formats only. A password written in plain prose is not found.
+- Ruff 11, pip-audit 9 advisories, and bandit 2 LOW are still red. None is switched off.
+
+**4. Assumptions and unknowns**
+
+- All results come from one Windows machine (Python 3.13.5).
+- The workflow has not run on GitHub (CI-01).
+- Make is not installed here, so `make security` was not run. The same stage ran through `scripts\evidence.ps1 -Stage security`.
+- Unknown: whether production runs `opa` as a long-lived server.
+- The plan said 4 new tests. The result is 12, because of parameters and the `SB-18` and `BL-03` tests.
+
+**5. Artifacts created or changed** (under `06-telecom-service-network-incident-ops/`)
+
+- New: `docs/13-security-validation/evidence.md`, `scripts/check_junit_no_skips.py`, `tests/ci/test_skip_guard.py`, and four files under `tests/security/` (`test_audit_log_security.py`, `test_client_flags_ignored.py`, `test_secret_detector.py`, `test_docs_secret_scan.py`).
+- Changed: `pyproject.toml`, `Makefile`, `scripts/evidence.sh`, `scripts/evidence.ps1`, `tests/conftest.py`, `tests/security/test_secret_patterns.py`, `tests/access/test_negative_access.py`, `tests/observability/test_audit_schema.py`, `tests/characterization/test_current_behaviour.py`, `policy/tests/test_policy_python.py`, `.github/workflows/ci.yml` (stage 6 name and comment), `docs/07-cicd/evidence.md`, `docs/07-cicd/pipeline-improvement-plan.md`, and the Half A files (`security/threat-model.md`, the plan, negative tests, abuse-case evidence, backlog).
+- Refreshed by the pipeline run: the files in `evidence/`. `logs/audit.log` was restored to 240 lines.
+- Not changed: anything under `apps/`.
+
+**6. Blocking issues**
+
+- None. No security test is skipped. No scan is switched off.
+
+**7. Recommended next action**
+
+Decide on `SB-20`: should the app run `opa` as a long-lived server, or should the default engine stay the Python copy? Then commit the work. After that, run S05-14 (audit chain), which closes `SB-12`. The Linux run and the first GitHub run still prove the workflow, so run one when you push.
+
+## 2026-10-11
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Decide SB-20 for me: run opa as a long-lived server, or keep the Python copy as the default engine. What is your recommendation as a FDE?
+
+### Assistant
+
+**Recommendation: keep the Python copy as the default engine for now. Do not add an `opa` server in this packet. Set the engine explicitly so it no longer depends on what is on the PATH.**
+
+Measured today (read-only, this Windows machine):
+
+| Way to evaluate one access decision | Time |
+|---|---|
+| Python copy (`policy.evaluate_access`) | median 0.005 ms |
+| `opa run --server` on localhost, over HTTP | median 6.3 ms, p95 30.7 ms (50 calls) |
+| `opa eval` started as a new program, as the app does today with `opa` on the PATH | a record read takes a median 150 ms, a summary 401 ms (`evidence.md` EV-01) |
+
+Why keep the Python copy:
+
+1. The Rego copy is still checked. The two agreement tests run on 82,959 inputs and `opa test` passes 30 of 30. The skip guard (`SB-10`) fails the build if those tests ever skip. So the Python copy cannot drift from the Rego copy without a red build.
+2. A server adds work this packet has no room for: a second process to start and stop, a port, a timeout, a failure rule (server down means deny), and a change to the `Dockerfile` and the workflow. Each needs its own test.
+3. The speed gain is small. The Python copy is about 1,000 times faster than the server per decision.
+4. The setting `auto` is the hazard. The same code answers in 10 ms or 150 ms, depending on whether `opa` is on the PATH. A reader cannot tell which engine ran from the code.
+
+What to change (a small follow-up, not done now):
+
+- Make the default of `POLICY_ENGINE` equal to `python` in `apps/api/services/policy.py`, and keep `opa` as an explicit choice.
+- Add the engine name to the audit row or the health body, so a reader can see which engine decided.
+- Keep `tests/conftest.py` as it is.
+
+When to revisit: if a stage decides that Rego must decide in production, run the server then, with a bundle, a timeout, a deny on failure, and a latency test with a limit the team sets.
+
+Risk of this choice: the Python copy is code the team wrote. The agreement tests cover the inputs they use. They do not prove every input.
+
+Nothing in `apps/` changed. I added the measurement and this recommendation to the `SB-20` row in `remediation-backlog.md`. The decision stays with you.

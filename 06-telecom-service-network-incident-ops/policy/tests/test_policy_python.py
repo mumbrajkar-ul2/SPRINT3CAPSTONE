@@ -21,6 +21,11 @@ from fastapi.testclient import TestClient
 from apps.api.main import app
 from apps.api.services import audit, domain_service, policy
 
+# Stage S05-13 Half B: every test in this file is part of the security suite.
+# That includes the two tests that compare the Python copy with the Rego copy.
+# They need `opa` on the PATH. A skip there is a failure of the security gate.
+pytestmark = pytest.mark.security
+
 FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures"
 # Each file holds one object keyed by the fixture name. That lets `opa test`
 # merge all the files into data.fixtures. The Rego tests read the same files.
@@ -51,8 +56,17 @@ def with_changes(base, **changes):
 
 @pytest.fixture(autouse=True)
 def python_engine(monkeypatch):
-    """Run the Python copy unless a test says otherwise."""
+    """Run the Python copy unless a test says otherwise.
+
+    S05-13 Half B. The search for the `opa` program is cached once per process. With `opa`
+    on the PATH, test_engine_failure_denies (which empties PATH) filled the cache with "not
+    found", and test_engine_name_follows_the_setting then failed. Reset the cache around
+    every test so no test sees another test's PATH.
+    """
     monkeypatch.setenv("POLICY_ENGINE", "python")
+    policy.reset_engine_cache()
+    yield
+    policy.reset_engine_cache()
 
 
 @pytest.fixture

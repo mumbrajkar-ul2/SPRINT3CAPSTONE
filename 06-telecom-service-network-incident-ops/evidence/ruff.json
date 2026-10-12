@@ -11,7 +11,7 @@
       "applicability": "safe",
       "edits": [
         {
-          "content": "from typing import Optional\n\nfrom fastapi import FastAPI, Header\nfrom fastapi.responses import JSONResponse\n\nfrom apps.api.services import ai_gateway, audit, domain_service, policy\n\n",
+          "content": "from typing import Optional\n\nfrom fastapi import FastAPI, Header, Request\nfrom fastapi.responses import JSONResponse\n\nfrom apps.api.services import ai_gateway, audit, domain_service, policy\n\n",
           "end_location": {
             "column": 1,
             "row": 7
@@ -38,8 +38,8 @@
     "cell": null,
     "code": "UP045",
     "end_location": {
-      "column": 58,
-      "row": 36
+      "column": 76,
+      "row": 74
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
     "fix": {
@@ -48,115 +48,91 @@
         {
           "content": "str | None",
           "end_location": {
-            "column": 58,
-            "row": 36
+            "column": 76,
+            "row": 74
           },
           "location": {
-            "column": 45,
-            "row": 36
+            "column": 63,
+            "row": 74
           }
         }
       ],
       "message": "Convert to `X | None`"
     },
     "location": {
-      "column": 45,
-      "row": 36
+      "column": 63,
+      "row": 74
     },
     "message": "Use `X | None` for type annotations",
     "name": "non-pep604-annotation-optional",
-    "noqa_row": 36,
+    "noqa_row": 74,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional"
   },
   {
     "cell": null,
-    "code": "I001",
-    "end_location": {
-      "column": 16,
-      "row": 1
-    },
-    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\services\\ai_gateway.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "import os\nimport time\n\n",
-          "end_location": {
-            "column": 1,
-            "row": 3
-          },
-          "location": {
-            "column": 1,
-            "row": 1
-          }
-        }
-      ],
-      "message": "Organize imports"
-    },
-    "location": {
-      "column": 1,
-      "row": 1
-    },
-    "message": "Import block is un-sorted or un-formatted",
-    "name": "unsorted-imports",
-    "noqa_row": 1,
-    "severity": "error",
-    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
-  },
-  {
-    "cell": null,
-    "code": "F401",
-    "end_location": {
-      "column": 10,
-      "row": 1
-    },
-    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\services\\ai_gateway.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "import time",
-          "end_location": {
-            "column": 16,
-            "row": 1
-          },
-          "location": {
-            "column": 1,
-            "row": 1
-          }
-        }
-      ],
-      "message": "Remove unused import: `os`"
-    },
-    "location": {
-      "column": 8,
-      "row": 1
-    },
-    "message": "`os` imported but unused",
-    "name": "unused-import",
-    "noqa_row": 1,
-    "severity": "error",
-    "url": "https://docs.astral.sh/ruff/rules/unused-import"
-  },
-  {
-    "cell": null,
     "code": "DTZ003",
     "end_location": {
-      "column": 37,
-      "row": 9
+      "column": 32,
+      "row": 87
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\services\\audit.py",
     "fix": null,
     "location": {
-      "column": 20,
-      "row": 9
+      "column": 15,
+      "row": 87
     },
     "message": "`datetime.datetime.utcnow()` used",
     "name": "call-datetime-utcnow",
-    "noqa_row": 9,
+    "noqa_row": 87,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/call-datetime-utcnow"
+  },
+  {
+    "cell": null,
+    "code": "SIM114",
+    "end_location": {
+      "column": 33,
+      "row": 168
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\services\\breaker.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": " or self._state == CLOSED and self._failures >= self.failure_threshold",
+          "end_location": {
+            "column": 54,
+            "row": 165
+          },
+          "location": {
+            "column": 54,
+            "row": 165
+          }
+        },
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 169
+          },
+          "location": {
+            "column": 1,
+            "row": 167
+          }
+        }
+      ],
+      "message": "Combine `if` branches"
+    },
+    "location": {
+      "column": 17,
+      "row": 165
+    },
+    "message": "Combine `if` branches using logical `or` operator",
+    "name": "if-with-same-arms",
+    "noqa_row": 165,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/if-with-same-arms"
   },
   {
     "cell": null,
@@ -170,7 +146,7 @@
       "applicability": "safe",
       "edits": [
         {
-          "content": "import argparse\nimport csv\nfrom pathlib import Path\n\n\n",
+          "content": "import argparse\nimport csv\nimport sys\nfrom pathlib import Path\n\n",
           "end_location": {
             "column": 1,
             "row": 4
@@ -279,7 +255,7 @@
     "code": "SIM103",
     "end_location": {
       "column": 16,
-      "row": 53
+      "row": 55
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\security\\test_secret_patterns.py",
     "fix": {
@@ -289,11 +265,11 @@
           "content": "return not (value.startswith(\"${\") or value.startswith(\"%\"))",
           "end_location": {
             "column": 16,
-            "row": 53
+            "row": 55
           },
           "location": {
             "column": 5,
-            "row": 51
+            "row": 53
           }
         }
       ],
@@ -301,11 +277,11 @@
     },
     "location": {
       "column": 5,
-      "row": 51
+      "row": 53
     },
     "message": "Return the negated condition directly",
     "name": "needless-bool",
-    "noqa_row": 51,
+    "noqa_row": 53,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/needless-bool"
   },
@@ -314,7 +290,7 @@
     "code": "PIE810",
     "end_location": {
       "column": 55,
-      "row": 51
+      "row": 53
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\security\\test_secret_patterns.py",
     "fix": {
@@ -324,11 +300,11 @@
           "content": "value.startswith((\"${\", \"%\"))",
           "end_location": {
             "column": 55,
-            "row": 51
+            "row": 53
           },
           "location": {
             "column": 8,
-            "row": 51
+            "row": 53
           }
         }
       ],
@@ -336,11 +312,11 @@
     },
     "location": {
       "column": 8,
-      "row": 51
+      "row": 53
     },
     "message": "Call `startswith` once with a `tuple`",
     "name": "multiple-starts-ends-with",
-    "noqa_row": 51,
+    "noqa_row": 53,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/multiple-starts-ends-with"
   },
