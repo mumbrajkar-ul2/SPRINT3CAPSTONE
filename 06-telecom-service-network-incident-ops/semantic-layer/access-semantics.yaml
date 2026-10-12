@@ -1,8 +1,9 @@
-# access-semantics.yaml -- semantic layer 1.0.0
+# access-semantics.yaml -- semantic layer 1.1.0
 # Who may do what, to which records, for what reason, and at what risk.
 # Five value lists with ids: actions, resources, purposes, scopes, risks.
 # Stage S04-03 writes the policy input model from these five lists. Stage S04-06 reads them in Rego.
-version: "1.0.0"
+# Stage S05R (1.1.0) added one resource, one OPA item, and corrected the sentences that described the state before S04-06.
+version: "1.1.0"
 file: access-semantics
 description: >-
   The seven telecom personas and what each may do. Every persona entry maps to actions, resources, a purpose, a
@@ -18,6 +19,11 @@ source:
   - docs/02-baseline/ai-qualification.md
   - docs/00-contract/operating-contract.md
   - docs/01-discovery/brownfield-risk-register.md
+  - docs/03-identity/target-access-matrix.md
+  - docs/14-audit/audit-read-access-design.md
+  - docs/10-performance/scaling-recommendations.md
+  - policy/opa/policy_data.json
+  - apps/api/services/policy.py
   - ../Project_Intent.md
 
 # ---------------------------------------------------------------------------
@@ -107,8 +113,19 @@ resources:
   - id: resource.sensitive_device_fields
     name: sensitive device fields
     fields: [field.device.mgmt_ip, field.device.credential_profile]
-    description: The two device cells that must stay out of prompts. Which personas may read them is Unknown. Today every allowed role reads them.
-    source: [docs/02-baseline/defect-list.md, docs/00-contract/operating-contract.md]
+    description: >-
+      The two device cells that must stay out of prompts. Which personas may read them is Unknown. Today every
+      allowed role reads them. Now (S05R, 1.1.0): stage S04-03 proposed one allow row for these cells, TA-15, for
+      persona.network_engineer. The live record route still returns both cells to every allowed role (defect F10).
+    source: [docs/02-baseline/defect-list.md, docs/00-contract/operating-contract.md, docs/03-identity/target-access-matrix.md]
+  - id: resource.model_call_queue
+    name: model call queue
+    description: >-
+      A waiting line for model calls, so a slow model does not hold up the other routes. The queue is a proposal
+      (SR-04). No queue exists in the code. A policy row or an audit row that names the queue uses this id.
+    proposed: true
+    owner: Team-Force
+    source: [docs/10-performance/scaling-recommendations.md, apps/api/services/breaker.py]
 
 # ---------------------------------------------------------------------------
 # Value list 3 of 5: purposes. Why the caller is doing it.
@@ -236,21 +253,32 @@ api_roles_today:
     name: admin
     accepted_on: GET /records/{record_id}
     maps_to_persona: null
-    description: Accepted by the Python list. No telecom persona is called admin. The OPA file allows admin every action. That is the shared-admin gap.
-    source: [apps/api/main.py, policy/opa/access.rego]
+    description: >-
+      Accepted by the Python list. No telecom persona is called admin. Before stage S04-06, the OPA file allowed
+      admin every action. That was the shared-admin gap. Now (S05R, 1.1.0): role.admin has exactly one allow row,
+      TA-35. It may read resource.audit_log for purpose.audit_review over scope.all_records at risk.read_only.
+      Stage S04-06 removed the rule that allowed any admin. Stage S05-14 added TA-35.
+    source: [apps/api/main.py, policy/opa/access.rego, policy/opa/policy_data.json, docs/14-audit/audit-read-access-design.md]
   - id: role.operator
     name: operator
     accepted_on: GET /records/{record_id}
     maps_to_persona: persona.noc_operator
     mapping_label: Inference
-    description: Accepted by the Python list. Used when no header is sent. The OPA file allows operator to read. The closest persona is noc_operator. That mapping is an inference.
-    source: [apps/api/main.py, policy/opa/access.rego, docs/02-baseline/defect-list.md]
+    description: >-
+      Accepted by the Python list. Used when no header is sent on the record route. The closest persona is
+      noc_operator. That mapping is an inference. Before stage S04-06, the OPA file allowed operator to read. Now
+      (S05R, 1.1.0): the policy swaps role.operator for persona.noc_operator before it looks for a matching row.
+      Stage S04-06 made that change.
+    source: [apps/api/main.py, policy/opa/access.rego, docs/02-baseline/defect-list.md, apps/api/services/policy.py]
   - id: role.clinician
     name: clinician
     accepted_on: GET /records/{record_id}
     maps_to_persona: null
-    description: Accepted by the Python list. A health-care word in a telecom system. Listed under removed_roles below.
-    source: [apps/api/main.py, docs/02-baseline/defect-list.md]
+    description: >-
+      Accepted by the Python list. A health-care word in a telecom system. Listed under removed_roles below. Now
+      (S05R, 1.1.0): the word still reaches the policy as role.clinician. It matches no allow row, so the call gets
+      HTTP 403 and an audit row. Stage S04-06 made that change.
+    source: [apps/api/main.py, docs/02-baseline/defect-list.md, apps/api/services/policy.py]
   - id: role.engineer
     name: engineer
     accepted_on: GET /records/{record_id}
@@ -269,25 +297,50 @@ api_roles_today:
 opa_rules_today:
   - id: policy.opa.admin_any
     name: any admin
-    description: allow is true when input.role is admin. No action, resource, purpose, or scope check.
+    description: >-
+      The rule that was in policy/opa/access.rego before stage S04-06. allow was true when input.role was admin,
+      with no check of action, resource, purpose, or scope. Now (S05R, 1.1.0): stage S04-06 removed this rule.
+      The id stays so the old docs still resolve. Use policy.opa.access_matrix.
+    deprecated: true
+    replaced_by: policy.opa.access_matrix
     source: [policy/opa/access.rego]
   - id: policy.opa.operator_read
     name: operator plus read
-    description: allow is true when input.role is operator and input.action is read.
+    description: >-
+      The rule that was in policy/opa/access.rego before stage S04-06. allow was true when input.role was operator
+      and input.action was read. Now (S05R, 1.1.0): stage S04-06 replaced this rule with the allow rows for
+      persona.noc_operator. The id stays so the old docs still resolve. Use policy.opa.access_matrix.
+    deprecated: true
+    replaced_by: policy.opa.access_matrix
     source: [policy/opa/access.rego]
   - id: policy.opa.default_deny
     name: default deny
-    description: allow is false for every other input. No Python file calls this policy, so the API does not use it.
-    source: [policy/opa/access.rego, docs/01-discovery/current-state-architecture.md]
+    description: >-
+      allow is false for every other input. Before stage S04-06, no Python file called this policy, so the API did
+      not use it. Now (S05R, 1.1.0): apps/api/services/policy.py runs it, or its Python copy, on the record route,
+      the summary route, and the audit route. Stage S04-06 made that change. It is still the reason string for a
+      call with no matching row.
+    source: [policy/opa/access.rego, docs/01-discovery/current-state-architecture.md, apps/api/services/policy.py]
+  - id: policy.opa.access_matrix
+    name: access matrix rows
+    description: >-
+      The allow rows TA-01 to TA-35 in policy/opa/policy_data.json. A call is allowed when role, action, resource,
+      purpose, scope, and risk equal one row, the action is not on the caller's denied list, and an execute call
+      carries an approval id. TA-01 to TA-34 come from the personas in this file. TA-35 comes from
+      docs/14-audit/audit-read-access-design.md. Every row is PROPOSED.
+    proposed: true
+    owner: Team-Force
+    source: [policy/opa/policy_data.json, policy/opa/access.rego, docs/03-identity/target-access-matrix.md, docs/14-audit/audit-read-access-design.md]
 
 removed_roles:
   - role: role.clinician
     reason: >-
       A clinician is a health-care job. The telecom persona list in docs/domain-specific-spec.md does not contain
       it. The role lets a caller read a device row including mgmt_ip and credential_profile. Why it is on the list
-      is Unknown. Defect F03. Stage S04-03 removes it from the allow list.
+      is Unknown. Defect F03. Stage S04-03 proposed removing it from the allow list. Now (S05R, 1.1.0): the policy
+      has no allow row for role.clinician, so a call with that word gets HTTP 403. Stage S04-06 made that change.
     defect_refs: [F03]
-    source: [apps/api/main.py, docs/domain-specific-spec.md, docs/02-baseline/defect-list.md]
+    source: [apps/api/main.py, docs/domain-specific-spec.md, docs/02-baseline/defect-list.md, policy/opa/policy_data.json]
 
 # ---------------------------------------------------------------------------
 # The seven personas. Each grant names one action, the resources, a purpose, a scope, and a risk.
@@ -435,7 +488,10 @@ personas:
         scope: scope.own_vendor_devices
         risk: risk.read_only
     denied: [action.approve, action.execute, action.write, action.recommend]
-    note_today: The replay sent X-User-Role vendor and got error forbidden with HTTP 200 and no audit line.
+    note_today: >-
+      Before stage S04-06, the replay sent X-User-Role vendor and got error forbidden with HTTP 200 and no audit
+      line. Now (S05R, 1.1.0): the same call gets HTTP 403 and an audit row with action policy.deny. Stage S04-06
+      made that change.
     source: [docs/domain-specific-spec.md, docs/02-baseline/defect-list.md, data/synthetic/events.jsonl]
 
   - id: persona.ai_agent

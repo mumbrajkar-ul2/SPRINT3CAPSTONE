@@ -1,8 +1,19 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "file": "business-rules",
-  "description": "The rules this system must keep. Each rule has a stable id, the entities and fields it touches, what the code does today, the defect rows that show the gap, and the stage that will enforce it. enforced_today is false on every rule. The repo has no code that enforces any of them.",
+  "description": "The rules this system must keep. Each rule has a stable id, the entities and fields it touches, what the code does today, the defect rows that show the gap, and the stage that will enforce it. enforced_today is true when code under apps/ or etl/ runs the rule on a live route or in the batch. It is false when the rule is held only by a policy file, by a module that no route calls, or by nothing. At version 1.0.0 the flag was false on every rule. At 1.1.0 the file holds 20 rules. The flag is true on nine and false on eleven. The sentence \"Now (S05R, 1.1.0)\" in each current_behaviour says what is true now and which stage changed it.",
   "source": [
+    "docs/06-policy/policy-catalogue.md",
+    "docs/13-security-validation/security-test-suite-plan.md",
+    "docs/11-reliability/failure-mode-catalogue.md",
+    "docs/14-audit/audit-read-access-design.md",
+    "apps/api/services/dedupe.py",
+    "apps/api/services/policy.py",
+    "apps/api/services/audit.py",
+    "apps/api/services/audit_query.py",
+    "etl/run_daily_batch.py",
+    "policy/opa/access.rego",
+    "policy/opa/ai_action.rego",
     "docs/02-baseline/defect-list.md",
     "docs/02-baseline/ai-qualification.md",
     "docs/02-baseline/data-quality-baseline.md",
@@ -29,7 +40,7 @@
         "field.device.device_id"
       ],
       "statement": "When no device row has the requested id, the lookup returns no device. It does not return the first row or any other row.",
-      "current_behaviour": "domain_service.load_record returns rows[0] when no cell matches. GET /records/DOES-NOT-EXIST returns the REC-0001 row with HTTP 200. The summary of a missing id is a summary of REC-0001.",
+      "current_behaviour": "domain_service.load_record returns rows[0] when no cell matches. GET /records/DOES-NOT-EXIST returns the REC-0001 row with HTTP 200. The summary of a missing id is a summary of REC-0001. Now (S05R, 1.1.0): load_record still returns rows[0] for a missing id, and GET /records/{id} still returns it with HTTP 200. On the summary route, the policy input record_found is false when the loaded row's device_id differs from the id, and the call is BLOCK with failmode.missing_id (stage S04-09). The record route is unchanged.",
       "defect_refs": [
         "F01",
         "F02"
@@ -52,12 +63,12 @@
         "field.device.device_id"
       ],
       "statement": "The lookup compares the requested id with device_id only. It does not compare the id with hostname, vendor, or any other cell.",
-      "current_behaviour": "load_record tests record_id in row.values(). A request for the word legacy would return a row whose hostname is legacy.",
+      "current_behaviour": "Before stage S04-10, load_record tested record_id in row.values(). A request for the word legacy would have returned a row whose hostname is legacy. Now (S05R, 1.1.0): load_record looks the id up in an index of device_id and nothing else. Stage S04-10 (SR-01) made that change.",
       "defect_refs": [
         "F17",
         "F22"
       ],
-      "enforced_today": false,
+      "enforced_today": true,
       "enforcement_stage": "S04-11",
       "source": [
         "apps/api/services/domain_service.py",
@@ -73,11 +84,11 @@
         "concept.remediation"
       ],
       "statement": "Text from a model is a recommendation. No code path takes that text and changes a device, a circuit, an order, or an incident. The model never holds the execute agency.",
-      "current_behaviour": "The live gateway returns the sentence Review and approve before action. No execute route exists. The risk is a later worker who treats the JSON as a change ticket.",
+      "current_behaviour": "The live gateway returns the sentence Review and approve before action. No execute route exists. The risk is a later worker who treats the JSON as a change ticket. Now (S05R, 1.1.0): the gateway never returns EXECUTE. The answer type does not allow it, and the policy blocks EXECUTE for every caller except persona.automation_service (row B6 in policy/opa/ai_action.rego). Stage S04-09 made that change. No route changes stored state.",
       "defect_refs": [
         "F12"
       ],
-      "enforced_today": false,
+      "enforced_today": true,
       "enforcement_stage": "S04-09",
       "source": [
         "docs/02-baseline/ai-qualification.md",
@@ -96,7 +107,7 @@
         "field.alarm.last_seen_at"
       ],
       "statement": "On every alarm row, last_seen_at is the same time as first_seen_at or later. A row that breaks this is flagged and does not become an incident on its own.",
-      "current_behaviour": "166 of 354 alarm rows have last_seen_at before first_seen_at. Example ALA-00002 on file line 3. No code reads the file.",
+      "current_behaviour": "166 of 354 alarm rows have last_seen_at before first_seen_at. Example ALA-00002 on file line 3. No code reads the file. Now (S05R, 1.1.0): apps/api/services/dedupe.py check_alarm_row flags such a row with last_seen_before_first_seen, and flags a row with a blank or unreadable time with times_unreadable. No route or batch calls this module, so enforced_today stays false. Stage S04-11 made that change.",
       "defect_refs": [
         "F08"
       ],
@@ -119,7 +130,7 @@
         "role.admin"
       ],
       "statement": "Each actor uses its own identity with only the actions it needs. A shared user whose password sits in source, and an admin role that is allowed every action, both break this. Neither counts as least privilege.",
-      "current_behaviour": "legacy/reconcile_legacy.py holds user app_shared and a password in the source file. The same password text is in .env.example. policy/opa/access.rego allows any admin for any action. The gap list names overpowered_automation_account. Whether automation_service is the app_shared account is Unknown.",
+      "current_behaviour": "legacy/reconcile_legacy.py holds user app_shared and a password in the source file. The same password text is in .env.example. Before stage S04-06, policy/opa/access.rego allowed any admin for any action. The gap list names overpowered_automation_account. Whether automation_service is the app_shared account is Unknown. Now (S05R, 1.1.0): access.rego has no any-admin rule. role.admin has exactly one allow row, TA-35, which reads resource.audit_log. Stage S04-06 removed the any-admin rule. Stage S05-14 added TA-35. The password statement is unchanged by S05R.",
       "defect_refs": [
         "F05"
       ],
@@ -143,7 +154,7 @@
         "field.alarm.storm_batch_id"
       ],
       "statement": "Two alarm rows with the same dedupe_key and the same storm_batch_id are one alarm shown twice. They count as one alarm. The rows stay on disk. Grouping does not delete a row.",
-      "current_behaviour": "Three dedupe_key values appear twice. No code groups them. The check is string equality on two columns.",
+      "current_behaviour": "Three dedupe_key values appear twice. No code groups them. The check is string equality on two columns. Now (S05R, 1.1.0): apps/api/services/dedupe.py alarm_key and alarm_intake group alarms by the two columns and keep every row. No route or batch calls the module, so enforced_today stays false. Stage S04-11 made that change.",
       "defect_refs": [],
       "enforced_today": false,
       "enforcement_stage": "S04-11",
@@ -165,7 +176,7 @@
         "concept.policy_decision"
       ],
       "statement": "Before any change follows a model recommendation, three things exist in this order. The access policy returned allow. A named human wrote an approval id. An audit row was written. Then, and only then, a change may run. The change must also be reversible and validated.",
-      "current_behaviour": "The summary route calls no policy. No route writes an approval id. The audit row for ai.summary holds record_id and model only. All three gates are absent.",
+      "current_behaviour": "The summary route calls no policy. No route writes an approval id. The audit row for ai.summary holds record_id and model only. All three gates are absent. Now (S05R, 1.1.0): the summary route runs the access policy and the ai_action policy, and writes an audit row with 15 keys. The EXECUTE rows in the ai_action policy need an approval id, an audit row written, and a change plan that is reversible and validated (rows B7 to B10). No route writes an approval id and no route reaches EXECUTE, so the rule is held by the policy only and enforced_today stays false. Stages S04-06, S04-08, and S04-09 made that change.",
       "defect_refs": [
         "F11",
         "F12",
@@ -191,12 +202,12 @@
         "concept.prompt"
       ],
       "statement": "The prompt text sent to a model never contains mgmt_ip, credential_profile, a password, a key, or a token. The allow list in ai-context-policy.yaml names the fields that may enter.",
-      "current_behaviour": "PROMPT_TEMPLATE.format(record=record) places the whole device row in the prompt, including both fields.",
+      "current_behaviour": "Before stage S04-09, PROMPT_TEMPLATE.format(record=record) placed the whole device row in the prompt, including both fields. Now (S05R, 1.1.0): the gateway builds the prompt from policy.prompt_fields.allowed, checks the text for forbidden names and values, and stops the call with BLOCK and failmode.forbidden_field_in_prompt. Stage S04-09 made that change. The record route still returns both cells to every allowed role (defect F10).",
       "defect_refs": [
         "F12",
         "F10"
       ],
-      "enforced_today": false,
+      "enforced_today": true,
       "enforcement_stage": "S04-09",
       "source": [
         "apps/api/services/ai_gateway.py",
@@ -214,9 +225,9 @@
         "entity.ai_invocation"
       ],
       "statement": "When stale_topology_flag is true, the recommendation call stops before the model runs. The outcome is BLOCK. What a blank flag should do is Unknown.",
-      "current_behaviour": "The flag is inside the returned row. No branch reads it. 192 rows are true.",
+      "current_behaviour": "The flag is inside the returned row. No branch reads it. 192 rows are true. Now (S05R, 1.1.0): the ai_action policy reads the flag before the model runs (row B5). A true flag gives BLOCK and no model call. A blank flag gives HOLD_FOR_REVIEW (row H3). The summary route is blocked too, which is PROPOSED. Stage S04-09 made that change.",
       "defect_refs": [],
-      "enforced_today": false,
+      "enforced_today": true,
       "enforcement_stage": "S04-09",
       "source": [
         "docs/02-baseline/ai-qualification.md",
@@ -233,11 +244,11 @@
         "concept.policy_decision"
       ],
       "statement": "When a role is refused, the response status says refused and an audit row records the refusal. A refused call is not invisible.",
-      "current_behaviour": "A role outside the five-name list gets HTTP 200 with body error forbidden and no audit line.",
+      "current_behaviour": "Before stage S04-06, a role outside the five-name list got HTTP 200 with body error forbidden and no audit line. Now (S05R, 1.1.0): a refused call gets HTTP 403 and an audit row with action policy.deny, on the record route, the summary route, and the audit route. Stage S04-06 made that change.",
       "defect_refs": [
         "F14"
       ],
-      "enforced_today": false,
+      "enforced_today": true,
       "enforcement_stage": "S04-08",
       "source": [
         "apps/api/main.py",
@@ -253,7 +264,7 @@
         "concept.policy_decision"
       ],
       "statement": "A call that sends no role header is refused. The server does not fill in operator for the caller.",
-      "current_behaviour": "Header(default=\"operator\") on the record route allows the read. The summary route checks no role at all.",
+      "current_behaviour": "Header(default=\"operator\") on the record route allows the read. The summary route checks no role at all. Now (S05R, 1.1.0): the record route still fills in operator when the header is missing (defect F15, still open). The summary route and the audit route have no default. A missing header has no role and gets HTTP 403 (stage S04-06). See status.code.role_header.absent.",
       "defect_refs": [
         "F15",
         "F16"
@@ -273,11 +284,11 @@
         "concept.audit_row"
       ],
       "statement": "Every audit row holds who acted, which request chain it belongs to, and, for a model call, which approval id and policy result applied. See metric.audit_completeness.",
-      "current_behaviour": "audit.write_event writes ts, action, and details. No actor, no correlation id, no approval id.",
+      "current_behaviour": "Before stage S04-08, audit.write_event wrote ts, action, and details, with no actor, no correlation id, and no approval id. Now (S05R, 1.1.0): every row has the 15 keys in concept.audit_row, including actor and correlation_id. The approval_id key exists and is null on every row, because no route writes an approval id. Stages S04-08, S04-09, S04-12, and S05-14 made that change.",
       "defect_refs": [
         "F11"
       ],
-      "enforced_today": false,
+      "enforced_today": true,
       "enforcement_stage": "S05-14",
       "source": [
         "apps/api/services/audit.py",
@@ -298,7 +309,7 @@
         "field.ai_invocation.ai_call_id"
       ],
       "statement": "Each key value appears on one row of its table. A second row with the same key is a defect to hold aside, not a second object.",
-      "current_behaviour": "Each of the six CSV files has three keys that appear twice. Whether the repeated id should collapse is Unknown. Writes under data/synthetic are prohibited.",
+      "current_behaviour": "Each of the six CSV files has three keys that appear twice. Whether the repeated id should collapse is Unknown. Writes under data/synthetic are prohibited. Now (S05R, 1.1.0): the device loader keeps the first row of a repeated device_id in its index (stage S04-10). apps/api/services/dedupe.py has key functions for alarms, orders, and events. No route calls them for the other tables, so enforced_today stays false.",
       "defect_refs": [
         "F06"
       ],
@@ -308,6 +319,163 @@
         "docs/02-baseline/data-quality-baseline.md",
         "docs/02-baseline/defect-list.md",
         "docs/00-contract/operating-contract.md"
+      ]
+    },
+    {
+      "id": "rule.audit_case_id_limit",
+      "name": "an audit case id over 128 characters is refused",
+      "kind": "access",
+      "applies_to": [
+        "resource.audit_log",
+        "concept.audit_row",
+        "field.audit_row.correlation_id"
+      ],
+      "statement": "The audit route GET /audit/{correlation_id} refuses an id longer than 128 characters. It answers HTTP 400, writes a row with action audit.id_refused, and does not look the id up. The limit counts characters, and it does not limit which characters are allowed.",
+      "current_behaviour": "apps/api/services/audit_query.py holds MAX_ID_LENGTH 128. apps/api/main.py checks the length after the policy allows the call. The number 128 was accepted for stage S05-14 Half B by Mangesh (FDE) on 2026-10-12. It is PROPOSED. Whether the characters of an id need a limit is Unknown.",
+      "defect_refs": [],
+      "enforced_today": true,
+      "enforcement_stage": "S05-14",
+      "stage_note": "See status.code.audit_action.audit_id_refused and status.code.error.id_too_long.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "apps/api/main.py",
+        "docs/14-audit/audit-read-access-design.md",
+        "docs/14-audit/evidence.md"
+      ]
+    },
+    {
+      "id": "rule.audit_log_holds_no_forbidden_field",
+      "name": "the audit log holds no forbidden field",
+      "kind": "ai_gate",
+      "applies_to": [
+        "concept.audit_row",
+        "field.device.mgmt_ip",
+        "field.device.credential_profile",
+        "concept.prompt"
+      ],
+      "statement": "No audit row holds mgmt_ip, credential_profile, a password, a key, a token, or the prompt text. The audit row has fixed keys and no place for a device cell. The hash of the prompt stands in for the prompt text.",
+      "current_behaviour": "apps/api/services/audit.py write_event builds the row from the 15 fixed keys. The audit route replaces a value that holds a forbidden name before it leaves (audit_query.withhold_forbidden). The tests test_every_audit_row_has_every_required_field and test_gr11_audit_row_has_provenance_and_no_prompt_text check it.",
+      "defect_refs": [],
+      "enforced_today": true,
+      "enforcement_stage": "S04-12",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit.py",
+        "apps/api/services/audit_query.py",
+        "tests/observability/test_audit_schema.py",
+        "tests/ai/test_guardrails.py",
+        "docs/13-security-validation/security-test-suite-plan.md"
+      ]
+    },
+    {
+      "id": "rule.no_secret_value_committed",
+      "name": "no secret value is committed to the repo",
+      "kind": "data_invariant",
+      "applies_to": [
+        "concept.prompt",
+        "concept.audit_row"
+      ],
+      "statement": "No committed file holds a secret value. A file may name a secret, for example SHARED_DB_PASSWORD, and may not hold its value. A key pattern, a password assignment, or a token assignment with a real value in a file outside the skip list breaks this rule.",
+      "current_behaviour": "tests/security/test_secret_patterns.py test_repo_has_no_secret_patterns scans the tree. The semantic-layer test test_no_secret_value_anywhere_in_the_tree scans this folder. A test enforces the rule. No code in apps/ or etl/ does, so enforced_today is false. The legacy script reads its password from the environment.",
+      "defect_refs": [
+        "F05"
+      ],
+      "enforced_today": false,
+      "enforcement_stage": "S05-13",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "tests/security/test_secret_patterns.py",
+        "docs/13-security-validation/security-test-suite-plan.md",
+        "docs/04-secrets/sensitive-field-handling-checklist.md"
+      ]
+    },
+    {
+      "id": "rule.policy_copies_agree",
+      "name": "the Python copy and the Rego copy of the policy agree",
+      "kind": "access",
+      "applies_to": [
+        "policy.opa.access_matrix",
+        "concept.policy_decision"
+      ],
+      "statement": "The Python copy of each policy and the Rego copy return the same result for the same input. Both read one data file, policy_data.json.",
+      "current_behaviour": "policy/tests/test_policy_python.py runs both copies on every access row and on every AI action input (test_opa_and_python_agree_on_access and test_opa_and_python_agree_on_every_ai_action_combination). The tests need opa on the PATH. A test enforces the rule. No route does, so enforced_today is false.",
+      "defect_refs": [],
+      "enforced_today": false,
+      "enforcement_stage": "S04-06",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "policy/tests/test_policy_python.py",
+        "policy/opa/policy_data.json",
+        "apps/api/services/policy.py",
+        "docs/13-security-validation/security-test-suite-plan.md"
+      ]
+    },
+    {
+      "id": "rule.bad_row_held_aside_batch_goes_on",
+      "name": "a bad row is held aside and the batch goes on",
+      "kind": "data_invariant",
+      "applies_to": [
+        "entity.device",
+        "field.device.device_id",
+        "metric.quarantine_rate"
+      ],
+      "statement": "When a row in a batch is bad, the batch holds that row aside, names it by file line, and goes on with the other rows. A bad row is a row with a blank cell, a short row, a long row, or bytes that are not valid UTF-8. No file is written for the held-aside rows.",
+      "current_behaviour": "etl/run_daily_batch.py counts every such row in quarantined and prints each one on stderr with its file line. malformed still counts only rows with a blank cell. Stage S04-11 Half B made that change (decision D-7). The count is printed and is not stored (see the deferred decision on a stored place for it).",
+      "defect_refs": [],
+      "enforced_today": true,
+      "enforcement_stage": "S04-11",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "etl/run_daily_batch.py",
+        "tests/reliability/test_drills.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "rule.repeat_event_is_one_event",
+      "name": "an event seen twice is one event",
+      "kind": "data_invariant",
+      "applies_to": [
+        "entity.event",
+        "field.event.event_id"
+      ],
+      "statement": "Two event lines with the same event_id are one event. The second line is a repeat. The line stays on disk.",
+      "current_behaviour": "apps/api/services/dedupe.py event_key returns (event_id,) and DedupeSet says whether a key was seen. The memory lasts for one process. No route or batch calls it, so enforced_today is false. The key shape follows docs/11-reliability/idempotency-plan.md.",
+      "defect_refs": [],
+      "enforced_today": false,
+      "enforcement_stage": "S04-11",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/dedupe.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "rule.order_attempt_same_retry_is_one_attempt",
+      "name": "an order attempt with the same order_id and retry_count is one attempt",
+      "kind": "data_invariant",
+      "applies_to": [
+        "entity.service_order",
+        "field.service_order.order_id",
+        "field.service_order.retry_count"
+      ],
+      "statement": "Two order rows with the same order_id and the same retry_count are one attempt. A row with the same order_id and a different retry_count is a new attempt.",
+      "current_behaviour": "apps/api/services/dedupe.py order_key returns (order_id, retry_count). No route or batch calls it, so enforced_today is false.",
+      "defect_refs": [],
+      "enforced_today": false,
+      "enforcement_stage": "S04-11",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/dedupe.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
       ]
     }
   ]

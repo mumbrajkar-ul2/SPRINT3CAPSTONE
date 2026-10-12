@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "file": "status-taxonomy",
   "description": "Every status word used in code, docs, and the CSV files, with the column it sits in and how many rows hold it. Counts are from one read of data/synthetic on 2026-10-10. The repo defines no allowed list for any column. Each field below says so with allowed_list_defined_by_repo false.",
   "source": [
@@ -607,7 +607,7 @@
     {
       "id": "status.word.not_enforced",
       "word": "not_enforced",
-      "description": "A status word. A control exists in name and is not applied. The live summary returns guardrail_status not_enforced on every call. The same word also fills 15 other columns.",
+      "description": "A status word. A control exists in name and is not applied. Before stage S04-09, the live summary returned guardrail_status not_enforced on every call. Now (S05R, 1.1.0): the live summary returns enforced, and not_enforced is a failure value. Stage S04-09 made that change. The same word also fills 15 other columns.",
       "appears_in": [
         "status.device.hostname",
         "status.device.vendor",
@@ -4649,7 +4649,7 @@
       "id": "status.code.guardrail_status.not_enforced",
       "value": "not_enforced",
       "word": "status.word.not_enforced",
-      "description": "The live summary returns guardrail_status not_enforced on every call. The function does not check the prompt before it returns. 27 CSV rows also hold this word in guardrail_status.",
+      "description": "Before stage S04-09, the live summary returned guardrail_status not_enforced on every call. The function did not check the prompt before it returned. 27 CSV rows also hold this word in guardrail_status. Now (S05R, 1.1.0): the live gateway returns status.code.guardrail_status.enforced, and not_enforced is a failure value. Stage S04-09 made that change.",
       "source": [
         "apps/api/services/ai_gateway.py",
         "docs/01-discovery/ai-subsystem-discovery.md"
@@ -4676,7 +4676,7 @@
     {
       "id": "status.code.error.forbidden",
       "value": "forbidden",
-      "description": "A role outside the five-name list receives the body error forbidden with HTTP 200 and no audit line. That is defect F14.",
+      "description": "Before stage S04-06, a role outside the five-name list received the body error forbidden with HTTP 200 and no audit line. That was defect F14. Now (S05R, 1.1.0): the body error forbidden comes with HTTP 403 and an audit row with action policy.deny. Stage S04-06 made that change.",
       "source": [
         "apps/api/main.py",
         "docs/02-baseline/defect-list.md"
@@ -4685,7 +4685,7 @@
     {
       "id": "status.code.audit_action.record_read",
       "value": "record.read",
-      "description": "The audit action written after an allowed record read. Details hold record_id and role.",
+      "description": "The audit action written after an allowed record read. Before stage S04-08, details held record_id and role. Now (S05R, 1.1.0): the row has the 15 keys in concept.audit_row, and record_id is not one of them. Stages S04-08 and S04-12 made that change.",
       "source": [
         "apps/api/main.py",
         "apps/api/services/audit.py"
@@ -4694,7 +4694,7 @@
     {
       "id": "status.code.audit_action.ai_summary",
       "value": "ai.summary",
-      "description": "The audit action written after every summary call. Details hold record_id and model. No actor, no correlation id, no approval id.",
+      "description": "The audit action written after a summary call that ended RECOMMEND_ONLY. Before stage S04-08, details held record_id and model, with no actor, no correlation id, and no approval id. Now (S05R, 1.1.0): the row has the 15 keys in concept.audit_row. A held call writes policy.hold and a blocked call writes policy.deny (stage S04-09).",
       "source": [
         "apps/api/main.py",
         "apps/api/services/audit.py",
@@ -4714,10 +4714,534 @@
       "id": "status.code.role_header_default.operator",
       "value": "operator",
       "ref": "role.operator",
-      "description": "The value used when a call sends no X-User-Role header. That default allows the read. That is defect F15.",
+      "description": "The value used when a call sends no X-User-Role header. That default allows the read. That is defect F15. Now (S05R, 1.1.0): this is still true on the record route. The summary route has no default. It denies a call with no header (stage S04-06). See status.code.role_header.absent.",
       "source": [
         "apps/api/main.py",
         "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.policy_deny",
+      "value": "policy.deny",
+      "description": "The audit action written when the policy refuses a call, on any of the three routes. It also names an AI call that ended BLOCK. The outcome key holds BLOCK on an AI call and is null on an access refusal. The word is reused on the audit route (stage S05-14).",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/08-observability/log-schema.md",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.policy_hold",
+      "value": "policy.hold",
+      "description": "The audit action written when an AI call ends HOLD_FOR_REVIEW. The route returns HTTP 202 and no summary. The outcome key holds HOLD_FOR_REVIEW.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/08-observability/log-schema.md",
+        "docs/09-ai-guardrails/evidence.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.audit_read",
+      "value": "audit.read",
+      "description": "The audit action the route GET /audit/{correlation_id} writes on its own row when it returned a case. The row names resource.audit_log. The row is written after the read, so the case in the response does not include it.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/14-audit/audit-read-access-design.md",
+        "docs/14-audit/evidence.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.audit_not_found",
+      "value": "audit.not_found",
+      "description": "The audit action the audit route writes when the policy allowed the call and no row has the id. The route returns HTTP 404.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/14-audit/audit-read-access-design.md",
+        "docs/14-audit/evidence.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.audit_id_refused",
+      "value": "audit.id_refused",
+      "description": "The audit action the audit route writes when the id in the path is longer than the limit in rule.audit_case_id_limit. The route returns HTTP 400 and does not look the id up.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/14-audit/audit-read-access-design.md",
+        "docs/14-audit/evidence.md"
+      ]
+    },
+    {
+      "id": "status.code.error.not_found",
+      "value": "not_found",
+      "description": "The body error the audit route returns with HTTP 404 when no row has the id. The body holds no other text.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/14-audit/audit-read-access-design.md"
+      ]
+    },
+    {
+      "id": "status.code.error.id_too_long",
+      "value": "id_too_long",
+      "description": "The body error the audit route returns with HTTP 400 when the id in the path is over the limit. The body also holds max_length.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/audit-read-access-design.md"
+      ]
+    },
+    {
+      "id": "status.code.guardrail_status.enforced",
+      "value": "enforced",
+      "description": "The guardrail_status word the live gateway returns after stage S04-09. It says the prompt and answer checks ran. not_enforced is the failure value. This word is not in any CSV column.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/ai_gateway.py",
+        "docs/09-ai-guardrails/evidence.md"
+      ]
+    },
+    {
+      "id": "status.code.role_header.absent",
+      "value": "no X-User-Role header, or a blank one",
+      "description": "A call that sends no role header, or a blank one. apps/api/services/policy.py gives it no role id. The policy has no row for it, so the call is denied, and the audit row stores role null. The record route still treats a missing header as operator before it reaches the policy (defect F15).",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/policy.py",
+        "apps/api/main.py",
+        "docs/03-identity/policy-input-model.md",
+        "docs/03-identity/negative-access-test-plan.md"
+      ]
+    },
+    {
+      "id": "status.code.policy_reason.action_on_denied_list",
+      "value": "action_on_denied_list",
+      "description": "The reason string the access policy returns when a row matched and the action is on the caller's denied list. The denied list is the denied key on each persona in access-semantics.yaml. The call is refused.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "policy/opa/access.rego",
+        "apps/api/services/policy.py",
+        "docs/06-policy/evidence.md"
+      ]
+    },
+    {
+      "id": "status.code.token_estimate_method.word_count_x2_educational",
+      "value": "word_count_x2_EDUCATIONAL",
+      "description": "The value of the audit key token_estimate_method on a row that has a tokens number. It says tokens is the word count of the prompt times two. It is not a tokenizer and not a bill, so every number it makes is EDUCATIONAL. The key is null when tokens is null.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/ai_gateway.py",
+        "apps/api/services/audit.py",
+        "docs/08-observability/log-schema.md",
+        "docs/12-finops/finops-dashboard-fields.md"
+      ]
+    },
+    {
+      "id": "status.code.breaker_state.closed",
+      "value": "closed",
+      "description": "The model path is open for business. Calls go to the model. This is the normal state of the circuit breaker.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/breaker.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.breaker_state.open",
+      "value": "open",
+      "description": "The breaker refuses every call to the model for a set time. The call is held like a timeout. The word open here means refusing, not available.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/breaker.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.breaker_state.half_open",
+      "value": "half_open",
+      "description": "The set time has passed. The breaker lets one trial call through. A good answer returns it to closed. A failure returns it to open.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/breaker.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.model_call_queue_state.queued",
+      "value": "queued",
+      "word": "status.word.queued",
+      "description": "A model call is waiting in resource.model_call_queue. The same word is a workflow word on service orders. Here it means a waiting model call. The queue is a proposal (SR-04) and no code uses it.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/10-performance/scaling-recommendations.md"
+      ]
+    },
+    {
+      "id": "status.code.model_call_queue_state.running",
+      "value": "running",
+      "description": "A model call has left resource.model_call_queue and the model is working on it. The queue is a proposal (SR-04) and no code uses it.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/10-performance/scaling-recommendations.md"
+      ]
+    },
+    {
+      "id": "status.code.model_call_queue_state.done",
+      "value": "done",
+      "description": "A model call has finished and left resource.model_call_queue. The queue is a proposal (SR-04) and no code uses it.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/10-performance/scaling-recommendations.md"
+      ]
+    },
+    {
+      "id": "status.code.runbook_level.stopped",
+      "value": "Stopped",
+      "description": "A runbook level. A business route gives no useful answer to any caller, or audit rows cannot be written or are being lost. Act now. The level names are PROPOSED and use no number.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/runbooks/incident-response.md",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.runbook_level.degraded",
+      "value": "Degraded",
+      "description": "A runbook level. One dependency is down, and people still get answers or a held case. Work on it now. This is not the generic status word degraded on the CSV columns. It is the runbook's own level name.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/runbooks/incident-response.md",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.runbook_level.data_fault",
+      "value": "Data fault",
+      "description": "A runbook level. A data defect is found and the routes still answer. Record it and fix it in the next planned change.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/runbooks/incident-response.md",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.runbook_level.watch",
+      "value": "Watch",
+      "description": "A runbook level. A failure happened once and cleared by itself, and no user saw a wrong answer. Note it and look again if it repeats.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/runbooks/incident-response.md",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.field_destination.prompt",
+      "value": "prompt",
+      "description": "A place a field value may go. The text sent to a model. policy.prompt_fields says which fields may enter it.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/06-policy/policy-catalogue.md",
+        "apps/api/services/ai_gateway.py"
+      ]
+    },
+    {
+      "id": "status.code.field_destination.api_response",
+      "value": "api_response",
+      "description": "A place a field value may go. The body an API route returns to the caller. Today the record route returns every device cell, including mgmt_ip and credential_profile (defect F10).",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/06-policy/policy-catalogue.md",
+        "apps/api/main.py"
+      ]
+    },
+    {
+      "id": "status.code.field_destination.log_line",
+      "value": "log_line",
+      "description": "A place a field value may go. A row in logs/audit.log. rule.audit_log_holds_no_forbidden_field says which fields may never be written there.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/06-policy/policy-catalogue.md",
+        "apps/api/services/audit.py"
+      ]
+    },
+    {
+      "id": "status.code.fault.data_file_missing",
+      "value": "data file missing",
+      "description": "A fault, not a designed answer. devices.csv is missing and the record and summary routes return HTTP 500 plain text with no audit row. /health still says ok.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/11-reliability/failure-mode-catalogue.md",
+        "apps/api/services/domain_service.py"
+      ]
+    },
+    {
+      "id": "status.code.fault.audit_log_unwritable",
+      "value": "audit log unwritable",
+      "description": "A fault, not a designed answer. logs/audit.log cannot be written and every business route returns HTTP 500. No answer leaves without an audit row.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/11-reliability/failure-mode-catalogue.md",
+        "apps/api/services/audit.py"
+      ]
+    },
+    {
+      "id": "status.code.fault.policy_engine_failed",
+      "value": "policy_engine_error",
+      "description": "A fault, not a designed answer. The policy engine did not return a usable answer. The code returns the reason string policy_engine_error, and the call is refused.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/policy.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.policy_reason.input_invalid",
+      "value": "input_invalid",
+      "description": "The reason string the ai_action policy returns when the input has a missing key or a value outside its list. The call is BLOCK. See failmode.input_invalid.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "policy/opa/ai_action.rego",
+        "apps/api/services/policy.py",
+        "docs/09-ai-guardrails/unsafe-output-handling-rules.md"
+      ]
+    },
+    {
+      "id": "status.code.policy_reason.policy_version_differs",
+      "value": "policy_version_differs",
+      "description": "The reason string the ai_action policy returns when the policy version in the input differs from the version of the bundle. The call is HOLD_FOR_REVIEW. See failmode.policy_version_differs.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "policy/opa/ai_action.rego",
+        "docs/06-policy/ai-action-policy-design.md"
+      ]
+    },
+    {
+      "id": "status.code.alarm_flag.last_seen_before_first_seen",
+      "value": "last_seen_before_first_seen",
+      "description": "The flag the alarm intake check sets when last_seen_at is before first_seen_at. The row does not become an incident candidate. See rule.alarm_last_seen_not_before_first_seen.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/dedupe.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.alarm_flag.times_unreadable",
+      "value": "times_unreadable",
+      "description": "The flag the alarm intake check sets when first_seen_at or last_seen_at is blank or cannot be read, so the two cannot be compared. The row is flagged for review. What the owner wants for such a row is Unknown, and the flag is PROPOSED.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/dedupe.py",
+        "docs/11-reliability/failure-mode-catalogue.md"
+      ]
+    },
+    {
+      "id": "status.code.dedupe_result.new",
+      "value": "new",
+      "description": "The dedupe memory has not seen this key before. The row is kept as a first sighting.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/dedupe.py"
+      ]
+    },
+    {
+      "id": "status.code.dedupe_result.repeat",
+      "value": "repeat",
+      "description": "The dedupe memory has seen this key before. The row is a repeat of an earlier row. The row stays on disk. The memory lasts for one process.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/dedupe.py"
+      ]
+    },
+    {
+      "id": "status.code.dedupe_result.held_aside",
+      "value": "held_aside",
+      "description": "The row has no usable key, so the dedupe memory cannot decide. The row is held aside and counted.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/dedupe.py"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.approval_id",
+      "value": "approval_id",
+      "description": "A cannot-prove item. approval_id is null on every row of the case, and no approval route exists until stage S07.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.policy_decision",
+      "value": "policy_decision",
+      "description": "A cannot-prove item. policy_decision is null on every row of the case. The action word and the outcome are the only trace of the policy result.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.model",
+      "value": "model",
+      "description": "A cannot-prove item. No row of the case shows a model call. A call that stopped before the model has no hash.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.actor",
+      "value": "actor",
+      "description": "A cannot-prove item. At least one row of the case has no actor, because the role has no persona or the header was missing.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.final_action",
+      "value": "final_action",
+      "description": "A cannot-prove item. No column holds the final action. By the code, no route changes a device.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.record_asked_for",
+      "value": "record_asked_for",
+      "description": "A cannot-prove item. No column holds the record id the caller asked for.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.policy_reasons_and_version",
+      "value": "policy_reasons_and_version",
+      "description": "A cannot-prove item. The policy reasons and the policy version are not stored on any row.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.caller_identity",
+      "value": "caller_identity",
+      "description": "A cannot-prove item. The role is a header word the caller typed. Nothing proves who the caller was.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.case_membership",
+      "value": "case_membership",
+      "description": "A cannot-prove item. The caller chose the correlation_id. A second caller can reuse it and add a row to the case.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.log_integrity",
+      "value": "log_integrity",
+      "description": "A cannot-prove item. The log is a plain file, and a line can be changed or deleted. The route cannot prove the case is complete or unchanged.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.rows_before_correlation_id",
+      "value": "rows_before_correlation_id",
+      "description": "A cannot-prove item. Some lines in the log have no correlation_id and can never be returned by the audit route.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/audit-gap-report.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.unreadable_lines",
+      "value": "unreadable_lines",
+      "description": "A cannot-prove item. Some lines in the log could not be read and were skipped. The item appears only when that count is above zero.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
+      ]
+    },
+    {
+      "id": "status.code.cannot_prove.withheld_text",
+      "value": "withheld_text",
+      "description": "A cannot-prove item. Some values held a forbidden field name or a credential name and were replaced. The item appears only when that count is above zero.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/decision-provenance-model.md"
       ]
     }
   ],
@@ -4812,14 +5336,14 @@
     {
       "id": "collision.clinician_role_in_telecom_api",
       "name": "clinician is an API role in a telecom system",
-      "description": "apps/api/main.py accepts X-User-Role clinician on GET /records/{record_id}. A clinician is a health-care job. The telecom persona list in docs/domain-specific-spec.md does not contain it. A caller with that role can read a device row, including mgmt_ip and credential_profile. Why the word is on the list is Unknown.",
+      "description": "apps/api/main.py accepts X-User-Role clinician on GET /records/{record_id}. A clinician is a health-care job. The telecom persona list in docs/domain-specific-spec.md does not contain it. Before stage S04-06, a caller with that role could read a device row, including mgmt_ip and credential_profile. Why the word is on the list is Unknown.",
       "roles": [
         "role.clinician"
       ],
       "defect_refs": [
         "F03"
       ],
-      "resolution": "access-semantics.yaml lists role.clinician under removed_roles. Stage S04-03 removes it from the allow list.",
+      "resolution": "access-semantics.yaml lists role.clinician under removed_roles. Stage S04-03 proposed removing it from the allow list. Now (S05R, 1.1.0): the policy has no allow row for role.clinician. A caller with that word gets HTTP 403 and an audit row, and does not read the device row. Stage S04-06 made that change.",
       "source": [
         "apps/api/main.py",
         "docs/domain-specific-spec.md",
@@ -4832,7 +5356,7 @@
     {
       "id": "collision.token_count_vs_token_estimate",
       "name": "token_count in the CSV, token_estimate on the live body",
-      "description": "ai_invocations.csv stores token_count. The live summary returns token_estimate. They are two names for a token figure. The gateway does not write the CSV, so the two never meet.",
+      "description": "ai_invocations.csv stores token_count. Before stage S04-09, the live summary returned token_estimate. They are two names for a token figure. The gateway does not write the CSV, so the two never meet. Now (S05R, 1.1.0): the live body field is tokens, and the audit row key is tokens. The names token_count and tokens are two names for a token figure, and the number in tokens is EDUCATIONAL.",
       "fields": [
         "field.ai_invocation.token_count"
       ],
@@ -4891,13 +5415,43 @@
     {
       "id": "collision.mgmt_ip_holds_words",
       "name": "mgmt_ip holds words, not addresses",
-      "description": "Every filled mgmt_ip cell is one of alpha, beta, gamma, legacy, or modernized. None is a network address. The field still leaves the API in every allowed read and enters the prompt. The forbidden-field rule applies to the column, whatever it holds.",
+      "description": "Every filled mgmt_ip cell is one of alpha, beta, gamma, legacy, or modernized. None is a network address. The field still leaves the API in every allowed read of the record route (defect F10). Before stage S04-09 it also entered the prompt, and now the gateway keeps it out. The forbidden-field rule applies to the column, whatever it holds.",
       "fields": [
         "status.device.mgmt_ip"
       ],
       "source": [
         "data/synthetic/devices.csv",
         "docs/02-baseline/defect-list.md"
+      ]
+    },
+    {
+      "id": "collision.approval_required_column_and_policy_input",
+      "name": "approval_required as a status column and as a yes or no input",
+      "description": "The CSV column approval_required in ai_invocations.csv holds status words such as manual and pending. The policy input and the response field with the same spelling hold true or false. A query on the name approval_required mixes the two. The policy input has the id field.policy_input.approval_required. The column has the id field.ai_invocation.approval_required.",
+      "fields": [
+        "field.ai_invocation.approval_required",
+        "field.policy_input.approval_required"
+      ],
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "data/synthetic/ai_invocations.csv",
+        "policy/opa/ai_action.rego",
+        "docs/06-policy/ai-action-policy-design.md"
+      ]
+    },
+    {
+      "id": "collision.degraded_as_runbook_level_and_status_word",
+      "name": "Degraded as a runbook level and as a status word",
+      "description": "The runbook level Degraded means one dependency is down and people still get answers. The status word degraded fills columns in the CSV files with a different meaning. A query on the word mixes the two. The level has the id status.code.runbook_level.degraded.",
+      "words": [
+        "status.word.degraded"
+      ],
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/runbooks/incident-response.md",
+        "data/synthetic/ai_invocations.csv"
       ]
     }
   ]

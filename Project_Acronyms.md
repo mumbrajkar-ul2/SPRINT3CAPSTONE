@@ -2,14 +2,14 @@
 
 | Field | Value |
 |---|---|
-| Stage | Reader guide. Written while S04-03 Half A was in progress. Updated on 2026-10-11 after S04-12 Half B. |
-| Date / version | 2026-10-11, v1.2. v1.0 (2026-10-10) covered S04-03 Half A. v1.1 added the labels from S04-03 Half B through S04-07 Half B, and corrected five rows that the later stages made out of date (`OPA`, `CI`, `IaC`, `SBOM`, and the comment rows for `main.tf` and `access.rego`). v1.2 adds the labels from S04-08 through S04-12 Half B, and updates the rows for `EDUCATIONAL`, `HOLD_FOR_REVIEW`, `BLOCK`, `SLO`, and the comment rows for `ai_gateway.py` and `audit.py`. |
+| Stage | Reader guide. Written while S04-03 Half A was in progress. Updated on 2026-10-12 after S05-13, S05-14, and S05R. |
+| Date / version | 2026-10-12, v1.3. v1.0 (2026-10-10) covered S04-03 Half A. v1.1 added the labels from S04-03 Half B through S04-07 Half B, and corrected five rows that the later stages made out of date (`OPA`, `CI`, `IaC`, `SBOM`, and the comment rows for `main.tf` and `access.rego`). v1.2 added the labels from S04-08 through S04-12 Half B, and updated the rows for `EDUCATIONAL`, `HOLD_FOR_REVIEW`, `BLOCK`, `SLO`, and the comment rows for `ai_gateway.py` and `audit.py`. v1.3 adds the labels from S05-13 (security validation), S05-14 (audit chain), and S05R (semantic layer revision to version `1.1.0`). It also corrects the rows for `CI`, `PATH`, `Rego`, `TA-xx`, `AC-`, `S05R`, the scan codes, and the YAML prefix table. |
 | Author | Mangesh (FDE), drafted with Cursor |
-| Status | Current for the files on disk after S04-12 Half B. Stage ids S05-13 and later have not run, so no label from them is listed. A later stage that adds a new short code should add a row here. |
-| Evidence sources | Documents under the project root and `06-telecom-service-network-incident-ops/docs/`; `playbook/`; `semantic-layer/README.md`; comments in `apps/`, `etl/`, `legacy/`, `policy/opa/`, `infra/terraform/`, `scripts/`, `Dockerfile`, and `semantic-layer/`. v1.1 also read `docs/04-secrets/`, `docs/05-iac/`, `docs/06-policy/`, `docs/07-cicd/`, `policy/tests/fixtures/`, and `playbook/STATUS.md`. v1.2 also read `docs/08-observability/`, `docs/09-ai-guardrails/`, `docs/10-performance/`, `docs/11-reliability/`, `docs/12-finops/`, `docs/runbooks/`, `apps/api/services/breaker.py`, `apps/api/services/dedupe.py`, and `.env.example`. The synthetic CSV files and the chat transcript were left out of the scan. |
+| Status | Current for the files on disk after S05R. Stage ids S06 and later have not run, so no label from them is listed. A later stage that adds a new short code should add a row here. |
+| Evidence sources | Documents under the project root and `06-telecom-service-network-incident-ops/docs/`; `playbook/`; `semantic-layer/README.md`; comments in `apps/`, `etl/`, `legacy/`, `policy/opa/`, `infra/terraform/`, `scripts/`, `Dockerfile`, and `semantic-layer/`. v1.1 also read `docs/04-secrets/`, `docs/05-iac/`, `docs/06-policy/`, `docs/07-cicd/`, `policy/tests/fixtures/`, and `playbook/STATUS.md`. v1.2 also read `docs/08-observability/`, `docs/09-ai-guardrails/`, `docs/10-performance/`, `docs/11-reliability/`, `docs/12-finops/`, `docs/runbooks/`, `apps/api/services/breaker.py`, `apps/api/services/dedupe.py`, and `.env.example`. v1.3 also read `docs/13-security-validation/`, `docs/14-audit/`, `docs/02-baseline/semantic-layer-revision.md`, `apps/api/services/audit_query.py`, `scripts/check_junit_no_skips.py`, `evidence/ruff.json`, `evidence/bandit.json`, `evidence/pip-audit.json`, and the ten fixture files added since v1.2. The synthetic CSV files and the chat transcript were left out of the scan. |
 | Assumptions | A sample id such as `DEV-00013` is one row of a prefix. This file lists the prefix once. |
 | Unresolved issues | `security/threat-model.md` names STRIDE/MAESTRO and does not spell those letters out. The letters of MAESTRO are Unknown in this repo. |
-| Residual risks | Two lists can share a letter. `R07` is a risk. `R7` is a review check. Since v1.1, six more pairs share a label: `BL-01` (identity and CI/CD), `CM-01` (secrets and IaC), `H1` (a Half B run and a HOLD row), `R1` (a setup run and a review check), `AI-01` (a fixture and the words AI), and `OS-01` (a fixture and the letters OS). The tables below say which file each one lives in. Since v1.2, four more labels are shared: `PB-xx` (identity backlog and performance baseline), `HB-xx` (S04-06 Half B and S04-10 Half B), `DR-xx` (dependency register and reliability drills), and `B1` to `B9` (AI outcome rows and trust boundaries). The `D-1` to `D-7` decisions in `docs/11-reliability/` look like `D1` to `D8`, the hand-back ids, but they are a different list. |
+| Residual risks | Two lists can share a letter. `R07` is a risk. `R7` is a review check. Since v1.1, six more pairs share a label: `BL-01` (identity and CI/CD), `CM-01` (secrets and IaC), `H1` (a Half B run and a HOLD row), `R1` (a setup run and a review check), `AI-01` (a fixture and the words AI), and `OS-01` (a fixture and the letters OS). The tables below say which file each one lives in. Since v1.2, four more labels are shared: `PB-xx` (identity backlog and performance baseline), `HB-xx` (S04-06 Half B and S04-10 Half B), `DR-xx` (dependency register and reliability drills), and `B1` to `B9` (AI outcome rows and trust boundaries). The `D-1` to `D-7` decisions in `docs/11-reliability/` look like `D1` to `D8`, the hand-back ids, but they are a different list. Since v1.3, more labels are shared: `EV-xx` (S04-09 Half B and S05-13), `R3` to `R7` (S05-14 probe runs and review checks), `D-01` to `D-20` (S05R deferred items, with a leading zero) and `D-1` to `D-7` (reliability decisions), `SB-xx` (the S05-13 security backlog) and `BL-xx` (rows of the CI/CD backlog that the security backlog repeats), and `AR-xx` with `AR-Rx` (S05-14 findings and risks). The S05-13 file `docs/13-security-validation/remediation-backlog.md` uses both `SB-xx` and `BL-xx`. |
 
 ## What this file is
 
@@ -26,7 +26,7 @@ These labels number a row in one file. The letters say which list. The number sa
 | `Fxx` | A defect to change. Example: `F03` is the `clinician` role on the record route. | `docs/02-baseline/defect-list.md` | `F01` to `F23` |
 | `Kxx` | Current behaviour to leave in place until a named stage changes it. Example: `K02` is a read of `REC-0001` for an allowed role. | `docs/02-baseline/defect-list.md`, Keep table | `K01` to `K08` |
 | `Rxx` | A risk in the discovery register. Example: `R07` is the `clinician` role. `R16` is the missing role header. | `docs/01-discovery/brownfield-risk-register.md` | `R01` to `R24` |
-| `TA-xx` | One allow row in the target access matrix. Example: `TA-01` is `persona.noc_operator` reading a device. | `docs/03-identity/target-access-matrix.md` | `TA-01` to `TA-34` |
+| `TA-xx` | One allow row in the target access matrix. Example: `TA-01` is `persona.noc_operator` reading a device. `TA-35` was added in S05-14 Half B. It lets `role.admin` read `resource.audit_log` for `purpose.audit_review`. Mangesh accepted it on 2026-10-12. | `docs/03-identity/target-access-matrix.md`, `docs/14-audit/audit-read-access-design.md`, `policy/opa/policy_data.json` | `TA-01` to `TA-35` (35 rows in `policy_data.json`) |
 | `TA-Fx` | A finding about that matrix. Example: `TA-F5` is the note that the live header for the NOC reader is `operator`. | Same file, Findings table | `TA-F1` to `TA-F5` |
 | `CR-xx` | A finding about who can reach the API or the data today. | `docs/03-identity/current-role-matrix.md` | `CR-01` to `CR-07` |
 | `PB-xx` | One cut on the privilege-reduction backlog. | `docs/03-identity/privilege-reduction-backlog.md` | `PB-01` to `PB-04` |
@@ -50,7 +50,7 @@ These labels number a row in one file. The letters say which list. The number sa
 | `Wxx` | One worked combination of AI inputs, with the outcome row it reaches. Example: `W1` is `action.summarize` by `persona.noc_operator`, which gives RECOMMEND_ONLY through row `O1`. | `docs/06-policy/ai-action-policy-design.md` | `W1` to `W17` |
 | `AA-xx` | A finding about the AI action policy design. Example: `AA-01` says the playbook wording lets a caller skip approval by sending `approval_required` as false. | Same file, Findings table | `AA-01` to `AA-09` |
 | `EX-xx` | A finding about the exception handling model. Example: `EX-01` says every business rule is set aside today without a record. | `docs/06-policy/exception-handling-model.md` | `EX-01` to `EX-06` |
-| `AC-`, `AI-`, `DU-`, `OS-`, `PR-` plus a number | One example input (a fixture). `AC` is access, `AI` is AI approval, `DU` is data use, `OS` is operational safety, `PR` is production readiness. Each id names a JSON file. Example: `AC-01` is `ac-01-allow-noc-operator-reads-device.json`. | `docs/06-policy/example-inputs.md`; files in `policy/tests/fixtures/` | `AC-01` to `AC-05`, `AI-01` to `AI-10`, `DU-01` to `DU-04`, `OS-01`, `OS-02`, `PR-01`, `PR-02` (23 files) |
+| `AC-`, `AI-`, `DU-`, `OS-`, `PR-` plus a number | One example input (a fixture). `AC` is access, `AI` is AI approval, `DU` is data use, `OS` is operational safety, `PR` is production readiness. Each id names a JSON file. Example: `AC-01` is `ac-01-allow-noc-operator-reads-device.json`. | `docs/06-policy/example-inputs.md`; files in `policy/tests/fixtures/` | `AC-01` to `AC-07`, `AI-01` to `AI-10`, `DU-01` to `DU-04`, `OS-01`, `OS-02`, `PR-01`, `PR-02` (25 files). `AC-06` is `ac-06-allow-admin-reads-audit-log.json`. `AC-07` is `ac-07-deny-operator-reads-audit-log.json`. |
 | `EI-xx` | A finding about those example inputs. Example: `EI-01` says every policy area has at least one allow fixture and one deny fixture. | `docs/06-policy/example-inputs.md`, Findings table | `EI-01` to `EI-04` |
 | `HB-xx` | A finding that S04-06 Half B recorded. Example: `HB-01` says the three gateway flags are placeholders, so the policy reports `forbidden_field_in_prompt` as false. | `docs/06-policy/evidence.md` | `HB-01` to `HB-09` |
 | `DR-xx` | One dependency in the dependency risk register. Example: `DR-01` is `fastapi` 0.115.0. | `docs/07-cicd/dependency-risk-register.md` | `DR-01` to `DR-22` |
@@ -94,6 +94,24 @@ These labels number a row in one file. The letters say which list. The number sa
 | `OB-Fx` | A finding about that backlog. | Same file | `OB-F1` to `OB-F2` |
 | `FD-xx` | A finding about the FinOps dashboard fields. | `docs/12-finops/finops-dashboard-fields.md` | `FD-01` to `FD-04` |
 | `FB-xx` | A finding that S04-12 Half B recorded. | `docs/12-finops/evidence.md` | `FB-01` to `FB-06` |
+| `SV-xx` | One security test requirement: a threat, the test that covers it, and what the test must show. Example: `SV-01` is a role with no matrix row reading a device record. `SV-27` is a security test that skips while the stage still exits 0. | `docs/13-security-validation/security-test-suite-plan.md`, `docs/13-security-validation/abuse-case-evidence.md` | `SV-01` to `SV-27` |
+| `SVF-xx` | A finding about that test plan. Example: `SVF-09` says the secret scan reads no file when the repo sits in a folder named `docs`, `venv`, `.venv`, or `.git`. | `docs/13-security-validation/security-test-suite-plan.md` | `SVF-01` to `SVF-09` |
+| `AE-xx` | A finding from the abuse case run. Example: `AE-01` says 19 of 20 rows with a test passed and the 20th skipped. | `docs/13-security-validation/abuse-case-evidence.md` | `AE-01` to `AE-04` |
+| `NG-xx` | One negative test design. Example: `NG-01` is `write_event` refusing an empty correlation id. `NG-04` is the secret scan finding a planted secret. | `docs/13-security-validation/negative-tests.md` | `NG-01` to `NG-04` |
+| `NG-Fx` | A finding about those designs. | Same file | `NG-F1`, `NG-F2` |
+| `SC-xx` | A finding about the scanning checklist. Example: `SC-05` says the secret scan has three blind spots. | `docs/13-security-validation/scanning-checklist.md` | `SC-01` to `SC-05` |
+| `SB-xx` | One row of the security remediation backlog. Example: `SB-01` is a call with no role header being treated as `operator`. `SB-10` is a security test that skips without failing the build. `SB-21` is the workflow runner image, pinned to `ubuntu-24.04` on 2026-10-12. | `docs/13-security-validation/remediation-backlog.md` | `SB-01` to `SB-21` |
+| `EV-xx` (security) | A finding that S05-13 Half B recorded. Example: `EV-01` says a record read takes a median 150 ms when the app starts `opa` for each decision, and 10 ms with the Python copy. This is a different list from the S04-09 `EV-xx` above. | `docs/13-security-validation/evidence.md` | `EV-01` to `EV-09` |
+| `AG-xx` | A finding in the audit gap report. Example: `AG-01` says 96 of 240 lines had 3 keys and no `correlation_id`. `AG-08` says `role` and `actor` hold a claim and not a proven fact. | `docs/14-audit/audit-gap-report.md` | `AG-01` to `AG-08` |
+| `DP-xx` | A finding about the decision provenance model. Example: `DP-01` says 15 of 24 facts have a column on the row and 9 do not. | `docs/14-audit/decision-provenance-model.md` | `DP-01` to `DP-02` |
+| `AR-xx` | A finding about audit read access. Example: `AR-01` says no role could read the audit log before `TA-35`. | `docs/14-audit/audit-read-access-design.md` | `AR-01` to `AR-03` |
+| `AR-Rx` | A risk of the audit read route. Example: `AR-R1` says any caller can type `admin`, so the row is only as strong as the header. | Same file | `AR-R1` to `AR-R4` |
+| `BA-xx` | A finding about the before-and-after audit row. Example: `BA-01` says the row grew from 3 keys to 15. | `docs/14-audit/before-and-after-audit-example.md` | `BA-01` to `BA-03` |
+| `EC-xx` | A finding about the one-case evidence chain. | `docs/14-audit/evidence-chain-one-case.md` | `EC-01` to `EC-03` |
+| `CE-xx` | A finding about the compliance evidence mapping. Example: `CE-01` says all five control areas have stored evidence with a test name. | `docs/14-audit/compliance-evidence-mapping.md` | `CE-01` to `CE-03` |
+| `Rx` (audit probe) | One call in the S05-14 Half B run against the audit route. Example: `R3` is `operator` asking for an existing case and getting 403. `R7` is `admin` sending an id of 129 characters and getting 400. | `docs/14-audit/evidence.md` | `R3` to `R7` |
+| `C-xx` | One row of the S05R collection table. It names a place where a design, policy, test, or comment asked for a term the YAML lacked, and the decision taken. | `docs/02-baseline/semantic-layer-revision.md` | `C-01` to `C-65` |
+| `D-xx` (deferred) | One question that S05R left open with owner Team-Force. It has a leading zero. This is a different list from the reliability `D-x` decisions and from the hand-back ids `D0` to `D8`. | `docs/02-baseline/semantic-layer-revision.md` | `D-01` to `D-20` |
 
 Worked example. `F03`, `R07`, and `CR-01` all talk about the header word `clinician`. `F03` is the defect row. `R07` is the risk row. `CR-01` is the current-access finding. `TA-01` is a different fact: the target allow for `persona.noc_operator` to read a device. `NA-02` is the test that will check the `clinician` deny after Half B.
 
@@ -136,8 +154,9 @@ A stage id starts with `S`. The playbook file of the same name holds the prompt.
 | `S03R` | The review of that YAML. The `R` marks a review. |
 | `S03F` | The fix pass after a failed review. The `F` marks the fixes. |
 | `S04-03` to `S04-12` | Phase 4. The number after the hyphen is the challenge number, 3 through 12. |
-| `S05-13`, `S05-14` | Phase 5. Challenges 13 and 14. |
-| `S05R` | The revision that folds open questions into the YAML and raises the version. |
+| `S05-13` | Phase 5, challenge 13. Security validation: a security test suite plan, abuse cases, negative tests, a scanning checklist, and a remediation backlog. Half B added the skip guard `scripts/check_junit_no_skips.py` and the `security` test marker. |
+| `S05-14` | Phase 5, challenge 14. The audit chain: gaps in the audit row, the decision provenance model, compliance evidence mapping, and the read route `GET /audit/{correlation_id}`. Half B added `TA-35`. |
+| `S05R` | The revision that folds open questions into the YAML and raises the version. It ran on 2026-10-12 and raised the layer from `1.0.0` to `1.1.0`: 92 ids added, 0 removed, 2 deprecated. The result is CONDITIONAL PASS, with 20 deferred questions. The record is `docs/02-baseline/semantic-layer-revision.md`. |
 | `S06` | The PRD. |
 | `S06R` | The review of the PRD. |
 | `S07` | The application and the demo. |
@@ -153,19 +172,22 @@ S04-07 Half B ran three scan tools. Each prints its own code for a finding. Thes
 
 | Code | What it means | Where it shows up |
 |---|---|---|
-| `I001` | `ruff`: imports are not in sorted order. 6 files. | `ruff.json`, backlog `BL-10` |
-| `UP045` | `ruff`: `Optional[X]` is written the old way. `apps/api/main.py:36`. | Same |
-| `F401` | `ruff`: an import is never used. `os` in `apps/api/services/ai_gateway.py:1`. | Same |
-| `DTZ003` | `ruff`: `datetime.utcnow()` returns a time with no time zone. `apps/api/services/audit.py:9`. | Same |
-| `C401` | `ruff`: a generator is turned into a set in a longer way than needed. | Same |
+| `I001` | `ruff`: imports are not in sorted order. 5 files in the 2026-10-12 run. | `ruff.json`, backlog `BL-10` |
+| `UP045` | `ruff`: `Optional[X]` is written the old way. `apps/api/main.py:83`. | Same |
+| `F401` | `ruff`: an import is never used. The two findings in `apps/api/services/ai_gateway.py` were in the S04-07 run. They are gone from `ruff.json` now. | `docs/07-cicd/`, `docs/13-security-validation/evidence.md` `EV-06` |
+| `DTZ003` | `ruff`: `datetime.utcnow()` returns a time with no time zone. `apps/api/services/audit.py:87`. | `ruff.json` |
+| `SIM114` | `ruff`: two `if` branches can be one branch with `or`. `apps/api/services/breaker.py:165`. New since S04-11. | Same |
+| `C401` | `ruff`: a generator is turned into a set in a longer way than needed. `semantic-layer/tests/test_semantic_layer.py:344`. | Same |
 | `SIM103` | `ruff`: an `if` that returns True or False can return the test itself. | Same |
 | `PIE810` | `ruff`: several `startswith` calls can be one call with a tuple. | Same |
 | `EXE002` | `ruff`: a file is marked executable and has no `#!` first line. It appeared only when a Windows folder was mounted into Docker, which marks every file executable. Git stores these files as mode 644, so CI does not see it. | `evidence/` run record, `docs/07-cicd/evidence.md` |
-| `B404` | `bandit`: the code imports `subprocess`. `apps/api/services/policy.py:24`. | `bandit.json`, backlog `BL-12` |
-| `B603` | `bandit`: the code calls `subprocess.run` with a list. `apps/api/services/policy.py:66`. | Same |
-| `PYSEC-yyyy-nnn` | `pip-audit`: an advisory id from the Python package advisory database. 9 ids on 3 packages, for example `PYSEC-2026-1845` on `pytest`. | `pip-audit.json`, backlog `BL-11` |
+| `B404` | `bandit`: the code imports `subprocess`. `apps/api/services/policy.py:25`. | `bandit.json`, backlog `BL-12` |
+| `B603` | `bandit`: the code calls `subprocess.run` with a list. `apps/api/services/policy.py:86`. | Same |
+| `PYSEC-yyyy-nnn` | `pip-audit`: an advisory id from the Python package advisory database. 9 unique ids on 3 packages (`pytest`, `python-dotenv`, `starlette`), listed 18 times in `pip-audit.json`. Example: `PYSEC-2026-1845`. | `pip-audit.json`, backlog `BL-11` |
 
 `LOW` and `HIGH` in `bandit.json` are severity and confidence words. Both bandit results are LOW severity with HIGH confidence.
+
+The 2026-10-12 run of `scripts\evidence.ps1` found 11 `ruff` findings, 2 `bandit` results, and 9 unique `pip-audit` advisories. `evidence/exit-codes.txt` shows `lint=1`, `pip_audit=1`, and `bandit=1`. The other eight stages exit 0.
 
 ## Words written in capitals
 
@@ -186,8 +208,8 @@ Each row says what the letters stand for in this project, then where they show u
 | `CSV` | A table stored as text with commas. The six files under `data/synthetic/` are CSV files. | Domain spec, baseline. |
 | `URL` | A web address. `.env.example` holds `DATABASE_URL`. The value is a secret and is not copied here. | `.env.example`, component inventory. A test comment in `semantic-layer/tests/test_semantic_layer.py` says a URL may embed a password. |
 | `DB` | Database. The legacy script assigns `SHARED_DB_USER` and `SHARED_DB_PASSWORD`. The reconcile function counts a CSV file. | `legacy/reconcile_legacy.py`. |
-| `OPA` | Open Policy Agent. In this repo it is the policy files `policy/opa/access.rego` and `policy/opa/ai_action.rego`, with one shared data file, `policy/opa/policy_data.json`. Since S04-06 Half B the API calls the policy. `apps/api/services/policy.py` runs `opa eval` when the `opa` binary is on the PATH. Otherwise it applies the same table in Python. | `access.rego`, `ai_action.rego`, `policy.py`, `docs/06-policy/`. |
-| `CI` | The automated check on a change. Since S04-07 Half B, `.github/workflows/ci.yml` sits at the repo root and runs one step per stage: install, lint, three test groups, the secret-pattern test, SBOM, `pip-audit`, `bandit`, checksums, and an upload of `evidence/`. It has not run on GitHub yet. | Project Intent section 4.3, the workflow file, `docs/07-cicd/`. |
+| `OPA` | Open Policy Agent. In this repo it is the policy files `policy/opa/access.rego` and `policy/opa/ai_action.rego`, with one shared data file, `policy/opa/policy_data.json`. Since S04-06 Half B the API calls the policy. `apps/api/services/policy.py` runs `opa eval` when the `opa` binary is on the PATH. Otherwise it applies the same table in Python. The setting `POLICY_ENGINE` can force `python` or `opa`. The tests under `tests/` set the Python copy by default (`tests/conftest.py`). `opa test` passes 32 of 32 on 2026-10-12. | `access.rego`, `ai_action.rego`, `policy.py`, `docs/06-policy/`, `docs/13-security-validation/evidence.md`. |
+| `CI` | The automated check on a change. Since S04-07 Half B, `.github/workflows/ci.yml` sits at the repo root and runs one step per stage: install, lint, three test groups, the secret-pattern test, SBOM, `pip-audit`, `bandit`, checksums, and an upload of `evidence/`. It has run on GitHub on the image `ubuntu-24.04`, pinned on 2026-10-12 (backlog `SB-21`). The job is red because `lint`, `pip_audit`, and `bandit` exit 1 on the findings listed above. The skip guard `scripts/check_junit_no_skips.py` fails the security stage when any security test is skipped. | Project Intent section 4.3, the workflow file, `docs/07-cicd/`. |
 | `CI/CD` | The path that builds, tests, and releases the software. Challenge 7. `CD` is the release half of that path. | `How the product spine addresses the 16 challenges - plain speak.md`, `playbook/S04-07-cicd.md`. |
 | `ETL` | The batch job that reads a file, counts rows, and writes a count. The guide's words are: extract data, change it, and load it. The comment in `etl/run_daily_batch.py` says malformed rows are counted and left in the file. | `etl/run_daily_batch.py`, the spine note. |
 | `IaC` | Infrastructure as code. The Terraform file `infra/terraform/main.tf` builds no cloud resource. S04-05 Half B corrected it to write one local settings file with no secret. The first comment of the file no longer uses these letters. | `infra/terraform/main.tf`, `docs/05-iac/`, `playbook/S04-05-iac.md`. |
@@ -212,11 +234,11 @@ Each row says what the letters stand for in this project, then where they show u
 | `STRIDE` | The threat-model file names STRIDE/MAESTRO and does not spell the letters. STRIDE is the usual six-part list: spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege. | `security/threat-model.md`. |
 | `MAESTRO` | Named beside STRIDE in that same file. The file does not spell the letters. The expansion is Unknown here. | `security/threat-model.md`. |
 | `SL` | A short name the review notes use for the folder `semantic-layer/`. | `docs/02-baseline/semantic-layer-review.md`. |
-| `Rego` | The language of Open Policy Agent policy files. The two `.rego` files and the two `*_test.rego` files are written in it. 30 Rego tests pass. | `policy/opa/`, `policy/tests/`, `docs/06-policy/`. |
+| `Rego` | The language of Open Policy Agent policy files. The two `.rego` files and the two `*_test.rego` files are written in it. 32 Rego tests pass (`opa test`, 2026-10-12). Two were added in S05-14 for `TA-35`. | `policy/opa/`, `policy/tests/`, `docs/06-policy/`. |
 | `CycloneDX` | The file format of the SBOM. The tool `cyclonedx-py` writes version 1.6 here. | `evidence/sbom.cdx.json`, `docs/07-cicd/sbom-recommendation.md`. |
 | `JUnit` | The XML test-result format that `pytest --junitxml` writes. Four files in `evidence/` use it: `junit-tests.xml`, `junit-semantic-layer.xml`, `junit-policy.xml`, and `junit-security.xml`. | `evidence/`, `docs/07-cicd/release-evidence-checklist.md`. |
 | `XML` | A text format with nested tags. The JUnit result files are XML. | Same. |
-| `PATH` | The list of folders the shell searches for a program. `opa` is not on the PATH on this Windows machine, so 2 policy tests skip and `evidence.ps1` falls back to a Docker image. | `docs/06-policy/evidence.md`, `docs/07-cicd/evidence.md`. |
+| `PATH` | The list of folders the shell searches for a program. Before 2026-10-12, `opa` was not on the PATH on this Windows machine, so 2 policy tests skipped and `evidence.ps1` fell back to a Docker image. Now `opa` 1.21.1 is in `C:\Users\mange\tools\opa` on the user PATH, and no policy test skips. | `docs/06-policy/evidence.md`, `docs/07-cicd/evidence.md`, `docs/13-security-validation/evidence.md`. |
 | `WSL` | Windows Subsystem for Linux. The S04-05 runs used a WSL Ubuntu 22.04 install for a Python 3.10 check. It had no `venv` module, so no virtual environment was made there. | `docs/05-iac/deployment-dependency-list.md`, `docs/05-iac/evidence.md`. |
 | `UTC` | The time zone of the times in `evidence/run-info.txt`, such as `2026-10-11T20:32:21Z`. The audit `ts` field is also UTC. | `evidence/run-info.txt`, `docs/08-observability/log-schema.md`. |
 | `FinOps` | Cost management for the AI calls. S04-12 counts tokens and cost units for each flow, each correlation chain, and each incident. The cost units are EDUCATIONAL. They are not money. | `playbook/S04-12-finops.md`, `docs/12-finops/`. |
@@ -248,6 +270,10 @@ These are written in capitals. They are status words, not file-row ids.
 | `EDUCATIONAL` | A teaching formula or rate. The token estimate `len(prompt.split()) * 2` stays educational until a real tokenizer is used. The audit field `token_estimate_method` holds the value `word_count_x2_EDUCATIONAL` to say so. The cost rate is 1.0 unit per 1000 tokens. It is a teaching number, not a price. |
 | `DECIDED` | A backlog item whose open choice the owner has settled, with a build stage named. Example: `OB-01` is DECIDED with a cache lifetime of 300 seconds, built in S07. |
 | `REVISED-S2Q` | The status of `docs/00-contract/cost-envelope.md` after the qualification stage rewrote the hosted-model rows. |
+| `Verified Fact` | A claim that names a file and line, a YAML id, a test name, or a command output the writer ran. The reviews and `semantic-layer-revision.md` use this label. |
+| `Inference` | A claim drawn from facts, with no direct proof. |
+| `Assumption` | Something taken as true so the work can go on. It is listed in the Assumptions row of the file. |
+| `Unknown` | The repo or the owner has not said. Example: the letters of MAESTRO. |
 
 ## Record id prefixes
 
@@ -287,7 +313,13 @@ Every item in `semantic-layer/` has an id in dot form. The first word is the kin
 | `scope.` | Which records the caller may touch. | `scope.all_records` |
 | `risk.` | How much harm a wrong action can do. | `risk.read_only` |
 | `rule.` | A rule the system must keep. | `rule.no_default_role` |
-| `policy.` | A named policy block. | `policy.opa.admin_any` |
+| `policy.` | A named policy block. The ids `policy.opa.admin_any` and `policy.opa.operator_read` are deprecated since 1.1.0. Both name `policy.opa.access_matrix` as the replacement. | `policy.opa.access_matrix` |
+| `status.word.` | A word that appears in a status column of the data. | `status.word.gold` |
+| `status.code.` | A word the code writes, such as an audit action, an error, or a reason. S05R added 47. | `status.code.audit_action.audit_read` |
+| `collision.` | A word used with two meanings. | `collision.gold_bronze_as_severity` |
+| `metric.` | A number the system can report. No metric has a target. | `metric.api_availability` |
+| `field.audit_row.` | One of the 15 keys of the audit row, added in S05R. | `field.audit_row.correlation_id` |
+| `field.policy_input.` | One of the 8 inputs of the AI action policy, added in S05R. | `field.policy_input.record_found` |
 | `provenance.` | A field that says where an answer came from. | `provenance.approval_id` |
 | `outcome.` | One of the four AI outcomes. | `outcome.hold_for_review` |
 | `entity.` | A table or the event log. | `entity.device` |
@@ -313,6 +345,16 @@ These names come from S04-08 to S04-12. They are field names, setting names, and
 | `held row` | An audit row for a call that stopped before the model. Its `model`, `tokens`, and `latency_ms` are empty. The FinOps script leaves held rows out of the token and latency means. | `docs/12-finops/metrics_from_audit.py`. |
 | `quarantined` | An ETL count of rows held aside because they are damaged. The three older counts are unchanged. | `etl/run_daily_batch.py`, `docs/11-reliability/recovery-evidence.md`. |
 | `dedupe.py` | A small helper that treats two alarms with the same `dedupe_key` and `storm_batch_id` as one. | `apps/api/services/dedupe.py`, `docs/11-reliability/idempotency-plan.md`. |
+| `POLICY_ENGINE` | The setting that picks which copy of the policy runs. Values are `auto`, `python`, and `opa`. `auto` is the default. With `auto` the app starts `opa eval` for each decision when `opa` is on the PATH. | `apps/api/services/policy.py`, `tests/conftest.py`, `docs/13-security-validation/evidence.md` `EV-01`. |
+| `security` marker | The pytest mark `@pytest.mark.security`. `pytest -m security` runs 195 tests. A skipped test in that run fails the stage. | `tests/`, `scripts/check_junit_no_skips.py`. |
+| `check_junit_no_skips.py` | A script that reads a JUnit file and exits 1 when any test is skipped or no test ran. Added in S05-13 Half B. | `scripts/check_junit_no_skips.py`. |
+| `GET /audit/{correlation_id}` | The route that returns every audit row for one case, in time order. Only `role.admin` may read it (`TA-35`). An id over 128 characters gets HTTP 400. | `apps/api/main.py`, `apps/api/services/audit_query.py`. |
+| `audit.read`, `audit.not_found`, `audit.id_refused` | The three audit action words the audit route writes on its own row. They are new in S05-14. The route reuses `policy.deny` for a refused caller. S05R gave each one a `status.code.audit_action.*` id. | `apps/api/main.py`. |
+| `policy.deny`, `policy.hold` | Audit action words for a denied call and a held call. | `apps/api/main.py`, `status.code.audit_action.policy_deny` and `policy_hold` in `status-taxonomy.yaml`. |
+| `MAX_ID_LENGTH` | The most characters a case id may have on the audit route. It is 128. PROPOSED. Mangesh accepted it on 2026-10-12. | `apps/api/services/audit_query.py`, `rule.audit_case_id_limit`. |
+| `cannot_prove` | A list the audit route returns with each case. It names facts the log cannot show, such as `approval_id`, `log_integrity`, and `final_action`. It has 13 item names. | `apps/api/services/audit_query.py`, `status.code.cannot_prove.*`. |
+| `enforced_today` | A flag on each rule in `business-rules.yaml`. It is true when code in `apps/` or `etl/` runs the rule on a live route or in the batch. At `1.1.0` it is true on 9 of 20 rules. | `semantic-layer/business-rules.yaml`. |
+| `deprecated`, `replaced_by` | Two YAML keys added to the schema in S05R. An id marked `deprecated: true` keeps its meaning and names the id that replaces it. | `semantic-layer/schemas/semantic-layer.schema.json`. |
 | `local-sim-v1` | The stub model. Its text is SIMULATED. The repo has no second model version, so `model` and `model_version` hold the same string. | `ai_gateway.py`, `docs/09-ai-guardrails/evidence.md`. |
 
 ## Code comments
@@ -325,7 +367,7 @@ The Python comments name few initials. They describe the current behaviour in se
 | `etl/run_daily_batch.py` | Malformed records are counted and left in the file. | The batch is the `ETL` job. The comment does not use the letters. |
 | `semantic-layer/build.py` | The seven YAML files, in the order the README lists them. | `YAML` |
 | `semantic-layer/tests/test_semantic_layer.py` | A URL may embed a password. | `URL` |
-| `policy/opa/access.rego` | The file replaces the two brownfield rules. It answers whether a caller may take an action on a resource, for a purpose, over a scope, at a risk. The allow rows `TA-01` to `TA-34` live in `policy_data.json`. Every grant is PROPOSED. | `TA-xx`, `PROPOSED` |
+| `policy/opa/access.rego` | The file replaces the two brownfield rules. It answers whether a caller may take an action on a resource, for a purpose, over a scope, at a risk. The allow rows `TA-01` to `TA-35` live in `policy_data.json`. Every grant is PROPOSED. | `TA-xx`, `PROPOSED` |
 | `policy/opa/ai_action.rego` | It returns one of RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK, EXECUTE. Any BLOCK row wins. Otherwise any HOLD row wins. Otherwise the action decides. No row compares a number. | `B1` to `B10`, `H1` to `H4`, `O1` to `O3`, the four outcome words |
 | `apps/api/services/policy.py` | Policy evaluation for the API. Stage S04-06 Half B. | The `OPA` policy; no other initials. |
 | `apps/api/settings.py` | Load required settings from the process environment. A setting that is absent, empty, or still the placeholder raises an error. | No initials. |
@@ -335,3 +377,8 @@ The Python comments name few initials. They describe the current behaviour in se
 | `apps/api/services/ai_gateway.py` | Since S04-09 Half B the prompt comes from the YAML allow list, the model call has a timeout, and the answer must match a schema. The token formula is marked EDUCATIONAL. | `EDUCATIONAL`, `PROPOSED` |
 | `apps/api/services/audit.py` | Since S04-08 Half B the row carries an actor, a correlation id, and the five provenance values. Since S04-12 Half B it has a 15th field, `token_estimate_method`. No retention class. | `EDUCATIONAL` |
 | `apps/api/services/domain_service.py` | A missing id returns the first row. | No initials. |
+| `apps/api/services/audit_query.py` | Reads one case back from the audit log. Read only. A row with no `correlation_id` is never returned. The item names on the cannot-prove list are PROPOSED plain names. | `PROPOSED`, `S05-14` |
+| `apps/api/main.py` (audit route) | The three audit action words are PROPOSED. The comment says the YAML had no id for them. S05R answered that comment with `status.code.audit_action.*` ids. | `PROPOSED` |
+| `scripts/check_junit_no_skips.py` | Fails when a JUnit file shows a skipped test or no test. Stage S05-13 Half B, backlog row `SB-10`. PROPOSED. Owner: Team-Force. | `SB-xx`, `PROPOSED` |
+
+Many comments in `apps/`, `policy/opa/`, and `etl/` end with "Open question for S03". S05R read each one and did not edit any of them. `docs/02-baseline/semantic-layer-revision.md` section 8 says how each one was answered.

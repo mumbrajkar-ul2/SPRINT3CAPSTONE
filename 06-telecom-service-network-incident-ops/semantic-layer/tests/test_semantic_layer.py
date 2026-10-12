@@ -45,7 +45,7 @@ EXPECTED_TREE = {
     "schemas/semantic-layer.schema.json",
     "tests/test_semantic_layer.py",
 }
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$")
 # Every id in the tree starts with one of these words. A whole-string value with one of these
@@ -396,6 +396,10 @@ def test_every_referenced_id_is_defined(docs):
             if isinstance(value, str) and value.startswith(ID_PREFIXES) and ID_RE.match(value):
                 if path and path[-1] == "id":
                     continue
+                # S05R. A code value is the literal text the code writes, such as the audit action
+                # policy.deny. It is not a reference to another id.
+                if len(path) == 3 and path[0] == "code_values" and path[2] == "value":
+                    continue
                 if value not in defined:
                     undefined.add((name, "/".join(str(p) for p in path), value))
     assert not undefined, sorted(undefined)
@@ -612,3 +616,78 @@ def test_no_secret_value_anywhere_in_the_tree():
             if s in text:
                 hits.append((p.relative_to(SL).as_posix(), s[:2] + "..."))
     assert not hits, hits
+
+
+# ---------------------------------------------------------------------------
+# S05R (1.1.0). Rows that protect the ids the revision added or kept.
+# ---------------------------------------------------------------------------
+
+def test_a_deprecated_item_names_a_defined_replacement(docs):
+    defined = set(defined_ids(docs))
+    deprecated = [node for _, _, node in items_with_id(docs) if node.get("deprecated") is True]
+    assert {n["id"] for n in deprecated} >= {"policy.opa.admin_any", "policy.opa.operator_read"}
+    for node in deprecated:
+        assert node.get("replaced_by") in defined, f"{node['id']} has no defined replaced_by"
+        assert node["replaced_by"] != node["id"]
+
+
+def test_schema_rejects_deprecated_without_replacement(docs, validator):
+    doc = copy.deepcopy(docs["access-semantics.yaml"])
+    del doc["opa_rules_today"][0]["replaced_by"]
+    assert list(validator.iter_errors(doc)), "schema accepted deprecated true with no replaced_by"
+
+
+def test_audit_row_fields_are_the_keys_the_code_writes(docs):
+    import ast
+
+    tree = ast.parse((REPO / "apps" / "api" / "services" / "audit.py").read_text(encoding="utf-8"))
+    keys = None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", "") == "SCHEMA_KEYS" for t in node.targets):
+            keys = ast.literal_eval(node.value)
+    assert keys, "SCHEMA_KEYS not found in audit.py"
+    concept = next(c for c in docs["entities.yaml"]["concepts"] if c["id"] == "concept.audit_row")
+    rows = concept["row_fields"]
+    assert [r["name"] for r in rows] == list(keys)
+    assert [r["position"] for r in rows] == list(range(1, len(keys) + 1))
+    assert [r["id"] for r in rows] == ["field.audit_row." + k for k in keys]
+
+
+def test_cannot_prove_ids_match_the_item_names_in_the_code(docs):
+    code = (REPO / "apps" / "api" / "services" / "audit_query.py").read_text(encoding="utf-8")
+    named = set(re.findall(r'_item\(\s*"([a-z_]+)"', code))
+    values = {c["value"] for c in docs["status-taxonomy.yaml"]["code_values"]
+              if c["id"].startswith("status.code.cannot_prove.")}
+    assert named == values, f"in code only {named - values}; in YAML only {values - named}"
+    assert len(named) == 13
+
+
+def test_audit_action_words_in_main_py_all_have_an_id(docs):
+    code = (REPO / "apps" / "api" / "main.py").read_text(encoding="utf-8")
+    words = set(re.findall(r'"((?:audit|policy|record|ai)\.[a-z_]+)"', code))
+    values = {c["value"] for c in docs["status-taxonomy.yaml"]["code_values"]
+              if c["id"].startswith("status.code.audit_action.")}
+    assert words <= values, f"audit action words with no id: {sorted(words - values)}"
+
+
+def test_every_id_the_code_policy_and_tests_name_is_still_defined(docs):
+    """No id that apps/, policy/ or tests/ cite may lose its definition."""
+    defined = set(defined_ids(docs))
+    prefixes = ("rule.", "failmode.", "provenance.", "outcome.", "persona.", "resource.", "purpose.", "scope.",
+                "risk.", "action.", "role.", "metric.", "ai_use.", "agency.", "pick.", "concept.", "entity.")
+    prefix_alt = "|".join(re.escape(p) for p in prefixes)
+    pattern = re.compile(r"""["'`]((?:""" + prefix_alt + r""")[a-z0-9_]+(?:\.[a-z0-9_]+)*)["'`]""")
+    roots = [REPO / "apps", REPO / "policy", REPO / "tests", REPO / "etl"]
+    missing: dict[str, set[str]] = {}
+    for root in roots:
+        for p in root.rglob("*"):
+            if p.suffix not in {".py", ".rego"} or "__pycache__" in p.parts:
+                continue
+            for ident in pattern.findall(p.read_text(encoding="utf-8", errors="ignore")):
+                if ident not in defined:
+                    missing.setdefault(ident, set()).add(p.relative_to(REPO).as_posix())
+    # Ids that tests invent on purpose, to prove that an unknown id is refused.
+    for ident in list(missing):
+        if all(f.startswith(("tests/", "policy/tests/")) for f in missing[ident]):
+            missing.pop(ident)
+    assert not missing, {k: sorted(v) for k, v in missing.items()}

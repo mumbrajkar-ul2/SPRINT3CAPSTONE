@@ -1,23 +1,13 @@
 [
   {
     "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 44,
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 153,
       "col": 1
     },
-    "package": "data.workshop.access_test",
-    "name": "test_clinician_is_denied",
-    "duration": 7159600
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 35,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_live_operator_role_may_read_a_device",
-    "duration": 8494100
+    "package": "data.workshop.ai_action_test",
+    "name": "test_ai_fixtures_were_loaded",
+    "duration": 5021300
   },
   {
     "location": {
@@ -27,7 +17,7 @@
     },
     "package": "data.workshop.access_test",
     "name": "test_missing_role_is_denied",
-    "duration": 7700800
+    "duration": 6031800
   },
   {
     "location": {
@@ -37,167 +27,7 @@
     },
     "package": "data.workshop.access_test",
     "name": "test_automation_may_execute_with_an_approval_id",
-    "duration": 16419400
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 40,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_admin_is_denied",
-    "duration": 16419400
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 114,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_all_35_rows_were_loaded",
-    "duration": 508900
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 70,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_ai_agent_may_not_execute",
-    "duration": 13096100
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 63,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_automation_may_not_execute_without_an_approval_id",
-    "duration": 20877100
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 29,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_noc_operator_may_read_a_device",
-    "duration": 30051000
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 93,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_operator_may_not_read_the_audit_log",
-    "duration": 34968600
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 49,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_execute_unreachable_when_approval_id_key_is_missing",
-    "duration": 5469300
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 36,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_remediation_blocked_without_approval_id",
-    "duration": 18082500
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 29,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_remediation_becomes_a_change_with_all_checks",
-    "duration": 14639500
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 138,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_access_fixtures_were_loaded",
-    "duration": 1607500
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 109,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_summarize_is_recommend_only",
-    "duration": 10935600
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 63,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_ai_agent_cannot_execute",
-    "duration": 24445300
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\access_test.rego",
-      "row": 52,
-      "col": 1
-    },
-    "package": "data.workshop.access_test",
-    "name": "test_one_changed_field_is_denied",
-    "duration": 58196800
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 69,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_audit_row_must_come_first",
-    "duration": 69826700
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 84,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_stale_true_blocks",
-    "duration": 21800900
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 55,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_each_missing_key_blocks",
-    "duration": 63507700
+    "duration": 7890800
   },
   {
     "location": {
@@ -207,57 +37,37 @@
     },
     "package": "data.workshop.access_test",
     "name": "test_admin_may_read_the_audit_log",
-    "duration": 12400000
+    "duration": 10638000
   },
   {
     "location": {
       "file": "policy\\tests\\ai_action_test.rego",
-      "row": 74,
+      "row": 49,
       "col": 1
     },
     "package": "data.workshop.ai_action_test",
-    "name": "test_change_plan_must_be_ok",
-    "duration": 61272600
+    "name": "test_execute_unreachable_when_approval_id_key_is_missing",
+    "duration": 6678400
   },
   {
     "location": {
       "file": "policy\\tests\\ai_action_test.rego",
-      "row": 118,
+      "row": 29,
       "col": 1
     },
     "package": "data.workshop.ai_action_test",
-    "name": "test_recommend_is_held_for_review",
-    "duration": 8132800
+    "name": "test_remediation_becomes_a_change_with_all_checks",
+    "duration": 9210900
   },
   {
     "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 102,
+      "file": "policy\\tests\\access_test.rego",
+      "row": 114,
       "col": 1
     },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_block_wins_over_hold",
-    "duration": 21888800
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 153,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_ai_fixtures_were_loaded",
-    "duration": 4774300
-  },
-  {
-    "location": {
-      "file": "policy\\tests\\ai_action_test.rego",
-      "row": 128,
-      "col": 1
-    },
-    "package": "data.workshop.ai_action_test",
-    "name": "test_the_model_cannot_set_its_own_outcome",
-    "duration": 13990400
+    "package": "data.workshop.access_test",
+    "name": "test_all_35_rows_were_loaded",
+    "duration": 1010800
   },
   {
     "location": {
@@ -267,17 +77,197 @@
     },
     "package": "data.workshop.ai_action_test",
     "name": "test_approval_must_be_required",
-    "duration": 14670600
+    "duration": 21878900
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 63,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_automation_may_not_execute_without_an_approval_id",
+    "duration": 21878900
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 93,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_operator_may_not_read_the_audit_log",
+    "duration": 18870900
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 52,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_one_changed_field_is_denied",
+    "duration": 28471500
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 70,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_ai_agent_may_not_execute",
+    "duration": 5267600
   },
   {
     "location": {
       "file": "policy\\tests\\ai_action_test.rego",
-      "row": 42,
+      "row": 36,
       "col": 1
     },
     "package": "data.workshop.ai_action_test",
-    "name": "test_execute_unreachable_with_empty_approval_ids",
-    "duration": 418578400
+    "name": "test_remediation_blocked_without_approval_id",
+    "duration": 20901200
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 40,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_admin_is_denied",
+    "duration": 3606900
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 63,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_ai_agent_cannot_execute",
+    "duration": 19133300
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 35,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_live_operator_role_may_read_a_device",
+    "duration": 6209600
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 74,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_change_plan_must_be_ok",
+    "duration": 13225200
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 44,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_clinician_is_denied",
+    "duration": 3740300
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 69,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_audit_row_must_come_first",
+    "duration": 19856500
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 29,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_noc_operator_may_read_a_device",
+    "duration": 14046600
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 55,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_each_missing_key_blocks",
+    "duration": 34201300
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\access_test.rego",
+      "row": 138,
+      "col": 1
+    },
+    "package": "data.workshop.access_test",
+    "name": "test_access_fixtures_were_loaded",
+    "duration": 1021400
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 84,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_stale_true_blocks",
+    "duration": 19710300
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 109,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_summarize_is_recommend_only",
+    "duration": 13379300
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 118,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_recommend_is_held_for_review",
+    "duration": 7121700
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 128,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_the_model_cannot_set_its_own_outcome",
+    "duration": 8023300
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 102,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_block_wins_over_hold",
+    "duration": 25669800
   },
   {
     "location": {
@@ -287,7 +277,17 @@
     },
     "package": "data.workshop.access_test",
     "name": "test_access_fixtures_give_expected_results",
-    "duration": 383818600
+    "duration": 55887500
+  },
+  {
+    "location": {
+      "file": "policy\\tests\\ai_action_test.rego",
+      "row": 42,
+      "col": 1
+    },
+    "package": "data.workshop.ai_action_test",
+    "name": "test_execute_unreachable_with_empty_approval_ids",
+    "duration": 92556200
   },
   {
     "location": {
@@ -297,7 +297,7 @@
     },
     "package": "data.workshop.ai_action_test",
     "name": "test_hold_rows",
-    "duration": 474744600
+    "duration": 76934100
   },
   {
     "location": {
@@ -307,7 +307,7 @@
     },
     "package": "data.workshop.access_test",
     "name": "test_every_row_allows_its_own_call",
-    "duration": 555875700
+    "duration": 118565500
   },
   {
     "location": {
@@ -317,6 +317,6 @@
     },
     "package": "data.workshop.ai_action_test",
     "name": "test_ai_fixtures_give_expected_results",
-    "duration": 593039800
+    "duration": 167398000
   }
 ]

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "file": "entities",
   "description": "The seven entities of this system. Six are CSV tables named in docs/domain-specific-spec.md. The seventh is the event log events.jsonl. Each field says what the cells hold today and whether the running API reads it. The API reads devices.csv only. It returns the whole device row.",
   "source": [
@@ -13,7 +13,12 @@
     "data/synthetic/events.jsonl",
     "docs/01-discovery/data-and-integration-map.md",
     "apps/api/services/domain_service.py",
-    "apps/api/main.py"
+    "apps/api/main.py",
+    "apps/api/services/audit.py",
+    "apps/api/services/policy.py",
+    "docs/08-observability/log-schema.md",
+    "docs/14-audit/decision-provenance-model.md",
+    "docs/06-policy/exception-handling-model.md"
   ],
   "field_types": [
     "identifier",
@@ -187,7 +192,7 @@
           "name": "stale_topology_flag",
           "type": "boolean_word",
           "status_field": "status.device.stale_topology_flag",
-          "description": "true means the stored picture of this device may be out of date. 192 rows are true, 161 false, 1 blank. The API returns the flag inside the row. No code branches on it.",
+          "description": "true means the stored picture of this device may be out of date. 192 rows are true, 161 false, 1 blank. The API returns the flag inside the row. Before stage S04-09, no code branched on it. Now (S05R, 1.1.0): the ai_action policy reads it on the summary route (rule.stale_topology_blocks_recommendation).",
           "api_reads_today": true,
           "source": [
             "data/synthetic/devices.csv",
@@ -438,7 +443,7 @@
           "name": "dedupe_key",
           "type": "identifier",
           "id_form": "DED-00002",
-          "description": "Alarms that share this key are the same alarm repeated. Three keys appear twice. No code groups them.",
+          "description": "Alarms that share this key are the same alarm repeated. Three keys appear twice. Before stage S04-11, no code grouped them. Now (S05R, 1.1.0): apps/api/services/dedupe.py has the key function, and no route calls it.",
           "api_reads_today": false,
           "source": [
             "data/synthetic/alarms.csv",
@@ -846,7 +851,7 @@
           "type": "word",
           "status_field": "status.ai_invocation.guardrail_status",
           "references": "concept.guardrail",
-          "description": "Whether the safety checks ran. The cells hold the generic status words. not_enforced is on 27 rows. The live body always says not_enforced.",
+          "description": "Whether the safety checks ran. The cells hold the generic status words. not_enforced is on 27 rows. Before stage S04-09, the live body always said not_enforced. Now (S05R, 1.1.0): the live body says enforced. See status.code.guardrail_status.enforced.",
           "api_reads_today": false,
           "source": [
             "data/synthetic/ai_invocations.csv",
@@ -1011,10 +1016,11 @@
     {
       "id": "concept.guardrail",
       "name": "guardrail",
-      "description": "A check that runs before or after a model call and can stop the result. The live gateway returns guardrail_status not_enforced. No check runs today.",
+      "description": "A check that runs before or after a model call and can stop the result. Before stage S04-09, the live gateway returned guardrail_status not_enforced and no check ran. Now (S05R, 1.1.0): the gateway checks the prompt before the model and the answer after it, and returns guardrail_status enforced. Stage S04-09 made that change.",
       "source": [
         "apps/api/services/ai_gateway.py",
-        "docs/01-discovery/ai-subsystem-discovery.md"
+        "docs/01-discovery/ai-subsystem-discovery.md",
+        "docs/09-ai-guardrails/evidence.md"
       ]
     },
     {
@@ -1057,16 +1063,236 @@
     {
       "id": "concept.audit_row",
       "name": "audit row",
-      "description": "One JSON line in logs/audit.log. Today it holds ts, action, and details. It has no actor, no correlation id, and no approval id.",
+      "description": "One JSON line in logs/audit.log. Before stage S04-08, it held ts, action, and details, with no actor, no correlation id, and no approval id. Now (S05R, 1.1.0): it holds the 15 keys in row_fields below, in that order. The keys have ids with the prefix field.audit_row. The keys are written by apps/api/services/audit.py (SCHEMA_KEYS). The row has no record_id key and no reasons key. Stages S04-08, S04-09, S04-12, and S05-14 made that change.",
       "source": [
         "apps/api/services/audit.py",
-        "docs/02-baseline/defect-list.md"
+        "docs/02-baseline/defect-list.md",
+        "docs/08-observability/log-schema.md"
+      ],
+      "row_fields": [
+        {
+          "id": "field.audit_row.ts",
+          "name": "ts",
+          "type": "timestamp",
+          "position": 1,
+          "nullable": false,
+          "description": "The time the row was written, as UTC text from datetime.utcnow().isoformat().",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "docs/08-observability/log-schema.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.correlation_id",
+          "name": "correlation_id",
+          "type": "identifier",
+          "position": 2,
+          "nullable": false,
+          "description": "The request chain id. The server keeps the X-Correlation-Id header when it has text, and creates a UUID otherwise. It also serves as the trace id, because the repo has no separate trace id.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/main.py",
+            "docs/14-audit/decision-provenance-model.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.actor",
+          "name": "actor",
+          "type": "word",
+          "position": 3,
+          "nullable": true,
+          "description": "The persona word for the role header, such as noc_operator. It is null when the role has no persona or the header was missing. It is not a named person.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "docs/08-observability/log-schema.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.role",
+          "name": "role",
+          "type": "word",
+          "position": 4,
+          "nullable": true,
+          "description": "The role word the caller sent in X-User-Role. It is null when the header was missing or blank.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/main.py",
+            "docs/08-observability/log-schema.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.action",
+          "name": "action",
+          "type": "word",
+          "position": 5,
+          "nullable": false,
+          "description": "What happened. One of the words in status.code.audit_action.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/main.py",
+            "docs/08-observability/log-schema.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.resource",
+          "name": "resource",
+          "type": "word",
+          "position": 6,
+          "nullable": false,
+          "description": "The resource id the call touched, either resource.device or resource.audit_log.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/main.py",
+            "docs/08-observability/log-schema.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.policy_decision",
+          "name": "policy_decision",
+          "type": "word",
+          "position": 7,
+          "nullable": true,
+          "description": "The allow or deny answer from the policy. The key exists and is null on every row today. The same meaning has two older names, concept.policy_decision and provenance.policy_result. This id is the one for the audit column.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "docs/08-observability/log-schema.md",
+            "docs/14-audit/audit-gap-report.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.approval_id",
+          "name": "approval_id",
+          "type": "identifier",
+          "position": 8,
+          "nullable": true,
+          "description": "The stored approval id. The key exists and is null on every row, because no route writes an approval id.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "docs/08-observability/log-schema.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.model",
+          "name": "model",
+          "type": "text",
+          "position": 9,
+          "nullable": true,
+          "description": "The model name. It is null on a row where the model did not run.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/services/ai_gateway.py"
+          ]
+        },
+        {
+          "id": "field.audit_row.model_version",
+          "name": "model_version",
+          "type": "text",
+          "position": 10,
+          "nullable": true,
+          "description": "The model version. It is null on a row where the model did not run.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/services/ai_gateway.py"
+          ]
+        },
+        {
+          "id": "field.audit_row.prompt_hash",
+          "name": "prompt_hash",
+          "type": "text",
+          "position": 11,
+          "nullable": true,
+          "description": "The SHA-256 hash, in hexadecimal, of the prompt text that was sent. It is null when no prompt was sent. The prompt text itself is never stored.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/services/ai_gateway.py"
+          ]
+        },
+        {
+          "id": "field.audit_row.tokens",
+          "name": "tokens",
+          "type": "number",
+          "position": 12,
+          "nullable": true,
+          "description": "The token count for the model call. Today it is a word count times two, which is EDUCATIONAL. It is null when the model did not run.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/services/ai_gateway.py"
+          ]
+        },
+        {
+          "id": "field.audit_row.latency_ms",
+          "name": "latency_ms",
+          "type": "number",
+          "position": 13,
+          "nullable": true,
+          "description": "The milliseconds the model call took. It is null when the model did not run.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/services/ai_gateway.py"
+          ]
+        },
+        {
+          "id": "field.audit_row.outcome",
+          "name": "outcome",
+          "type": "word",
+          "position": 14,
+          "nullable": true,
+          "description": "One of the four outcome words on an AI call. It is null on a record read and on an access refusal.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/main.py",
+            "docs/08-observability/log-schema.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.token_estimate_method",
+          "name": "token_estimate_method",
+          "type": "word",
+          "position": 15,
+          "nullable": true,
+          "description": "How tokens was worked out. The value today is word_count_x2_EDUCATIONAL. It is null when tokens is null. See status.code.token_estimate_method.word_count_x2_educational.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "docs/08-observability/log-schema.md",
+            "docs/12-finops/finops-dashboard-fields.md"
+          ]
+        }
       ]
     },
     {
       "id": "concept.prompt",
       "name": "prompt",
-      "description": "The text sent to a model. Today the prompt is one fixed sentence plus the whole device row, including mgmt_ip and credential_profile.",
+      "description": "The text sent to a model. Before stage S04-09, the prompt was one fixed sentence plus the whole device row, including mgmt_ip and credential_profile. Now (S05R, 1.1.0): the prompt is a fixed instruction plus one line for each allowed field the record holds. policy.prompt_fields names the allowed fields. Stage S04-09 made that change.",
       "source": [
         "apps/api/services/ai_gateway.py",
         "docs/02-baseline/defect-list.md"
@@ -1075,11 +1301,35 @@
     {
       "id": "concept.policy_decision",
       "name": "policy decision",
-      "description": "The allow or deny answer from the access policy. Today policy/opa/access.rego exists on disk and no Python code calls it. The API checks a Python list instead.",
+      "description": "The allow or deny answer from the access policy. Before stage S04-06, policy/opa/access.rego existed on disk and no Python code called it. The API checked a Python list instead. Now (S05R, 1.1.0): apps/api/services/policy.py runs the Rego file, or its Python copy, on every route, and returns allow, deny, and the reasons. Stage S04-06 made that change. The audit column for this answer is field.audit_row.policy_decision.",
       "source": [
         "policy/opa/access.rego",
         "apps/api/main.py",
-        "docs/01-discovery/brownfield-risk-register.md"
+        "docs/01-discovery/brownfield-risk-register.md",
+        "apps/api/services/policy.py"
+      ]
+    },
+    {
+      "id": "concept.waiver",
+      "name": "waiver",
+      "description": "A dated exception to one rule id, granted by a named owner. The exception design says the register and the audit row would hold a waiver. No register, no route, and no audit action for a waiver exists in the code. The two audit actions for a waiver being granted and used are deferred. The person who may grant a waiver is Team-Force, which is a team and not a persona.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/06-policy/exception-handling-model.md",
+        "docs/00-contract/operating-contract.md"
+      ]
+    },
+    {
+      "id": "concept.decision_provenance",
+      "name": "decision provenance",
+      "description": "The record of how one decision was made. The design groups the facts into nine groups: actor, request, data used, model, policy, approval, final action, trace, and what cannot be proven. The audit row holds some of the facts. The 13 items on the cannot-prove list have ids in status.code.cannot_prove. Several facts have no column yet. Those are listed as deferred in docs/02-baseline/semantic-layer-revision.md.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "docs/14-audit/decision-provenance-model.md",
+        "apps/api/services/audit_query.py",
+        "docs/14-audit/audit-gap-report.md"
       ]
     },
     {
