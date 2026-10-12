@@ -140,6 +140,8 @@ After all seven calls the temporary log had 11 lines: 4 case rows and 7 route ro
 
 The R2 response held neither `mgmt_ip` nor `credential_profile`. **Verified Fact.**
 
+**GitHub run.** **Verified Fact.** The workflow ran for commit `78c79b3` on 2026-10-12: run [38221204638](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38221204638). In the uploaded artifact, `junit-security.xml` has 195 tests with 0 failures, 0 errors, and 0 skipped. Stage 6 (security tests, no skips allowed) passed. `opa-test.json` has 32 of 32 passed. The job is red because lint, pip_audit, and bandit exit 1 on the known findings.
+
 ## What the 32 tests check
 
 | Group | What a test proves |

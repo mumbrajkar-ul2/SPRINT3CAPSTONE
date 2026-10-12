@@ -52,7 +52,7 @@ Three stages exit 1 (lint, pip_audit, bandit) because the scans found real issue
 
 **The skip guard held.** At the start of this stage the shell had no `opa` on the PATH. The two agreement tests skipped, and `scripts/check_junit_no_skips.py` printed `security gate FAILED: 2 security test(s) skipped`. With `C:\Users\mange\tools\opa` on the PATH, all 195 ran and the guard exit code was 0.
 
-**CI.** `.github/workflows/ci.yml` did not change. The workflow installs `opa` 1.21.1, so the GitHub run should show the same counts as the table. That run has not happened yet. **Unknown** until it does.
+**CI.** `.github/workflows/ci.yml` did not change. The workflow installs `opa` 1.21.1. **Verified Fact.** The workflow ran on GitHub for commit `78c79b3` on 2026-10-12: run [38221204638](https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38221204638). The uploaded artifact (`runner=github-actions`, Linux) shows tests 97, semantic_layer 35, policy 87, and security 195 with `failures` 0, `errors` 0, and `skipped` 0 in each file. `opa-test.json` holds 32 tests and all 32 passed. Stage 6 passed. The exit codes are the same 11 lines as the Windows run: lint, pip_audit, and bandit exit 1 on the real findings, and the other eight stages exit 0. The job is red for that reason only.
 
 ## What Half B built
 
