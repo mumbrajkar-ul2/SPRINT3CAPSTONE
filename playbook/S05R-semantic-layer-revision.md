@@ -18,6 +18,14 @@ What goes in: a persona, a resource name, a scope value, a status word, a rule, 
 - `06-telecom-service-network-incident-ops/docs/03-identity/` through `docs/14-audit/` (every Half A design file)
 - `06-telecom-service-network-incident-ops/policy/` (to read ids the Rego comments cite)
 - `06-telecom-service-network-incident-ops/tests/` (to read ids the tests cite)
+- `06-telecom-service-network-incident-ops/apps/`, `etl/`, `security/`, and `docs/12-finops/metrics_from_audit.py` (read only: their comments hold "Open question for S03" lines)
+- Every Half B `evidence.md` under `docs/04-secrets/` through `docs/14-audit/`, `docs/runbooks/`, and `evidence/README.md` (they also hold "Open question for S03" lines)
+- `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md` (v1.4; row 10 says Team-Force owns every PROPOSED item)
+- `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-fixes.md` (every S03F round)
+- The "Advisories" section of `docs/02-baseline/semantic-layer-review.md` (advisories are not "Fixes required" rows, so the collect step reads them as well)
+- `06-telecom-service-network-incident-ops/docs/14-audit/audit-read-access-design.md` and `docs/14-audit/evidence.md` (S05-14: row TA-35, the audit route, and three new action words)
+- `playbook/STATUS.md` (owner decisions logged by date)
+- Tooling for the test step: `opa` 1.21.1 at `C:\Users\mange\tools\opa` on the PATH (the user PATH has it; a shell opened before that change may not)
 
 ## Prompt
 
@@ -28,16 +36,16 @@ What goes in: a persona, a resource name, a scope value, a status word, a rule, 
 Collect every term, id, field, status word, persona, metric, rule, and outcome that the Phase 4 and Phase 5 designs introduced or needed and the YAML lacks. Fold each one into `semantic-layer/` with a source list. Raise the version. Rebuild. Rerun the tests. Rerun the S03R check rows. Record the diff. After this stage the YAML holds every meaning the modernization introduced, and no later stage changes it without an ADR.
 
 ## Scope
-Include: every file under `semantic-layer/`; every Half A design file under `docs/03-identity/` through `docs/14-audit/`; `docs/02-baseline/semantic-layer-review.md`; ids cited in `policy/` comments and in `tests/`.
-Exclude: application code; Rego text; CI YAML; Terraform; test code; any term that no design, policy, or test asks for; any change to the meaning of an id that already exists.
+Include: every file under `semantic-layer/`; every design file and every Half B `evidence.md` under `docs/03-identity/` through `docs/14-audit/`; `docs/runbooks/`; `security/`; `docs/02-baseline/semantic-layer-review.md` (including its advisories) and `semantic-layer-fixes.md`; ids and "Open question for S03" lines cited in `policy/` comments, in `tests/`, and in the comments of `apps/`, `etl/`, and `docs/12-finops/metrics_from_audit.py`.
+Exclude: edits to application code, Rego text, CI YAML, Terraform, or test code (a code comment is read, never changed); any term that no design, policy, or test asks for; any change to the meaning of an id that already exists. One case is not a change of meaning: a sentence that describes an old state the project has since changed (see Required analysis 4).
 
 ## Required analysis
-1. Collect. Search every Half A design file, the S03R review, the Rego comments, and the tests for: the phrase "Open question for S03"; any term, id, status word, persona, resource, scope value, metric, or field the file uses that does not resolve in the YAML; any "Fixes required" row from S03R still open. Write one table. Columns: source file and line; the term or id as the design wrote it; what the design needs it for; which YAML file it belongs in; decision.
+1. Collect. Search every file named in Scope, not only the Half A designs, for: the phrase "Open question for S03" (for example `rg -c "Open question for S03" 06-telecom-service-network-incident-ops`, which lists every file that holds it); any term, id, status word, persona, resource, scope value, metric, or field the file uses that does not resolve in the YAML; any "Fixes required" row from S03R still open; any S03R advisory still open. Merge repeats of one question into one row and list every source line. Write one table. Columns: source file and line; the term or id as the design wrote it; what the design needs it for; which YAML file it belongs in; decision.
 2. Decide. The decision is one of: add (new id); alias (the design used a different word for an id that exists; add the alias, keep the id); reject (the design can use an existing id; name it); defer (not a meaning; it is code, a number, or an open business question; name the owner). Every row has a decision and a one-sentence reason.
-3. Fold. For each add or alias: write the item in its YAML file with a stable dot-form id, a plain-speech `description:`, a `source:` list that names the design file and the repo file or test it came from, and `proposed: true` with `owner:` when the term is not in the inherited repo. Add a glossary entry in everyday words. Add the schema rule if the item needs a new shape. Add a test row if the item is required.
-4. Protect existing ids. Do not remove or rename an id that `apps/`, `policy/`, `tests/`, or `docs/` cite. If an id must change, keep the old id with `deprecated: true` and `replaced_by:`. Grep for every id you touched and list each file that cites it.
+3. Fold. For each add or alias: write the item in its YAML file with a stable dot-form id, a plain-speech `description:`, a `source:` list that names the design file and the repo file or test it came from, and `proposed: true` with `owner: Team-Force` (operating-contract.md row 10) when the term is not in the inherited repo. Add a glossary entry in everyday words. Add the schema rule if the item needs a new shape. Add a test row if the item is required.
+4. Protect existing ids. Do not remove or rename an id that `apps/`, `policy/`, `tests/`, or `docs/` cite. If an id must change, keep the old id with `deprecated: true` and `replaced_by:`. Grep for every id you touched and list each file that cites it. Stale state. Some YAML text describes the project as it was before Phase 4. Three known cases: `role.admin` (`access-semantics.yaml`, `glossary.md`) and `rule.shared_admin_not_least_privilege` (`business-rules.yaml`) say `access.rego` allows any admin every action, and `policy.opa.admin_any` names a rule S04-06 removed. Today `role.admin` has exactly one row, TA-35 (read `resource.audit_log`). For a case like this, keep the id and its meaning. Mark a removed rule with `deprecated: true` and `replaced_by:`. Correct only the sentence about the old state, and add one line that says what is true now and which stage changed it. Run a search for other cases (for example `rg -n "admin|brownfield|allows any" semantic-layer`) and list each one in the revision file.
 5. Version. Raise `version:` in every YAML file and in `README.md`. Use one new value for the whole tree, for example `1.1.0`. Add one row to the README change log: date, old version, new version, the number of ids added, and the design stages that caused them.
-6. Rebuild and test. Delete `generated/`. Run `python semantic-layer/build.py`. Run `pytest semantic-layer/tests -q`. Paste both outputs.
+6. Rebuild and test. Delete `generated/`. Run `python semantic-layer/build.py`, then `python semantic-layer/build.py --check`. Run `pytest semantic-layer/tests -q`. Paste the outputs. The app and other tests read `ai-context-policy.yaml` at run time (`ai_gateway.py`, `audit.py`, and the tests under `tests/security` and `tests/reliability`). So also run, with `opa` on the PATH: `pytest tests policy/tests semantic-layer/tests -q`, then `pytest -m security -q` followed by `python scripts/check_junit_no_skips.py <junit file>` (a skipped security test fails the stage), then `powershell -ExecutionPolicy Bypass -File scripts\evidence.ps1`. Paste the counts. The last full run, at S05-14, gave tests 97, semantic_layer 35, policy 87, `opa test` 32 of 32, security 195 with 0 skipped. `scripts\evidence.ps1` deletes `evidence/linux-py311/` in its first step. Restore it with `git checkout -- evidence/linux-py311`. A test run also adds rows to `logs/audit.log` (`BL-09`). Restore it with `git checkout -- logs/audit.log`. Say in the revision file which counts changed and why.
 7. Rerun S03R. Write rows R1 to R15 and failure-list rows 1 to 8 against the revised tree, in the same form S03R used. For every FAIL, write a numbered "Fixes required" list in the S03R form: the check ids it clears, the files and lines or ids, the change, and "Choice needed" with the options when the owner must decide.
 8. Diff. Record the change per file: ids added, aliases added, ids deprecated, glossary entries added, schema rules added, tests added. If the folder is a git repository, also paste `git diff --stat -- semantic-layer/`.
 
@@ -49,11 +57,12 @@ Exclude: application code; Rego text; CI YAML; Terraform; test code; any term th
 
 ## Constraints and guardrails
 - The tree stays exactly the capture-PDF tree plus `generated/` and `build.py`. Add no file.
-- Do not change the meaning of an existing id. Add a new id instead.
+- Do not change the meaning of an existing id. Add a new id instead. The one allowed correction is a sentence about an old state that is no longer true (Required analysis 4).
 - Do not add a term no design, policy, or test asked for.
 - No AI use may gain execute agency. The agency and approval point per AI use still match `docs/02-baseline/ai-qualification.md`.
 - No invented cutoff, threshold, or target number. PROPOSED with owner only.
-- A design file that used a provisional word may gain one line: "Resolved in S05R as <id>." Make no other change to Phase 4 or 5 files.
+- A design file that used a provisional word may gain one line: "Resolved in S05R as <id>." Make no other change to Phase 4 or 5 files. A code comment, a Rego comment, or a test is never edited. The revision file records the resolution for those.
+- Do not change a row of `policy/opa/policy_data.json` or any fixture. The YAML follows the policy. The policy does not follow the YAML in this stage.
 - Redact secrets. No password, key, or token value anywhere in the tree.
 - Plain speech. Short sentences. Everyday words.
 - Each artifact starts with a header table: Stage, Date / version, Author, Status, Evidence sources, Assumptions, Unresolved issues, Residual risks.
@@ -63,10 +72,12 @@ Exclude: application code; Rego text; CI YAML; Terraform; test code; any term th
 |---|---|
 | Entities | devices, circuits, alarms, incidents, service_orders, ai_invocations, events |
 | Personas | noc_operator, network_engineer, field_engineer, customer_support, automation_service, vendor_account, ai_agent |
-| Access fields | role, resource, purpose, scope, risk |
+| Access fields | role, resource, purpose, scope, risk (and action, the sixth field the matrix rows carry) |
+| Access matrix (S04-06, S05-14) | 35 rows in `policy/opa/policy_data.json`: TA-01 to TA-34 from the YAML, and TA-35 (`role.admin`, `action.read`, `resource.audit_log`, `purpose.audit_review`, `scope.all_records`, `risk.read_only`) from `docs/14-audit/audit-read-access-design.md`. Accepted by Mangesh (FDE) on 2026-10-12. |
+| Audit action words (S05-14) | `audit.read`, `audit.not_found`, `audit.id_refused` (new); `policy.deny` is reused. The route is `GET /audit/{correlation_id}`. The id limit is 128 characters. |
 | Four AI outcomes | RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK, EXECUTE |
 | Fields never in a prompt | mgmt_ip, credential_profile |
-| Log fields (S04-08) | ts, correlation_id, actor, role, action, resource, policy_decision, approval_id, model, model_version, prompt_hash, tokens, latency_ms, outcome |
+| Log fields (S04-08, extended by S04-12) | ts, correlation_id, actor, role, action, resource, policy_decision, approval_id, model, model_version, prompt_hash, tokens, latency_ms, outcome, token_estimate_method (15 keys) |
 | Provenance groups (S05-14) | actor, request, data used, model, policy, approval, final action, trace, cannot be proven |
 | S03 version | 1.0.0 |
 
@@ -75,7 +86,7 @@ Exclude: application code; Rego text; CI YAML; Terraform; test code; any term th
 2. `06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-revision.md` — the collection table with decisions, the fold list per YAML file, the build and test output, the fifteen S03R rows and eight failure-list rows, the id-citation check, and the diff.
 
 ## Completion gate
-PASS when every collected row has a decision and a reason, every add or alias is in the YAML with a source list and a glossary entry, the build and the tests pass, every S03R row is PASS, no cited id lost its meaning, and the new version is in every YAML file and the README. CONDITIONAL PASS when a deferred row names an owner, or when the only FAIL rows are R12 or R15 with a one-line fix. BLOCKED when a test fails, a YAML file is missing, an id that code or tests cite was removed, or any AI use has execute agency.
+PASS when every collected row has a decision and a reason, every add or alias is in the YAML with a source list and a glossary entry, the build, `build.py --check`, the semantic-layer tests, the full test run, and the security stage (0 skipped) pass, the stale-state sentences are corrected or listed, every S03R row is PASS, no cited id lost its meaning, and the new version is in every YAML file and the README. CONDITIONAL PASS when a deferred row names an owner, or when the only FAIL rows are R12 or R15 with a one-line fix. BLOCKED when a test fails, a YAML file is missing, an id that code or tests cite was removed, or any AI use has execute agency.
 
 ## Lifecycle linkage
 Cite `docs/02-baseline/semantic-layer-review.md`, the Phase 4 and 5 design files by path, and `docs/02-baseline/ai-qualification.md`. If a rerun row is FAIL, stage S03F applies this file's "Fixes required" list and keeps this version. Then S03R runs again in a fresh chat. S06 starts when that review reads PASS, or CONDITIONAL PASS with fixes applied. Stage S06 writes the version string from this stage into the PRD header and cites ids at this version. Stage S07 builds against this version. Stage S08 hashes this version and hands it to the second model unchanged. After this stage, a YAML change needs an ADR under `docs/ADR/` that names the id and the reason.
