@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "file": "access-semantics",
   "description": "The seven telecom personas and what each may do. Every persona entry maps to actions, resources, a purpose, a scope, and a risk. Scope is the set of records a persona may touch. The persona mappings are PROPOSED. The repo holds only a five-name Python allow list and a two-rule OPA file. Neither names a persona except ai_agent. Stage S04-03 confirms the mappings.",
   "source": [

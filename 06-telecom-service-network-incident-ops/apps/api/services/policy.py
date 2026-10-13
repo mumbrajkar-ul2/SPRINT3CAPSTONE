@@ -297,6 +297,34 @@ _SUMMARIZE = {
 _SUMMARIZE_DEFAULT = _SUMMARIZE["role.operator"]
 
 
+# Stage S07. The purpose and scope of the target row for each caller. A caller with no row
+# of its own is checked with the operator values, so the deny comes from the role.
+_STORM_READ = {
+    "role.operator": ("resource.alarm", "purpose.incident_triage", "scope.all_records"),  # TA-02
+    "role.engineer": ("resource.alarm", "purpose.network_change_planning", "scope.all_records"),  # TA-13
+}
+_STORM_READ_DEFAULT = _STORM_READ["role.operator"]
+
+_RECOMMEND = {
+    "role.operator": ("resource.device", "purpose.incident_triage", "scope.assigned_incident"),  # TA-08
+    "role.engineer": ("resource.device", "purpose.network_change_planning", "scope.all_records"),  # TA-16
+    "persona.ai_agent": ("resource.device", "purpose.ai_assistance", "scope.assigned_incident"),  # TA-34
+}
+_RECOMMEND_DEFAULT = _RECOMMEND["role.operator"]
+
+# TA-09. Only the NOC operator has an approve row. persona.ai_agent and
+# persona.automation_service are on the denied list. The engineer's approve row (TA-17) is
+# on resource.approval, which no route in this app uses.
+_APPROVE = {
+    "role.operator": (
+        "resource.ai_invocation",
+        "purpose.incident_triage",
+        "scope.assigned_incident",
+    ),
+}
+_APPROVE_DEFAULT = _APPROVE["role.operator"]
+
+
 def role_id_from_header(word):
     """Map the X-User-Role word to a YAML role id. A missing or blank word gives None."""
     if word is None or not str(word).strip():
@@ -333,6 +361,76 @@ def check_summarize(role_id) -> dict:
             "risk": "risk.recommendation",
         }
     )
+
+
+def check_storm_read(role_id) -> dict:
+    """Access decision for GET /alarms/storms/{id}. TA-02 and TA-13 are the allow rows."""
+    resource, purpose, scope = _STORM_READ.get(role_id, _STORM_READ_DEFAULT)
+    return evaluate_access(
+        {
+            "role": role_id,
+            "action": "action.read",
+            "resource": resource,
+            "purpose": purpose,
+            "scope": scope,
+            "risk": "risk.read_only",
+        }
+    )
+
+
+def check_recommend(role_id) -> dict:
+    """Access decision for POST /ai/recommend/{id}. TA-08, TA-16 and TA-34 are the allow rows."""
+    resource, purpose, scope = _RECOMMEND.get(role_id, _RECOMMEND_DEFAULT)
+    return evaluate_access(
+        {
+            "role": role_id,
+            "action": "action.recommend",
+            "resource": resource,
+            "purpose": purpose,
+            "scope": scope,
+            "risk": "risk.recommendation",
+        }
+    )
+
+
+def check_approve(role_id) -> dict:
+    """Access decision for POST /approvals/{id}. TA-09 is the one allow row."""
+    resource, purpose, scope = _APPROVE.get(role_id, _APPROVE_DEFAULT)
+    return evaluate_access(
+        {
+            "role": role_id,
+            "action": "action.approve",
+            "resource": resource,
+            "purpose": purpose,
+            "scope": scope,
+            "risk": "risk.decision",
+        }
+    )
+
+
+def check_sensitive_read(role_id) -> dict:
+    """Access decision for the two sensitive device cells (mgmt_ip and credential_profile).
+
+    Stage S07 (RQ-05 and RQ-06). TA-15 is the one allow row. It belongs to
+    persona.network_engineer. Every other role gets the row without those two cells.
+    """
+    return evaluate_access(
+        {
+            "role": role_id,
+            "action": "action.read",
+            "resource": "resource.sensitive_device_fields",
+            "purpose": "purpose.network_change_planning",
+            "scope": "scope.all_records",
+            "risk": "risk.read_only",
+        }
+    )
+
+
+def persona_of(role_id):
+    """The persona id for a role id, or the role id itself when it has no persona."""
+    if role_id is None:
+        return None
+    return ACCESS["persona_of"].get(role_id, role_id)
 
 
 def check_audit_read(role_id) -> dict:
@@ -384,9 +482,26 @@ def decide_summarize(
     `gateway_flags` holds forbidden_field_in_prompt, output_schema_ok, and
     timeout_hit as the gateway measured them. None means a pre-flight call.
     """
+    return decide_ai("action.summarize", role_id, record_id, record, access, gateway_flags)
+
+
+def decide_recommend(
+    role_id, record_id: str, record: dict, access: dict, gateway_flags=None
+) -> dict:
+    """Run ai_action for one recommend call (stage S07). `access` is the result of
+    check_recommend. A healthy call gets HOLD_FOR_REVIEW from row O2. The policy never
+    gives RECOMMEND_ONLY or EXECUTE to action.recommend.
+    """
+    return decide_ai("action.recommend", role_id, record_id, record, access, gateway_flags)
+
+
+def decide_ai(
+    action: str, role_id, record_id: str, record: dict, access: dict, gateway_flags=None
+) -> dict:
+    """Run ai_action for one summarize or recommend call."""
     payload = {
         "persona": role_id,
-        "action": "action.summarize",
+        "action": action,
         "resource": "resource.device",
         "risk": "risk.recommendation",
         "policy_result": "allow" if access.get("allow") else "deny",

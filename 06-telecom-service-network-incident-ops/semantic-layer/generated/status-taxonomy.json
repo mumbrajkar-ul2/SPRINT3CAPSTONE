@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "file": "status-taxonomy",
   "description": "Every status word used in code, docs, and the CSV files, with the column it sits in and how many rows hold it. Counts are from one read of data/synthetic on 2026-10-10. The repo defines no allowed list for any column. Each field below says so with allowed_list_defined_by_repo false.",
   "source": [
@@ -4685,7 +4685,7 @@
     {
       "id": "status.code.audit_action.record_read",
       "value": "record.read",
-      "description": "The audit action written after an allowed record read. Before stage S04-08, details held record_id and role. Now (S05R, 1.1.0): the row has the 15 keys in concept.audit_row, and record_id is not one of them. Stages S04-08 and S04-12 made that change.",
+      "description": "The audit action written after an allowed record read. Before stage S04-08, details held record_id and role. Now (S05R, 1.1.0): the row has the 15 keys in concept.audit_row, and record_id is not one of them. Stages S04-08 and S04-12 made that change. Now (S07, 1.2.0): the row has 17 keys, and record_id is the 16th.",
       "source": [
         "apps/api/main.py",
         "apps/api/services/audit.py"
@@ -4778,6 +4778,42 @@
         "apps/api/main.py",
         "docs/14-audit/audit-read-access-design.md",
         "docs/14-audit/evidence.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.storm_read",
+      "value": "record.storm_read",
+      "description": "The audit action GET /alarms/storms/{storm_batch_id} writes after an allowed read of one storm. The row names resource.alarm. It holds no record_id, because a storm is not a device. The route returns HTTP 200.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/prd/prd.md",
+        "docs/ADR/0005-s07-yaml-additions.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.ai_recommendation",
+      "value": "ai.recommendation",
+      "description": "The audit action POST /ai/recommend/{id} writes when it returned the recommendation sentence. The outcome key holds HOLD_FOR_REVIEW and the row holds the model call values and record_id. This row is the proof that a recommendation was shown with text. POST /approvals/{id} needs it under the same correlation id.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/prd/prd.md",
+        "docs/ADR/0005-s07-yaml-additions.md"
+      ]
+    },
+    {
+      "id": "status.code.audit_action.ai_approval",
+      "value": "ai.approval",
+      "description": "The audit action POST /approvals/{id} writes first, before it stores a decision. The row names resource.ai_invocation and record_id. For a yes the row holds the approval id. For a no approval_id is null. The row is written before the decision is stored.",
+      "proposed": true,
+      "owner": "Team-Force",
+      "source": [
+        "apps/api/main.py",
+        "docs/prd/prd.md",
+        "docs/ADR/0005-s07-yaml-additions.md"
       ]
     },
     {

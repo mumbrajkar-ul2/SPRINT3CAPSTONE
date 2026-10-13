@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Governed telecom incident application</title>
+<style>
+  :root { --ink:#1b1f24; --muted:#505a66; --line:#c9d1da; --bg:#f6f8fa; --card:#ffffff; --accent:#0b5cad; --ok:#116329; --warn:#8a4b00; --bad:#a1260d; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.5 system-ui, "Segoe UI", Arial, sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:#0d2b45; color:#fff; padding:16px 24px; }
+  header h1 { margin:0 0 4px; font-size:22px; }
+  header p { margin:0; color:#d6e4f0; }
+  main { max-width:1100px; margin:0 auto; padding:16px 24px 64px; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin:16px 0; }
+  section h2 { margin:0 0 4px; font-size:18px; }
+  .what { color:var(--muted); margin:0 0 12px; }
+  label { font-weight:600; margin-right:8px; }
+  input[type=text] { padding:6px 8px; border:1px solid var(--line); border-radius:4px; font:inherit; min-width:220px; }
+  button { padding:6px 14px; border:1px solid var(--accent); background:var(--accent); color:#fff; border-radius:4px; font:inherit; cursor:pointer; }
+  button.secondary { background:#fff; color:var(--accent); }
+  button.no { background:#fff; color:var(--bad); border-color:var(--bad); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  table { border-collapse:collapse; width:100%; margin:8px 0; font-size:14px; }
+  th, td { border:1px solid var(--line); padding:4px 8px; text-align:left; vertical-align:top; }
+  th { background:#eef2f6; }
+  .row { margin:8px 0; }
+  .status { display:inline-block; padding:2px 8px; border-radius:10px; background:#eef2f6; font-size:14px; }
+  .num { font-weight:600; white-space:nowrap; }
+  .label { display:inline-block; margin-left:4px; padding:0 6px; border-radius:8px; font-size:11px; font-weight:700; letter-spacing:.03em; vertical-align:middle; }
+  .label.REAL { background:#dcf3e1; color:#0b4a1e; }
+  .label.PRECOMPUTED { background:#e5e1f7; color:#35276f; }
+  .label.SIMULATED { background:#fdebc8; color:#6b3b00; }
+  .label.EDUCATIONAL { background:#d9ebfa; color:#0a4170; }
+  .notice { border-left:4px solid var(--warn); background:#fff6e5; padding:8px 12px; margin:8px 0; }
+  .notice.bad { border-color:var(--bad); background:#fdecea; }
+  .notice.good { border-color:var(--ok); background:#e8f6ec; }
+  .muted { color:var(--muted); }
+  code { background:#eef2f6; padding:0 4px; border-radius:3px; font-size:13px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:8px; margin:8px 0; }
+  .card { border:1px solid var(--line); border-radius:6px; padding:8px 12px; background:#fbfcfd; }
+  .card .k { color:var(--muted); font-size:13px; }
+  .card .v { font-size:22px; font-weight:700; }
+  ul.clean { margin:4px 0; padding-left:20px; }
+  .hash { word-break:break-all; font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Governed telecom incident application</h1>
+  <p>One case from an alarm storm to a person's decision. The model only recommends. A person decides. Nothing here changes a device.</p>
+</header>
+<main>
+
+<section id="intro">
+  <h2>How to read this page</h2>
+  <p class="what">Every number has a label next to it. REAL means the app counted it at the request. SIMULATED means the stub model made it up. EDUCATIONAL means a rule of thumb that is not a bill. PRECOMPUTED means it was copied from a stored report. This page shows no PRECOMPUTED number.</p>
+  <div class="row">
+    <label for="cid">Case id sent with every call (X-Correlation-Id)</label>
+    <code id="cid"></code>
+    <button class="secondary" id="newcase" type="button">Start a new case</button>
+  </div>
+  <p class="muted">The role is a word this page sends in the X-User-Role header. Nothing proves who the caller is. The page calls it a claimed role.</p>
+</section>
+
+<section id="step-storm">
+  <h2>Step one. Pick a storm and read its alarms</h2>
+  <p class="what">Role sent: <strong>operator</strong> (claimed role). Route: <code>GET /alarms/storms/{storm_batch_id}</code>.</p>
+  <div class="row">
+    <label for="storm">Storm batch id</label>
+    <input type="text" id="storm" list="storm-examples" value="STO-00002" autocomplete="off">
+    <datalist id="storm-examples">
+      <option value="STO-00002"></option>
+      <option value="STO-00005"></option>
+      <option value="STO-00019"></option>
+      <option value="STO-00001"></option>
+    </datalist>
+    <button id="read-storm" type="button">Read storm</button>
+  </div>
+  <p class="muted">Examples. STO-00002 has one flagged alarm, and its device gets a recommendation. STO-00005 has two alarms with the same dedupe key, and its device has a stale topology flag, so the recommendation is blocked. STO-00019 has two flagged alarms. STO-00001 names a device that has no device row.</p>
+  <div id="storm-out"></div>
+</section>
+
+<section id="step-lookup">
+  <h2>Step two. Look up one device</h2>
+  <p class="what">Role sent: <strong>operator</strong> (claimed role). Route: <code>GET /records/{id}</code>. The two sensitive fields are left out for this role.</p>
+  <div class="row">
+    <label for="device">Device id from the storm</label>
+    <select id="device" disabled></select>
+    <button id="lookup" type="button" disabled>Look up device</button>
+  </div>
+  <div id="lookup-out"></div>
+</section>
+
+<section id="step-recommend">
+  <h2>Step three. Ask for a recommendation</h2>
+  <p class="what">Role sent: <strong>operator</strong> (claimed role). Route: <code>POST /ai/recommend/{id}</code>. The model is a stub called <code>local-sim-v1</code>, so its text is SIMULATED. The outcome is never a command.</p>
+  <div class="row"><button id="recommend" type="button" disabled>Ask for a recommendation</button></div>
+  <div id="recommend-out"></div>
+</section>
+
+<section id="step-decide">
+  <h2>Step four. A person decides</h2>
+  <p class="what">Role sent: <strong>operator</strong> (claimed role). Route: <code>POST /approvals/{id}</code>. The server sets the approver. A yes gets an approval id. A no gets none. Neither one changes a device.</p>
+  <div class="row">
+    <button id="approve-yes" type="button" disabled>Approve (yes)</button>
+    <button id="approve-no" class="no" type="button" disabled>Reject (no)</button>
+  </div>
+  <div id="decide-out"></div>
+</section>
+
+<section id="step-audit">
+  <h2>Step five. Read the audit chain</h2>
+  <p class="what">Role sent: <strong>admin</strong> (claimed role). Route: <code>GET /audit/{correlation_id}</code>. Only the admin role may read the audit log.</p>
+  <div class="row"><button id="read-audit" type="button">Read audit chain</button></div>
+  <div id="audit-out"></div>
+</section>
+
+<section id="step-health">
+  <h2>Service check</h2>
+  <p class="what">Route: <code>GET /health</code>. A live call, not a stored value.</p>
+  <div class="row"><button id="read-health" class="secondary" type="button">Check health</button></div>
+  <div id="health-out"></div>
+</section>
+
+</main>
+
+<script>
+"use strict";
+
+// Every number on this page goes through num(). num() refuses a label that is not one of the four.
+const LABELS = ["REAL", "PRECOMPUTED", "SIMULATED", "EDUCATIONAL"];
+const OUTCOMES = ["RECOMMEND_ONLY", "HOLD_FOR_REVIEW", "BLOCK", "EXECUTE"];
+
+function newId() {
+  if (window.crypto && crypto.randomUUID) { return crypto.randomUUID(); }
+  return "case-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+}
+
+let correlationId = newId();
+let devices = [];
+let lastRecommendation = null;
+
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  Object.entries(attrs || {}).forEach(([k, v]) => {
+    if (k === "class") { node.className = v; } else { node.setAttribute(k, v); }
+  });
+  [].concat(children === undefined ? [] : children).forEach(child => {
+    node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  });
+  return node;
+}
+
+function badge(label) {
+  if (!LABELS.includes(label)) { throw new Error("A number needs one of four labels: " + label); }
+  return el("span", { class: "label " + label }, label);
+}
+
+function num(value, label) {
+  return el("span", { class: "num" }, [String(value), badge(label)]);
+}
+
+// Text from the server that holds digits (for example a count inside a cannot_prove line).
+// The label after the text covers the numbers inside that text.
+function textWithLabel(text, label) {
+  const parts = [String(text)];
+  if (/\d/.test(String(text))) { parts.push(" ", badge(label)); }
+  return el("span", {}, parts);
+}
+
+function clear(id) { const n = document.getElementById(id); n.replaceChildren(); return n; }
+function statusChip(status) { return el("span", { class: "status" }, ["HTTP status ", num(status, "REAL")]); }
+
+function notice(kind, text) { return el("div", { class: "notice " + kind }, text); }
+
+async function api(method, path, role, body) {
+  const headers = { "X-Correlation-Id": correlationId };
+  if (role) { headers["X-User-Role"] = role; }
+  const options = { method, headers };
+  if (body !== undefined) { headers["Content-Type"] = "application/json"; options.body = JSON.stringify(body); }
+  const response = await fetch(path, options);
+  let data = null;
+  try { data = await response.json(); } catch (e) { data = null; }
+  return { status: response.status, data };
+}
+
+function table(headers, rows) {
+  const t = el("table", {});
+  t.append(el("thead", {}, el("tr", {}, headers.map(h => el("th", {}, h)))));
+  t.append(el("tbody", {}, rows.map(r => el("tr", {}, r.map(cell => el("td", {}, cell))))));
+  return t;
+}
+
+function showCase() { document.getElementById("cid").textContent = correlationId; }
+
+function resetFlow() {
+  devices = [];
+  lastRecommendation = null;
+  ["storm-out", "lookup-out", "recommend-out", "decide-out", "audit-out"].forEach(clear);
+  const select = document.getElementById("device");
+  select.replaceChildren(); select.disabled = true;
+  ["lookup", "recommend", "approve-yes", "approve-no"].forEach(id => { document.getElementById(id).disabled = true; });
+}
+
+function selectedDevice() { return document.getElementById("device").value; }
+
+// ---- Step one ---------------------------------------------------------------------------------
+async function readStorm() {
+  resetFlow();
+  const out = clear("storm-out");
+  const storm = document.getElementById("storm").value.trim();
+  if (!storm) { out.append(notice("bad", "Type a storm batch id first.")); return; }
+  const { status, data } = await api("GET", "/alarms/storms/" + encodeURIComponent(storm), "operator");
+  out.append(statusChip(status));
+  if (status !== 200) {
+    out.append(notice("bad", "No storm was read. The server said: " + (data && data.error ? data.error : "no reason given") + "."));
+    return;
+  }
+  const listed = data.rows.length + data.held_aside.length;
+  out.append(el("div", { class: "grid" }, [
+    el("div", { class: "card" }, [el("div", { class: "k" }, "Raw count"), el("div", { class: "v" }, num(data.raw_count, "REAL"))]),
+    el("div", { class: "card" }, [el("div", { class: "k" }, "Deduped count"), el("div", { class: "v" }, num(data.deduped_count, "REAL"))]),
+    el("div", { class: "card" }, [el("div", { class: "k" }, "Flagged count"), el("div", { class: "v" }, num(data.flagged_count, "REAL"))]),
+    el("div", { class: "card" }, [el("div", { class: "k" }, "Alarm ids listed"), el("div", { class: "v" }, num(listed, "REAL"))]),
+  ]));
+  out.append(el("p", { class: "muted" }, "The rows in the alarm file are synthetic. The counts are computed from that file at the request. This page does not call any storm large or small."));
+  const toRow = r => [r.alarm_id, r.device_id || "(blank)", r.dedupe_key || "(blank)", r.flag || "(none)"];
+  out.append(el("h3", {}, "Rows"));
+  out.append(data.rows.length ? table(["Alarm id", "Device id", "Dedupe key", "Flag"], data.rows.map(toRow)) : el("p", { class: "muted" }, "No rows."));
+  if (data.held_aside.length) {
+    out.append(el("h3", {}, "Held aside (blank dedupe key)"));
+    out.append(table(["Alarm id", "Device id", "Dedupe key", "Flag"], data.held_aside.map(toRow)));
+  }
+  const ids = [];
+  data.rows.concat(data.held_aside).forEach(r => { if (r.device_id && !ids.includes(r.device_id)) { ids.push(r.device_id); } });
+  devices = ids;
+  const select = document.getElementById("device");
+  ids.forEach(id => select.append(el("option", { value: id }, id)));
+  const any = ids.length > 0;
+  select.disabled = !any;
+  ["lookup", "recommend", "approve-yes", "approve-no"].forEach(id => { document.getElementById(id).disabled = !any; });
+  if (!any) { out.append(notice("bad", "This storm lists no device id, so the next steps are off.")); }
+}
+
+// ---- Step two ---------------------------------------------------------------------------------
+async function lookup() {
+  const out = clear("lookup-out");
+  const id = selectedDevice();
+  const { status, data } = await api("GET", "/records/" + encodeURIComponent(id), "operator");
+  out.append(statusChip(status));
+  if (status === 404) {
+    out.append(notice("bad", "No device row has the id " + id + ". The server returned nothing for it and did not pick another device."));
+    return;
+  }
+  if (status !== 200) {
+    out.append(notice("bad", "The lookup was refused. The server said: " + (data && data.error ? data.error : "no reason given") + "."));
+    return;
+  }
+  const keys = Object.keys(data);
+  out.append(table(["Field", "Value"], keys.map(k => [k, String(data[k])])));
+  const hidden = ["mgmt_ip", "credential_profile"].filter(k => !(k in data));
+  if (hidden.length) { out.append(el("p", { class: "muted" }, "Left out for this role: " + hidden.join(" and ") + ".")); }
+}
+
+// ---- Step three -------------------------------------------------------------------------------
+async function recommend() {
+  const out = clear("recommend-out");
+  const id = selectedDevice();
+  const { status, data } = await api("POST", "/ai/recommend/" + encodeURIComponent(id), "operator");
+  out.append(statusChip(status));
+  lastRecommendation = { status, data };
+  if (!data) { out.append(notice("bad", "The server sent no readable answer.")); return; }
+  if (status === 403 && !data.outcome) { out.append(notice("bad", "The call was refused. The server said: " + data.error + ".")); return; }
+
+  out.append(el("p", {}, ["Outcome: ", el("strong", {}, data.outcome)]));
+  const hasText = data.recommendation !== null && data.recommendation !== undefined;
+  if (!hasText) {
+    // A held or blocked call shows the reason and no text at all.
+    out.append(notice("bad", "A person must review this case. The system shows no summary and no recommendation text."));
+    out.append(el("p", {}, ["Reason: ", (data.reasons || []).join(", ") || "none given"]));
+  } else {
+    out.append(notice("good", "A person must accept or reject this sentence before anything else happens. It is held for review."));
+    out.append(el("p", {}, [el("strong", {}, "Recommendation (SIMULATED): "), data.recommendation]));
+    out.append(el("p", {}, [el("strong", {}, "Summary (SIMULATED): "), data.summary]));
+    out.append(el("p", { class: "muted" }, ["Policy reason: ", (data.reasons || []).join(", ")]));
+  }
+  if (data.model) {
+    out.append(el("h3", {}, "Where the answer came from"));
+    out.append(table(["Item", "Value"], [
+      ["Model", data.model],
+      ["Model version", data.model_version],
+      ["Prompt hash", el("span", { class: "hash" }, data.prompt_hash)],
+      ["Tokens", num(data.tokens, "EDUCATIONAL")],
+      ["Latency in milliseconds", num(data.latency_ms, "SIMULATED")],
+      ["Correlation id", data.correlation_id],
+    ]));
+  } else {
+    out.append(el("p", { class: "muted" }, "The model did not run, so there is no model, hash, token count or delay."));
+  }
+}
+
+// ---- Step four --------------------------------------------------------------------------------
+async function decide(word) {
+  const out = clear("decide-out");
+  const id = selectedDevice();
+  const { status, data } = await api("POST", "/approvals/" + encodeURIComponent(id), "operator", { decision: word });
+  out.append(statusChip(status));
+  if (status === 404) {
+    out.append(notice("bad", "Nothing was stored. This case has no recommendation that was shown with text for this device. Ask for a recommendation first."));
+    return;
+  }
+  if (status !== 200) {
+    out.append(notice("bad", "Nothing was stored. The server said: " + (data && (data.error || data.detail) ? (data.error || data.detail) : "no reason given") + "."));
+    return;
+  }
+  out.append(notice("good", "The decision is stored. No device, circuit, incident or alarm was changed."));
+  out.append(table(["Item", "Value"], [
+    ["Decision", data.decision],
+    ["Approver (claimed role, set by the server)", data.approver],
+    ["Approval id", data.approval_id === null ? "none (a no gets no id)" : data.approval_id],
+    ["Device id", data.record_id],
+    ["Correlation id", data.correlation_id],
+  ]));
+}
+
+// ---- Step five --------------------------------------------------------------------------------
+async function readAudit() {
+  const out = clear("audit-out");
+  const { status, data } = await api("GET", "/audit/" + encodeURIComponent(correlationId), "admin");
+  out.append(statusChip(status));
+  if (status !== 200) {
+    out.append(notice("bad", "No chain was read. The server said: " + (data && data.error ? data.error : "no reason given") + ". Run steps one to four first, with this case id."));
+    return;
+  }
+  out.append(el("p", {}, ["Rows in this chain: ", num(data.row_count, "REAL"), " (counted from the audit log at the request). The log holds test rows and real rows together. This count covers only the rows that carry this case id."]));
+  const counts = {};
+  OUTCOMES.forEach(o => { counts[o] = 0; });
+  data.rows.forEach(r => { if (r.outcome in counts) { counts[r.outcome] += 1; } });
+  out.append(el("p", {}, ["Calls per outcome in this chain: "].concat(
+    OUTCOMES.flatMap(o => [o + " ", num(counts[o], "REAL"), "  "])
+  )));
+  out.append(table(
+    ["Time", "Action", "Role (claimed)", "Actor (claimed)", "Resource", "Outcome", "Device id", "Approval id", "Tokens", "Latency ms", "Final action"],
+    data.rows.map(r => [
+      r.ts, r.action, r.role === null ? "none" : r.role, r.actor === null ? "none" : r.actor, r.resource,
+      r.outcome === null ? "none" : r.outcome,
+      r.record_id === null ? "none" : r.record_id,
+      r.approval_id === null ? "none" : r.approval_id,
+      r.tokens === null ? "none" : num(r.tokens, "EDUCATIONAL"),
+      r.latency_ms === null ? "none" : num(r.latency_ms, "SIMULATED"),
+      r.final_action,
+    ])
+  ));
+  out.append(el("h3", {}, "What this log cannot prove"));
+  out.append(el("p", { class: "muted" }, "Role sent for this read: admin (claimed role). The role is a word the caller typed. The log cannot show who the caller was."));
+  out.append(el("ul", { class: "clean" }, data.cannot_prove.map(item =>
+    el("li", {}, [el("strong", {}, item.item), ": ", textWithLabel(item.reason, "REAL")])
+  )));
+}
+
+// ---- Service check ----------------------------------------------------------------------------
+async function readHealth() {
+  const out = clear("health-out");
+  const { status } = await api("GET", "/health", null);
+  out.append(el("p", {}, ["GET /health returned ", statusChip(status)]));
+}
+
+document.getElementById("read-storm").addEventListener("click", readStorm);
+document.getElementById("lookup").addEventListener("click", lookup);
+document.getElementById("recommend").addEventListener("click", recommend);
+document.getElementById("approve-yes").addEventListener("click", () => decide("yes"));
+document.getElementById("approve-no").addEventListener("click", () => decide("no"));
+document.getElementById("read-audit").addEventListener("click", readAudit);
+document.getElementById("read-health").addEventListener("click", readHealth);
+document.getElementById("newcase").addEventListener("click", () => { correlationId = newId(); showCase(); resetFlow(); });
+showCase();
+</script>
+</body>
+</html>

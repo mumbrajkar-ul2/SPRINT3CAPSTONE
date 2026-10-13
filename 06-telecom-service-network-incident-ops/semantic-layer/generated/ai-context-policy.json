@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "file": "ai-context-policy",
   "description": "The rules around every model call. Fields that may enter a prompt. Fields that never may. The shape every answer must have. The provenance fields that say where the answer came from. The four outcomes. What happens on a timeout or a bad answer. And, for each of the eleven capabilities from ai-qualification.md, the pick, the agency, and the human approval point. The allow list and the output shape are PROPOSED. Stage S04-09 confirms them.",
   "source": [
@@ -550,6 +550,52 @@
       "../Project_Intent.md"
     ]
   },
+  "command_phrases": {
+    "id": "policy.command_phrases",
+    "name": "command phrases",
+    "description": "Words and phrases that tell a person to change a device. When the model text holds one of the phrases, or one of the near-miss phrases, as whole words, POST /ai/recommend/{id} discards the text and holds the case for a person with the reason failmode.command_text_in_recommendation. The near-miss phrases are forms of the same verbs, such as rebooting for reboot. Both lists are short and miss phrases that mean the same. A harmless sentence that holds the word apply is held too. The lists are PROPOSED. Owner Team-Force. The starting phrases come from decision D-08.",
+    "phrases": [
+      "reboot",
+      "restart",
+      "shut down",
+      "delete",
+      "clear config",
+      "push config",
+      "apply"
+    ],
+    "near_miss_phrases": [
+      "reboots",
+      "rebooting",
+      "rebooted",
+      "restarts",
+      "restarting",
+      "restarted",
+      "shutdown",
+      "shut-down",
+      "shuts down",
+      "shutting down",
+      "deletes",
+      "deleting",
+      "deleted",
+      "clear the config",
+      "clearing config",
+      "clears config",
+      "push the config",
+      "pushing config",
+      "pushes config",
+      "applies",
+      "applying",
+      "applied"
+    ],
+    "proposed": true,
+    "owner": "Team-Force",
+    "source": [
+      "apps/api/services/ai_gateway.py",
+      "docs/prd/prd.md",
+      "docs/ADR/0005-s07-yaml-additions.md",
+      "docs/ADR/0002-s05r-deferred-and-proposed-decisions.md"
+    ]
+  },
   "fail_to_person": {
     "id": "policy.fail_to_person",
     "name": "fail to person",
@@ -651,7 +697,7 @@
         "id": "failmode.command_text_in_recommendation",
         "name": "command text in the recommendation",
         "outcome": "outcome.hold_for_review",
-        "description": "The recommendation text holds a sentence from the command list, which is a fixed tuple in ai_gateway.py (COMMAND_PHRASES). The answer is discarded and the case goes to the person with no text. The tuple holds one sentence today. The full list is PROPOSED and is deferred to Team-Force. Today the reason string is failmode.schema_failure, because the answer check rejects the text.",
+        "description": "The recommendation text holds a sentence from the command list, which is a fixed tuple in ai_gateway.py (COMMAND_PHRASES). The answer is discarded and the case goes to the person with no text. The tuple holds one sentence today. The full list is PROPOSED and is deferred to Team-Force. Today the reason string is failmode.schema_failure, because the answer check rejects the text. Now (S07, 1.2.0): POST /ai/recommend/{id} checks the text against policy.command_phrases and returns this id in the reasons list. POST /ai/summarize/{id} keeps the old behaviour and its reason string.",
         "proposed": true,
         "owner": "Team-Force",
         "source": [

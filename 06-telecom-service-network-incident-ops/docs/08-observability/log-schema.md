@@ -174,3 +174,16 @@ Stage S04-09 fills `model`, `model_version`, `prompt_hash`, `tokens`, and `laten
 ## Change from stage S04-12 Half B
 
 The audit row now has a fifteenth key, `token_estimate_method`. It holds `word_count_x2_EDUCATIONAL` on a row where `tokens` has a value, and null on every other row. It sits after `outcome`. The first fourteen keys and their order are unchanged. Open question for S03: this design needs a field id for `token_estimate_method`, so each token number says how it was worked out.
+
+## Change from stage S07
+
+The audit row now has 17 keys. Two keys are new and sit after `token_estimate_method`.
+
+- The 16th key is `record_id`. It holds the device id the caller asked for. It is null on a row that names no device, such as a storm read or an audit read. The id is stored as the caller typed it.
+- The 17th key is `final_action`. It holds the word `none` on every row, because no route in this app changes a device.
+
+`approval_id` is no longer always null. The route `POST /approvals/{id}` writes the id it made on the row `ai.approval` for a yes. A no leaves it null.
+
+Three new action words appear in `action`: `record.storm_read`, `ai.recommendation` and `ai.approval`. Each has a YAML id (`docs/ADR/0005-s07-yaml-additions.md`). A correlation id sent in `X-Correlation-Id` that is longer than 128 characters is not stored. The server makes a new UUID.
+
+Open question for S03: the word to store for a role header that is not in the known list. S07 stores the role as the caller sent it.

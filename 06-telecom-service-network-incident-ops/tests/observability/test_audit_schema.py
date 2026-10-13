@@ -31,6 +31,9 @@ REQUIRED_KEYS = (
     "outcome",
     # S04-12 Half B. The fifteenth key. Names the formula behind `tokens`.
     "token_estimate_method",
+    # S07. The sixteenth and seventeenth keys (PRD D-06 and D-05).
+    "record_id",
+    "final_action",
 )
 
 
@@ -61,6 +64,8 @@ def test_every_audit_row_has_every_required_field(tmp_path, monkeypatch):
         assert row["resource"] == "resource.device"
         assert row["policy_decision"] is None
         assert row["approval_id"] is None
+        # S07. Nothing in this app runs a command, so the last key says none.
+        assert row["final_action"] == "none"
         # S04-09: a row that ran the model carries the five provenance values.
         # Every other row leaves them null. This test used to expect null on all four.
         provenance = [row[key] for key in ("model", "model_version", "prompt_hash", "tokens", "latency_ms")]

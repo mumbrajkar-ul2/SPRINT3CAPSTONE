@@ -1,9 +1,461 @@
+# API contract for the governed telecom incident application. Stage S07.
+#
+# Source of truth: docs/prd/prd.md (RQ-01 to RQ-73) and apps/api/main.py.
+# A test (tests/app/test_openapi_fragment.py) checks that this file lists every route of the
+# app, that no route is named execute, and that the audit row has the same 17 keys as the code.
+#
+# Every route reads X-Correlation-Id. When the caller sends none, or sends more than 128
+# characters, the server makes a new UUID. Every response carries the id in the same header.
+# X-User-Role is a word the caller types. Nothing proves who the caller is (claimed role).
+# The role words in the access matrix are operator, engineer, ai_agent and admin. A missing
+# header has no role and gets 403 on every route that checks a role.
 openapi: 3.0.0
 info:
-  title: Brownfield API Fragment
-  version: 0.1.0
+  title: Governed telecom incident application
+  version: 0.2.0
+  description: >-
+    One case from an alarm storm to a person's decision. The model only recommends.
+    No route runs a command. No route is named execute. The route POST /approvals/{id}
+    is the only route that stores new state, and it writes its audit row first.
+components:
+  parameters:
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      description: >-
+        One id for one case. The server keeps it when it has text and is at most 128 characters.
+        Otherwise the server makes a new UUID.
+      schema: { type: string, maxLength: 128 }
+    UserRole:
+      name: X-User-Role
+      in: header
+      required: false
+      description: >-
+        The caller's claimed role word. A missing or blank header has no role and is refused
+        with 403. The server does not fill in a default.
+      schema: { type: string }
+  headers:
+    CorrelationIdOut:
+      description: The correlation id the server used for this call and wrote to the audit row.
+      schema: { type: string }
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: A short word or phrase, for example not_found, forbidden, data file missing.
+    StormRow:
+      type: object
+      required: [alarm_id, device_id, dedupe_key, flag]
+      properties:
+        alarm_id: { type: string }
+        device_id: { type: string }
+        dedupe_key: { type: string }
+        flag:
+          type: string
+          description: >-
+            last_seen_before_first_seen, times_unreadable, or an empty string when the row has no flag.
+    StormReply:
+      type: object
+      required: [raw_count, deduped_count, flagged_count, rows, held_aside]
+      description: Counts only. The reply sets no storm size and calls no storm large or small.
+      properties:
+        raw_count: { type: integer, description: Every row with this storm_batch_id. Label REAL. }
+        deduped_count: { type: integer, description: The different non-blank dedupe_key values. Label REAL. }
+        flagged_count: { type: integer, description: Rows that carry a flag word. Label REAL. }
+        rows:
+          type: array
+          items: { $ref: '#/components/schemas/StormRow' }
+        held_aside:
+          type: array
+          description: Rows with a blank dedupe_key.
+          items: { $ref: '#/components/schemas/StormRow' }
+    Device:
+      type: object
+      description: >-
+        One row of devices.csv. The fields mgmt_ip and credential_profile are present only for the
+        network engineer role (TA-15).
+      additionalProperties: { type: string }
+    AiOutcome:
+      type: string
+      description: This stage returns no EXECUTE.
+      enum: [RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK]
+    AiResponse:
+      type: object
+      required:
+        - record_id
+        - summary
+        - recommendation
+        - outcome
+        - model
+        - model_version
+        - prompt_hash
+        - tokens
+        - latency_ms
+        - source_count
+        - guardrail_status
+        - approval_required
+        - policy_result
+        - approval_id
+        - correlation_id
+        - reasons
+        - policy_version
+      properties:
+        record_id: { type: string }
+        summary:
+          type: string
+          nullable: true
+          description: Null on HOLD_FOR_REVIEW with no text and on BLOCK. No substitute text is made up.
+        recommendation:
+          type: string
+          nullable: true
+          description: Null on HOLD_FOR_REVIEW with no text and on BLOCK.
+        outcome: { $ref: '#/components/schemas/AiOutcome' }
+        model: { type: string, nullable: true, description: The stub model local-sim-v1. Label SIMULATED. }
+        model_version: { type: string, nullable: true }
+        prompt_hash: { type: string, nullable: true }
+        tokens:
+          type: integer
+          nullable: true
+          description: Word count times two. Label EDUCATIONAL.
+        latency_ms:
+          type: integer
+          nullable: true
+          description: The stub waits 10 ms. Label SIMULATED.
+        source_count: { type: integer }
+        guardrail_status: { type: string }
+        approval_required: { type: boolean }
+        policy_result: { type: string }
+        approval_id:
+          type: string
+          nullable: true
+          description: Always null. No model route makes an approval id.
+        correlation_id: { type: string }
+        reasons:
+          type: array
+          items: { type: string }
+        policy_version: { type: string }
+        error:
+          type: string
+          description: Present, with the value forbidden, on a BLOCK body.
+    ApprovalRequest:
+      type: object
+      required: [decision]
+      description: One key. The caller sends no approver and no approval id. The server sets both.
+      properties:
+        decision:
+          type: string
+          enum: ['yes', 'no']
+    ApprovalReply:
+      type: object
+      required: [approval_id, decision, approver, record_id, correlation_id]
+      properties:
+        approval_id:
+          type: string
+          nullable: true
+          description: Made by the server for a yes. Null for a no.
+        decision: { type: string, enum: ['yes', 'no'] }
+        approver:
+          type: string
+          description: The persona of the claimed role. Always persona.noc_operator.
+        record_id: { type: string, description: The device_id the recommendation was about. }
+        correlation_id: { type: string }
+    AuditRow:
+      type: object
+      description: One audit row. Keys are in this order. A key with no value is null and stays.
+      required:
+        - ts
+        - correlation_id
+        - actor
+        - role
+        - action
+        - resource
+        - policy_decision
+        - approval_id
+        - model
+        - model_version
+        - prompt_hash
+        - tokens
+        - latency_ms
+        - outcome
+        - token_estimate_method
+        - record_id
+        - final_action
+      properties:
+        ts: { type: string }
+        correlation_id: { type: string }
+        actor: { type: string, nullable: true, description: Persona word of the claimed role. }
+        role: { type: string, nullable: true, description: The claimed role word. }
+        action: { type: string, description: 'For example record.read, record.storm_read, ai.recommendation, ai.approval, policy.deny.' }
+        resource: { type: string }
+        policy_decision: { type: string, nullable: true }
+        approval_id: { type: string, nullable: true }
+        model: { type: string, nullable: true }
+        model_version: { type: string, nullable: true }
+        prompt_hash: { type: string, nullable: true }
+        tokens: { type: integer, nullable: true }
+        latency_ms: { type: integer, nullable: true }
+        outcome: { type: string, nullable: true }
+        token_estimate_method: { type: string, nullable: true }
+        record_id: { type: string, nullable: true, description: The 16th key. The device id the caller asked for. }
+        final_action: { type: string, description: The 17th key. The value is none on every row. }
+    CannotProveItem:
+      type: object
+      required: [item, reason]
+      properties:
+        item: { type: string }
+        reason: { type: string }
+    AuditReply:
+      type: object
+      required: [correlation_id, row_count, rows, cannot_prove]
+      properties:
+        correlation_id: { type: string }
+        row_count: { type: integer, description: Label REAL. }
+        rows:
+          type: array
+          description: The rows of the case in time order.
+          items: { $ref: '#/components/schemas/AuditRow' }
+        cannot_prove:
+          type: array
+          description: What the log cannot prove, including caller_identity.
+          items: { $ref: '#/components/schemas/CannotProveItem' }
+    Readiness:
+      type: object
+      required: [status, checks]
+      properties:
+        status: { type: string, enum: [ok, Degraded] }
+        checks:
+          type: object
+          required: [devices_csv, alarms_csv, audit_log_writable, policy_loaded]
+          properties:
+            devices_csv: { type: boolean }
+            alarms_csv: { type: boolean }
+            audit_log_writable: { type: boolean }
+            policy_loaded: { type: boolean }
+  responses:
+    Forbidden:
+      description: The role has no allow row, or the call has no role. A policy.deny audit row is written.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: forbidden }
+    NotFound:
+      description: No row, storm, or shown recommendation matches.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: not_found }
+    Fault:
+      description: >-
+        A data file is missing (error data file missing), the audit row cannot be written
+        (error audit log unwritable), or the approval cannot be stored (error approval not stored).
+        No data and no text is returned.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
 paths:
+  /:
+    get:
+      summary: The demo page. One HTML page that walks the flow and labels every number.
+      responses:
+        '200':
+          description: OK
+          content:
+            text/html:
+              schema: { type: string }
   /health:
     get:
+      summary: Liveness. Stays 200 while the model path, the data files or the audit log fail.
       responses:
         '200': { description: OK }
+  /ready:
+    get:
+      summary: Readiness. Checks devices.csv, alarms.csv, a writable audit log and a loaded policy.
+      responses:
+        '200':
+          description: All four checks pass.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Readiness' }
+        '503':
+          description: At least one check fails.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Readiness' }
+  /records/{id}:
+    get:
+      summary: Read one device row. Rule RQ-03, RQ-05, RQ-06, RQ-68.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: The device_id.
+        - $ref: '#/components/parameters/UserRole'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The device row. mgmt_ip and credential_profile are left out except for the network engineer.
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/CorrelationIdOut' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Device' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/Fault' }
+  /alarms/storms/{storm_batch_id}:
+    get:
+      summary: Read the alarms of one storm. Counts only. Changes no stored data.
+      parameters:
+        - name: storm_batch_id
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/UserRole'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The raw count, the deduped count, the flagged count, the rows and the rows held aside.
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/CorrelationIdOut' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StormReply' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/Fault' }
+  /ai/summarize/{id}:
+    post:
+      summary: A summary of one device. The outcome is RECOMMEND_ONLY, HOLD_FOR_REVIEW or BLOCK.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: The device_id.
+        - $ref: '#/components/parameters/UserRole'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: RECOMMEND_ONLY with the summary.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiResponse' }
+        '202':
+          description: HOLD_FOR_REVIEW. Summary and recommendation are null. A person must review.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiResponse' }
+        '403':
+          description: BLOCK with the AiResponse body, or a refused role with the Error body.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - { $ref: '#/components/schemas/AiResponse' }
+                  - { $ref: '#/components/schemas/Error' }
+        '500': { $ref: '#/components/responses/Fault' }
+  /ai/recommend/{id}:
+    post:
+      summary: A next-action recommendation for one device. Never RECOMMEND_ONLY and never EXECUTE.
+      description: >-
+        Policy row O2 gives HOLD_FOR_REVIEW to a healthy call, so a person must accept or reject
+        the sentence. A stop returns HOLD_FOR_REVIEW with no text or BLOCK. Command text, a
+        forbidden value in the answer, a bad answer shape, a timeout and an open breaker all
+        return no text. A model answer that says EXECUTE returns BLOCK.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: The device_id.
+        - $ref: '#/components/parameters/UserRole'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '202':
+          description: HOLD_FOR_REVIEW, with the sentence or with null text.
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/CorrelationIdOut' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AiResponse' }
+        '403':
+          description: BLOCK with the AiResponse body, or a refused role with the Error body.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - { $ref: '#/components/schemas/AiResponse' }
+                  - { $ref: '#/components/schemas/Error' }
+        '500': { $ref: '#/components/responses/Fault' }
+  /approvals/{id}:
+    post:
+      summary: Store a person's decision for a recommendation that was shown with text.
+      description: >-
+        The only route that stores new state. The role check runs first, then the body check,
+        then the check that a recommendation was shown with text under the same X-Correlation-Id.
+        The audit row is written before the approval is stored. The route runs no command.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: The device_id the recommendation was about.
+        - $ref: '#/components/parameters/UserRole'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApprovalRequest' }
+      responses:
+        '200':
+          description: The decision is stored.
+          headers:
+            X-Correlation-Id: { $ref: '#/components/headers/CorrelationIdOut' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApprovalReply' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422':
+          description: The body has no decision, or the decision is not the word yes or the word no. Nothing is stored.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail: { type: string }
+        '500': { $ref: '#/components/responses/Fault' }
+  /audit/{correlation_id}:
+    get:
+      summary: Read one case back from the audit log. Only the admin role may read it.
+      parameters:
+        - name: correlation_id
+          in: path
+          required: true
+          schema: { type: string, maxLength: 128 }
+        - $ref: '#/components/parameters/UserRole'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: The rows of the case in time order and the list of what the log cannot prove.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuditReply' }
+        '400':
+          description: The case id in the path is longer than 128 characters. It is not looked up.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string, example: id_too_long }
+                  max_length: { type: integer }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/Fault' }

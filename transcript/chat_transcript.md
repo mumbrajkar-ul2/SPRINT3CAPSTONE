@@ -7781,3 +7781,111 @@ None. "Fixes required" is empty. Section 9 of the review lists four optional fix
 
 **7. Recommended next action**
 Start S07 now. If you want Z-5 to Z-8 closed first, run S06F once for the optional wording edits, then run S06R again in a fresh chat. Either way, commit the PRD set before S07. Name `STO-00002` as the demo storm in the S07 demo script. I did not touch `playbook/STATUS.md`, so you can record the PASS row there.
+
+## 2026-10-13 23:10
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT: @playbook/S07-application-and-demo.md:21-90 INPUTS: prd.md, traceability.md, prd-review.md, semantic-layer, apps/api, apps/web/src/app/api.service.ts, data/contracts/openapi-fragment.yaml, approval-workflow.md, degraded-mode-design.md, finops-dashboard-fields.md (all under 06-telecom-service-network-incident-ops/)
+
+### Assistant
+
+## 1. Stage status
+
+**CONDITIONAL PASS.** All four gate conditions hold. Nine PRD gaps have no owner answer yet, and the stage can only report PASS when every gap row has one.
+
+## 2. Key findings
+
+- **The app works as the PRD describes.** The audit row is written before any state change. `POST /approvals/{id}` is the only route that stores anything. No route can EXECUTE.
+- **Routes built or changed:** `/`, `/health`, `/ready`, `/records/{id}`, `/alarms/storms/{storm_batch_id}`, `POST /ai/summarize/{id}`, `POST /ai/recommend/{id}`, `POST /approvals/{id}` and `GET /audit/{correlation_id}`.
+- **Gate results:**
+  - The demo reached a human decision in a real browser. Storm `STO-00002` ended with a stored "yes".
+  - The audit-before-state-change tests pass. This includes the test where the approval write fails and the audit row still exists.
+  - The AI-timeout run returned HTTP 202, `HOLD_FOR_REVIEW`, no summary and no recommendation. The page said "A person must review this case."
+  - Every number on the page carries a REAL, PRECOMPUTED, SIMULATED or EDUCATIONAL label. `tests/app/test_page.py` checks the page source.
+- **Neither BLOCKED condition was triggered.** Every `/ai/*` reply carries `outcome`, `reasons` and `policy_version`.
+- **Tests:** 136 new tests in `tests/app/`. All 43 tests the PRD names for S07 pass. RQ-31 is deferred (ADR 0004) and not built. The full run is 467 passed, 2 skipped. The two skips need the `opa` program, which is not on this machine.
+- **The audit row now has 17 keys** (`record_id` and `final_action` were added). Older tests that expected the old behaviour were updated, and each change is listed in section 5 of `docs/demo/evidence.md`.
+- **Semantic layer is 1.2.0** (765 ids). ADR 0005 records the additions.
+
+## 3. Major risks
+
+- The policy accepts any non-blank string as an approval id. It does not check that the id was stored.
+- The page tests read the page source. They do not run the page script. The browser run covered that part once, by hand.
+- The caller chooses the case id and the role word. Both are claims and the server cannot check them.
+- Older tests outside `tests/app/` still write to the real `logs/audit.log`. It grew from 80126 to 82826 bytes in one full run.
+- The near-miss command phrase list is a draft. Team-Force has not reviewed it.
+
+## 4. Assumptions and unknowns
+
+- The model is the stub `local-sim-v1`. `latency_ms` is SIMULATED. `tokens` is EDUCATIONAL (word count x 2).
+- The tests used the Python copy of the policy. The OPA copy was not run against it.
+- The 500 reply text "approval not stored" is PROPOSED wording. It needs the owner to accept it.
+- The browser run happened before two small page-text edits. The page script did not change, and `tests/app/test_page.py` passed afterwards.
+
+## 5. Artifacts created
+
+All paths are under `06-telecom-service-network-incident-ops/` unless noted.
+
+- Code: `apps/api/main.py` and `apps/api/static/index.html`
+- Tests: `tests/app/` (13 files), plus updates to older tests in `tests/`, `policy/tests/` and `tests/performance/`
+- Contract: `data/contracts/openapi-fragment.yaml` (version 0.2.0)
+- Demo docs:
+  - `docs/demo/demo-script.md`
+  - `docs/demo/demo-recording-notes.md`
+  - `docs/demo/evidence.md` (full pytest output, redacted audit rows, PRD gaps)
+- Updated docs:
+  - `docs/prd/prd.md`
+  - `docs/prd/traceability.md` (v1.9)
+  - `docs/08-observability/log-schema.md`
+  - `docs/ADR/0005-s07-yaml-additions.md`
+  - `semantic-layer/glossary.md`
+  - `semantic-layer/metrics.yaml`
+- Status log: `../playbook/STATUS.md` (new S07 row)
+
+## 6. Blocking issues
+
+No gate condition is blocked. These nine PRD gaps are open, and each needs an owner answer (full table in `docs/demo/evidence.md`, section 7):
+
+- **G-1:** The PRD does not say what to do with an unknown role word.
+- **G-2:** The PRD does not say whether 404, 422, `/` and `/ready` write audit rows. S07 writes none.
+- **G-3:** The PRD does not say whether storm reads and audit reads carry `record_id`.
+- **G-4:** The PRD does not list the status words that `/ready` returns.
+- **G-5:** The PRD's O-4 test list is incomplete. Several old tests had to change.
+- **G-6:** The PRD does not give the body shape for 422 and 500 replies, or say whether extra keys are allowed.
+- **G-7:** The page shows shares that no route serves. Counts cover only the rows with the case id.
+- **G-8:** The PRD does not give matching rules for command phrases and forbidden values.
+- **G-9:** The `apps/web` scaffold sends no role header, so it cannot call the app.
+
+## 7. Recommended next action
+
+1. Mangesh answers the nine gaps in `docs/demo/evidence.md`, section 7. The stage then moves to PASS.
+2. Team-Force reviews the near-miss phrase list.
+3. Run S08 (second model).
+4. Wire the Angular portal only if it meets the four conditions in operating-contract row 5.
+
+## 2026-10-13 15:47
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+System notice: two background shell tasks finished with an error (the demo servers on ports 8077 and 8078). Briefly inform the user and do any follow-up.
+
+### Assistant
+
+The two demo servers I started for the browser run (ports 8077 and 8078) have stopped. The error exit code is what a stopped server returns. The S07 results are unchanged, and nothing else needs doing.
+
+## 2026-10-13 15:58
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+start the app
+
+### Assistant
+
+The app is running at http://127.0.0.1:8000/. The health check returned HTTP 200. It uses the Python copy of the policy (POLICY_ENGINE=python). Stop it with Ctrl+C in its terminal.

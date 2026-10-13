@@ -450,9 +450,15 @@ def test_record_route_denies_with_403_and_audit_row(role, audit_log):
     assert rows[0]["outcome"] is None
 
 
-def test_record_route_keeps_missing_header_default_operator(audit_log):
-    """Still open for S04-03. PB-04 proposes refusing a missing header."""
-    assert client.get("/records/REC-0001").status_code == 200
+def test_record_route_refuses_a_missing_header(audit_log):
+    """Replaces test_record_route_keeps_missing_header_default_operator (S07, PRD O-4, RQ-01).
+
+    A call with no role has no caller. The route returns 403 and writes a policy.deny row.
+    """
+    assert client.get("/records/REC-0001").status_code == 403
+    rows = audit_log()
+    assert [row["action"] for row in rows] == ["policy.deny"]
+    assert rows[0]["role"] is None
 
 
 @pytest.mark.parametrize("role", ["operator", "ai_agent"])

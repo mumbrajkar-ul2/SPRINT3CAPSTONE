@@ -1,7 +1,7 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "file": "business-rules",
-  "description": "The rules this system must keep. Each rule has a stable id, the entities and fields it touches, what the code does today, the defect rows that show the gap, and the stage that will enforce it. enforced_today is true when code under apps/ or etl/ runs the rule on a live route or in the batch. It is false when the rule is held only by a policy file, by a module that no route calls, or by nothing. At version 1.0.0 the flag was false on every rule. At 1.1.0 the file holds 20 rules. The flag is true on nine and false on eleven. The sentence \"Now (S05R, 1.1.0)\" in each current_behaviour says what is true now and which stage changed it.",
+  "description": "The rules this system must keep. Each rule has a stable id, the entities and fields it touches, what the code does today, the defect rows that show the gap, and the stage that will enforce it. enforced_today is true when code under apps/ or etl/ runs the rule on a live route or in the batch. It is false when the rule is held only by a policy file, by a module that no route calls, or by nothing. At version 1.0.0 the flag was false on every rule. At 1.1.0 the file held 20 rules, with the flag true on nine and false on eleven. At 1.2.0 (stage S07) the file still holds 20 rules. The flag is true on 14 and false on 6. The sentence \"Now (S05R, 1.1.0)\" in each current_behaviour says what is true now and which stage changed it.",
   "source": [
     "docs/06-policy/policy-catalogue.md",
     "docs/13-security-validation/security-test-suite-plan.md",
@@ -40,13 +40,13 @@
         "field.device.device_id"
       ],
       "statement": "When no device row has the requested id, the lookup returns no device. It does not return the first row or any other row.",
-      "current_behaviour": "domain_service.load_record returns rows[0] when no cell matches. GET /records/DOES-NOT-EXIST returns the REC-0001 row with HTTP 200. The summary of a missing id is a summary of REC-0001. Now (S05R, 1.1.0): load_record still returns rows[0] for a missing id, and GET /records/{id} still returns it with HTTP 200. On the summary route, the policy input record_found is false when the loaded row's device_id differs from the id, and the call is BLOCK with failmode.missing_id (stage S04-09). The record route is unchanged.",
+      "current_behaviour": "domain_service.load_record returns rows[0] when no cell matches. GET /records/DOES-NOT-EXIST returns the REC-0001 row with HTTP 200. The summary of a missing id is a summary of REC-0001. Now (S05R, 1.1.0): load_record still returns rows[0] for a missing id, and GET /records/{id} still returns it with HTTP 200. On the summary route, the policy input record_found is false when the loaded row's device_id differs from the id, and the call is BLOCK with failmode.missing_id (stage S04-09). The record route is unchanged. Now (S07, 1.2.0): load_record returns None for a missing id. GET /records/{id} returns HTTP 404 with the body error not_found, and the recommend and summarize routes BLOCK with failmode.missing_id. No route returns another row.",
       "defect_refs": [
         "F01",
         "F02"
       ],
-      "enforced_today": false,
-      "enforcement_stage": "S04-11",
+      "enforced_today": true,
+      "enforcement_stage": "S07",
       "stage_note": "Operating contract row 2 allows GET /records/{id} to return 404 for a missing id. The inherited test test_missing_id_returns_first_row will fail at that point and must be replaced.",
       "source": [
         "apps/api/services/domain_service.py",
@@ -107,12 +107,12 @@
         "field.alarm.last_seen_at"
       ],
       "statement": "On every alarm row, last_seen_at is the same time as first_seen_at or later. A row that breaks this is flagged and does not become an incident on its own.",
-      "current_behaviour": "166 of 354 alarm rows have last_seen_at before first_seen_at. Example ALA-00002 on file line 3. No code reads the file. Now (S05R, 1.1.0): apps/api/services/dedupe.py check_alarm_row flags such a row with last_seen_before_first_seen, and flags a row with a blank or unreadable time with times_unreadable. No route or batch calls this module, so enforced_today stays false. Stage S04-11 made that change.",
+      "current_behaviour": "166 of 354 alarm rows have last_seen_at before first_seen_at. Example ALA-00002 on file line 3. No code reads the file. Now (S05R, 1.1.0): apps/api/services/dedupe.py check_alarm_row flags such a row with last_seen_before_first_seen, and flags a row with a blank or unreadable time with times_unreadable. No route or batch calls this module, so enforced_today stays false. Stage S04-11 made that change. Now (S07, 1.2.0): GET /alarms/storms/{storm_batch_id} calls check_alarm_row on every row of the storm, lists a flagged row with its flag word, and counts it in flagged_count. A flagged row is never counted as an incident candidate.",
       "defect_refs": [
         "F08"
       ],
-      "enforced_today": false,
-      "enforcement_stage": "S04-11",
+      "enforced_today": true,
+      "enforcement_stage": "S07",
       "stage_note": "Project_Intent.md 2.7 says a row shaped like ALA-00002 is flagged and does not become an incident. The flag compares two timestamps. It needs no cutoff.",
       "source": [
         "data/synthetic/alarms.csv",
@@ -154,10 +154,10 @@
         "field.alarm.storm_batch_id"
       ],
       "statement": "Two alarm rows with the same dedupe_key and the same storm_batch_id are one alarm shown twice. They count as one alarm. The rows stay on disk. Grouping does not delete a row.",
-      "current_behaviour": "Three dedupe_key values appear twice. No code groups them. The check is string equality on two columns. Now (S05R, 1.1.0): apps/api/services/dedupe.py alarm_key and alarm_intake group alarms by the two columns and keep every row. No route or batch calls the module, so enforced_today stays false. Stage S04-11 made that change.",
+      "current_behaviour": "Three dedupe_key values appear twice. No code groups them. The check is string equality on two columns. Now (S05R, 1.1.0): apps/api/services/dedupe.py alarm_key and alarm_intake group alarms by the two columns and keep every row. No route or batch calls the module, so enforced_today stays false. Stage S04-11 made that change. Now (S07, 1.2.0): GET /alarms/storms/{storm_batch_id} groups the rows of one storm with DedupeSet. deduped_count is the number of different non-blank dedupe_key values. No row is removed from a list.",
       "defect_refs": [],
-      "enforced_today": false,
-      "enforcement_stage": "S04-11",
+      "enforced_today": true,
+      "enforcement_stage": "S07",
       "stage_note": "The pick in ai-qualification.md is deterministic code. How many alarms make a storm is Unknown. This rule sets no count.",
       "source": [
         "data/synthetic/alarms.csv",
@@ -176,14 +176,14 @@
         "concept.policy_decision"
       ],
       "statement": "Before any change follows a model recommendation, three things exist in this order. The access policy returned allow. A named human wrote an approval id. An audit row was written. Then, and only then, a change may run. The change must also be reversible and validated.",
-      "current_behaviour": "The summary route calls no policy. No route writes an approval id. The audit row for ai.summary holds record_id and model only. All three gates are absent. Now (S05R, 1.1.0): the summary route runs the access policy and the ai_action policy, and writes an audit row with 15 keys. The EXECUTE rows in the ai_action policy need an approval id, an audit row written, and a change plan that is reversible and validated (rows B7 to B10). No route writes an approval id and no route reaches EXECUTE, so the rule is held by the policy only and enforced_today stays false. Stages S04-06, S04-08, and S04-09 made that change.",
+      "current_behaviour": "The summary route calls no policy. No route writes an approval id. The audit row for ai.summary holds record_id and model only. All three gates are absent. Now (S05R, 1.1.0): the summary route runs the access policy and the ai_action policy, and writes an audit row with 15 keys. The EXECUTE rows in the ai_action policy need an approval id, an audit row written, and a change plan that is reversible and validated (rows B7 to B10). No route writes an approval id and no route reaches EXECUTE, so the rule is held by the policy only and enforced_today stays false. Stages S04-06, S04-08, and S04-09 made that change. Now (S07, 1.2.0): POST /approvals/{id} runs the access policy, writes the ai.approval audit row first, and then stores the decision. The id of a yes is made by the server. A no has no id. No route changes a device and no route reaches EXECUTE, so the fourth gate (a reversible, validated change) does not exist and no EXECUTE route is built.",
       "defect_refs": [
         "F11",
         "F12",
         "F16"
       ],
-      "enforced_today": false,
-      "enforcement_stage": "S04-09",
+      "enforced_today": true,
+      "enforcement_stage": "S07",
       "stage_note": "Operating contract rows 2 and 9 and Project_Intent.md Appendix C name the four gates. The approver desk job is network_engineer, confirmed by Mangesh (FDE) on 2026-10-10. Stage S04-09 uses this title.",
       "source": [
         "docs/00-contract/operating-contract.md",
@@ -264,13 +264,13 @@
         "concept.policy_decision"
       ],
       "statement": "A call that sends no role header is refused. The server does not fill in operator for the caller.",
-      "current_behaviour": "Header(default=\"operator\") on the record route allows the read. The summary route checks no role at all. Now (S05R, 1.1.0): the record route still fills in operator when the header is missing (defect F15, still open). The summary route and the audit route have no default. A missing header has no role and gets HTTP 403 (stage S04-06). See status.code.role_header.absent.",
+      "current_behaviour": "Header(default=\"operator\") on the record route allows the read. The summary route checks no role at all. Now (S05R, 1.1.0): the record route still fills in operator when the header is missing (defect F15, still open). The summary route and the audit route have no default. A missing header has no role and gets HTTP 403 (stage S04-06). See status.code.role_header.absent. Now (S07, 1.2.0): the record route has no default either. A call with no role header gets HTTP 403, a policy.deny row and role null (PRD RQ-68).",
       "defect_refs": [
         "F15",
         "F16"
       ],
-      "enforced_today": false,
-      "enforcement_stage": "S04-03",
+      "enforced_today": true,
+      "enforcement_stage": "S07",
       "source": [
         "apps/api/main.py",
         "docs/02-baseline/defect-list.md"

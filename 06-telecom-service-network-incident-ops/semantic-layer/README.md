@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | Stage | S03 — Semantic layer (Execution Plan Phase 3; product path step 1, D3). Revised in S05R on 2026-10-12. |
-| Date / version | 2026-10-12, semantic layer `1.1.1`. The first version, `1.0.0`, is dated 2026-10-10. |
+| Date / version | 2026-10-13, semantic layer `1.2.0`. The first version, `1.0.0`, is dated 2026-10-10. |
 | Author | Mangesh (FDE), drafted with Cursor |
-| Status | S05R revision applied, then one text change under ADR 0002 (the p95 choice for model delay). The version is `1.1.1` in every YAML file, in the schema, and here. The schema validates all seven YAML files. 41 tests pass. `generated/` is rebuilt from the YAML by `build.py`. The S03R rows run again in `docs/02-baseline/semantic-layer-revision.md`. Every item in `Project_Intent.md` 6.2 is ticked below. |
+| Status | S05R revision applied, then one text change under ADR 0002 (the p95 choice for model delay). Stage S07 then added ids under ADR 0005 and raised the version to `1.2.0`. The version is `1.2.0` in every YAML file, in the schema, and here. The schema validates all seven YAML files. 41 tests pass. `generated/` is rebuilt from the YAML by `build.py`. The S03R rows run again in `docs/02-baseline/semantic-layer-revision.md`. Every item in `Project_Intent.md` 6.2 is ticked below. |
 | Evidence sources | `Semantic_Layer_capture.pdf`; `Project_Intent.md` 4.3, 5.1, 6.2, Appendix E; `docs/domain-specific-spec.md`; `docs/01-discovery/` (all six); `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/02-baseline/ai-qualification.md`; `apps/api/main.py`; `apps/api/services/ai_gateway.py`; `apps/api/services/domain_service.py`; `apps/api/services/audit.py`; `policy/opa/access.rego`; `data/synthetic/` (headers and distinct values, read-only, 2026-10-10) |
 | Assumptions | A column whose cells are all drawn from a small word pool is a status column. The persona grants, the purposes, the prompt allow list, and the output schema are PROPOSED with owner Team-Force. The API role `operator` maps to `noc_operator` and `engineer` maps to `network_engineer`. Both mappings are Inference. |
 | Unresolved issues | The repo defines no allowed list for any status column. The alarm-to-incident join key, the storm size, the retry maximum, the `sla_breach_risk` range, and the timeout are Unknown or PROPOSED. The live-change approver's desk job is `network_engineer`, confirmed on 2026-10-10. `jsonschema` is installed in `.venv` only. `requirements.txt` does not list it. |
@@ -66,7 +66,7 @@ Rule 5 says generated JSON serves the layer. The capture names the format. It do
 
 ## Version
 
-This is version `1.1.1`. Every YAML file carries `version: "1.1.1"` at the top. `build.py` refuses to write when two files disagree on the version.
+This is version `1.2.0`. Every YAML file carries `version: "1.2.0"` at the top. `build.py` refuses to write when two files disagree on the version.
 
 Stage S05R raised the version from `1.0.0` to `1.1.0` when it folded in the terms the control designs introduce. A change here now needs an ADR under `docs/ADR/`.
 
@@ -80,6 +80,7 @@ Stage S05R raised the version from `1.0.0` to `1.1.0` when it folded in the term
 | `1.0.0` | 2026-10-10 | Owner decision | The live-change approver's desk job is `network_engineer`. Mangesh (FDE) confirmed it. Stage S04-09 uses this title. The semantic-layer version stays `1.0.0`. |
 | `1.1.0` | 2026-10-12 | S05R (caused by designs from S04-03, S04-06, S04-08, S04-09, S04-10, S04-11, S04-12, S05-13, S05-14) | Folded in the terms the Phase 4 and 5 designs introduced. 92 ids added and 0 removed (665 to 757). Two OPA ids are deprecated with `replaced_by`. 92 glossary rows added (181 to 273). One schema rule added (`deprecated` needs `replaced_by`), plus new shapes for audit row fields, policy inputs, and `model_now`. Six tests added (35 to 41). Sentences that described the state before stages S04-06 to S04-12 were corrected. The full list is in `docs/02-baseline/semantic-layer-revision.md`. |
 | `1.1.1` | 2026-10-12 | ADR 0002 (the owner's decisions on the S05R open items) | One sentence changed in `metric.recommendation_latency`: the percentile to report is p95 (D-16). The glossary row has the same sentence. No id added, removed, or deprecated (757 ids). The `proposed: true` flags stay, because the flag marks items that are not in the inherited repo. |
+| `1.2.0` | 2026-10-13 | S07 (ADR 0005) | The app now writes what the PRD names. Ids added, none removed. Two audit row fields (`field.audit_row.record_id` and `field.audit_row.final_action`, so the audit row has 17 keys). Two approval record fields (`field.approval.decision` and `field.approval.approver`). Three audit action words (`status.code.audit_action.storm_read`, `.ai_recommendation` and `.ai_approval`). One block, `policy.command_phrases`, which holds the command phrases and the near-miss phrases. Eight glossary rows added (273 to 281). Five rules changed `enforced_today` from false to true (`rule.missing_id_not_other_device`, `rule.alarm_last_seen_not_before_first_seen`, `rule.duplicate_dedupe_key_in_storm_is_one_alarm`, `rule.ai_recommendation_needs_policy_approval_audit_before_state_change` and `rule.no_default_role`). No test was added or removed. |
 
 ## How to run
 
@@ -143,7 +144,7 @@ Where each kind of item came from. **Verified Fact** for every path.
 | Fields | 68 | The header row of each CSV; the keys of the first line of `events.jsonl`; `docs/01-discovery/data-and-integration-map.md` |
 | Which fields the API reads today | 12 of 68 | `apps/api/services/domain_service.py` reads `devices.csv` and matches the id against every cell. Every device field is `api_reads_today: true`. Every other field is `false`. |
 | Concepts | 17 | `Project_Intent.md` Appendix E (topology, SLA, remediation, guardrail); id columns with no table (customer, site, storm); `docs/00-contract/operating-contract.md` (approval, audit row, prompt, policy decision); `docs/domain-specific-spec.md` (four flows); `docs/06-policy/exception-handling-model.md` (waiver) and `docs/14-audit/decision-provenance-model.md` (decision provenance), added in S05R |
-| Audit row fields | 15 | `apps/api/services/audit.py` `SCHEMA_KEYS`; `docs/08-observability/log-schema.md`. Added in S05R under `concept.audit_row`. |
+| Audit row fields | 17 | `apps/api/services/audit.py` `SCHEMA_KEYS`; `docs/08-observability/log-schema.md`. Added in S05R under `concept.audit_row`. Two keys (`record_id`, `final_action`) added in 1.2.0. |
 | Policy inputs | 8 | `policy/opa/ai_action.rego`; `docs/06-policy/ai-action-policy-design.md`. Added in S05R. |
 | Relationships | 15 | `Project_Intent.md` Appendix E; shared id columns in the CSVs; `docs/01-discovery/business-flow-reconstruction.md` |
 | Status words | 44 | Every distinct non-blank word in 33 CSV word columns and 3 event fields, counted on 2026-10-10 |
@@ -190,7 +191,7 @@ Seven more overlaps are listed under `other_overlaps` in `status-taxonomy.yaml`.
 `tests/test_semantic_layer.py` has 41 tests. They fail when:
 
 - a file in the fixed tree is missing or an extra file appears
-- a YAML file does not carry `version: "1.1.1"`, or this README does not repeat it
+- a YAML file does not carry `version: "1.2.0"`, or this README does not repeat it
 - the schema rejects any YAML file, or the schema accepts a known-bad document (three negative tests)
 - a required entity, persona, status word, rule, metric, outcome, collision, or API role is missing
 - a GenAI use has an agency other than recommend, or any use other than workflow automation reaches EXECUTE
@@ -225,7 +226,7 @@ This is the S03 done test. Run on 2026-10-10. **Verified Fact.**
 ## Checklist from `Project_Intent.md` 6.2
 
 - [x] The folder matches `Semantic_Layer_capture.pdf`. The eleven entries are present. `build.py` and `generated/` are the two stated additions. `test_tree_is_exactly_the_capture_layout_plus_generated_and_build` locks the tree.
-- [x] `glossary.md` explains terms in everyday words. 273 rows (181 at 1.0.0 and 92 added in S05R). One row per entity, concept, status word, collision, rule, metric, action, resource, purpose, scope, risk, API role, persona, outcome, fail mode, agency word, pick word, AI use, and provenance field. S05R also adds a row for each audit row field, policy input, and new code word.
+- [x] `glossary.md` explains terms in everyday words. 281 rows (181 at 1.0.0, 92 added in S05R and 8 added in S07). One row per entity, concept, status word, collision, rule, metric, action, resource, purpose, scope, risk, API role, persona, outcome, fail mode, agency word, pick word, AI use, and provenance field. S05R also adds a row for each audit row field, policy input, and new code word.
 - [x] YAML defines entities, relationships, statuses, rules, metrics, access, and AI context. Seven files. Each carries `version`, `file`, `description`, and `source`.
 - [x] Status words used in code, docs, and CSV are listed. Collisions such as `gold` used as incident severity are named. 44 words, 36 status fields, 55 code words, 4 collisions, 7 other overlaps.
 - [x] JSON Schema validates the YAML. One schema, seven branches picked by the `file` key. `build.py` refuses to write on a validation error.
@@ -257,7 +258,7 @@ Run on 2026-10-12 after ADR 0002 (the first run was by stage S05R, at version `1
 
 ```text
 > python semantic-layer/build.py
-Validated 7 YAML files against semantic-layer.schema.json. Version 1.1.1.
+Validated 7 YAML files against semantic-layer.schema.json. Version 1.2.0.
   wrote generated/entities.json
   wrote generated/relationships.json
   wrote generated/status-taxonomy.json
@@ -269,7 +270,7 @@ Validated 7 YAML files against semantic-layer.schema.json. Version 1.1.1.
 exit=0
 
 > python semantic-layer/build.py --check
-generated/ matches the YAML. 7 files validated. Version 1.1.1.
+generated/ matches the YAML. 7 files validated. Version 1.2.0.
 exit=0
 
 > pytest semantic-layer/tests -q -p no:cacheprovider

@@ -36,15 +36,31 @@ SCHEMA_KEYS = (
     # EDUCATIONAL label travels with the number. Null when `tokens` is null.
     # Open question for S03: the YAML and log-schema.md have no id for this field.
     "token_estimate_method",
+    # S07 (PRD RQ-41, decision D-06). The 16th key. It names the device the caller asked for.
+    # It is null on a row that names no device (a storm read, an audit read).
+    "record_id",
+    # S07 (PRD RQ-40, decision D-05). The 17th key. It records what last happened to a device.
+    # The value is "none" on every row, because no route in this app changes a device.
+    "final_action",
 )
+
+# The value of the 17th key on every row (PRD RQ-40).
+FINAL_ACTION_NONE = "none"
+
+# PROPOSED. Owner: Team-Force (N-01). The longest correlation id the app keeps.
+MAX_CORRELATION_ID_LENGTH = 128
 
 
 def correlation_id_from_header(value):
-    """Keep a non-empty header. A missing or blank header becomes a new UUID."""
+    """Keep a header id that has text and is at most 128 characters.
+
+    A missing, blank or too long header becomes a new UUID (PRD RQ-49 and RQ-69).
+    The long text is not stored anywhere.
+    """
     if value is None:
         return str(uuid.uuid4())
     text = str(value).strip()
-    if text == "":
+    if text == "" or len(text) > MAX_CORRELATION_ID_LENGTH:
         return str(uuid.uuid4())
     return text
 
@@ -70,8 +86,13 @@ def write_event(
     tokens=None,
     latency_ms=None,
     token_estimate_method=None,
+    approval_id=None,
+    record_id=None,
 ):
-    """Append one audit row. policy_decision and approval_id stay null.
+    """Append one audit row. policy_decision stays null.
+
+    S07: `approval_id` is set only by the approvals route, for a yes. `record_id` is the
+    device id the caller asked for, or null. `final_action` is always "none".
 
     Stage S04-12 Half B: `token_estimate_method` names the formula behind `tokens`.
     It is stored only when `tokens` has a value. A row with no token count has no method.
@@ -91,7 +112,7 @@ def write_event(
         "action": action,
         "resource": resource,
         "policy_decision": None,
-        "approval_id": None,
+        "approval_id": approval_id,
         "model": model,
         "model_version": model_version,
         "prompt_hash": prompt_hash,
@@ -99,6 +120,8 @@ def write_event(
         "latency_ms": latency_ms,
         "outcome": outcome,
         "token_estimate_method": token_estimate_method if tokens is not None else None,
+        "record_id": record_id,
+        "final_action": FINAL_ACTION_NONE,
     }
     line = json.dumps(event) + "\n"
     # Stage S04-11 Half B (decision D-3). One thread writes at a time. Without the lock,

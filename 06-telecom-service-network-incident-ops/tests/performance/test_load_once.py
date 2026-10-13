@@ -121,22 +121,25 @@ def test_repeated_id_returns_the_first_row(tmp_path, monkeypatch):
     assert domain_service.load_record("DEV-1")["hostname"] == "first"
 
 
-def test_missing_id_still_returns_the_first_row(tmp_path, monkeypatch):
-    # Unchanged on purpose. S04-03 and S07 have not changed this (defect F01).
+def test_missing_id_returns_nothing(tmp_path, monkeypatch):
+    # S07 (PRD RQ-03). Replaces test_missing_id_still_returns_the_first_row (defect F01).
+    # The loader gives back None. It no longer gives back the first row.
     small_csv(tmp_path, monkeypatch, "DEV-1,first,SIT-1\nDEV-2,other,SIT-2\n")
-    assert domain_service.load_record("DEV-NO-SUCH-ID")["device_id"] == "DEV-1"
+    assert domain_service.load_record("DEV-NO-SUCH-ID") is None
 
 
-def test_empty_file_gives_the_error_body(tmp_path, monkeypatch):
+def test_empty_file_returns_nothing(tmp_path, monkeypatch):
+    # S07. Replaces test_empty_file_gives_the_error_body. An empty file has no row for any id.
     small_csv(tmp_path, monkeypatch, "")
-    assert domain_service.load_record("DEV-1") == {"error": "missing"}
+    assert domain_service.load_record("DEV-1") is None
 
 
 def test_only_device_id_is_matched(tmp_path, monkeypatch):
-    # Decision 1 of 2026-10-11. A site id or a hostname no longer finds a row (defect F17).
+    # Decision 1 of 2026-10-11. A site id or a hostname does not find a row (defect F17).
+    # S07: the loader used to answer such an id with the first row. It now answers None.
     small_csv(tmp_path, monkeypatch, "DEV-1,first,SIT-1\nDEV-2,other,SIT-2\n")
-    assert domain_service.load_record("SIT-2")["device_id"] == "DEV-1"
-    assert domain_service.load_record("other")["device_id"] == "DEV-1"
+    assert domain_service.load_record("SIT-2") is None
+    assert domain_service.load_record("other") is None
     assert domain_service.load_record("DEV-2")["device_id"] == "DEV-2"
 
 

@@ -104,12 +104,17 @@ def _load_prompt_policy() -> dict:
     forbidden_labels = sorted({item.split(".")[-1] for item in forbidden_ids})
     credential_names = list(prompt_fields["forbidden_credential_names"]["names"])
     required = [item["name"] for item in document["output_schema"]["required"]]
+    # S07 (PRD RQ-30 and RQ-71). The command phrases and the near-miss phrases come from
+    # the YAML (policy.command_phrases), so the code and the YAML cannot drift.
+    command_block = document["command_phrases"]
     return {
         "allowed": allowed,
         "forbidden_device": forbidden_device,
         "forbidden_labels": forbidden_labels,
         "credential_names": credential_names,
         "output_required": required,
+        "command_phrases": [str(p) for p in command_block["phrases"]],
+        "near_miss_phrases": [str(p) for p in command_block["near_miss_phrases"]],
     }
 
 
@@ -118,6 +123,10 @@ ALLOWED_FIELDS = tuple(_POLICY["allowed"])
 FORBIDDEN_DEVICE_FIELDS = tuple(_POLICY["forbidden_device"])
 FORBIDDEN_LABELS = tuple(_POLICY["forbidden_labels"]) + tuple(_POLICY["credential_names"])
 OUTPUT_REQUIRED = tuple(_POLICY["output_required"])
+# PROPOSED. Owner: Team-Force. The recommend route holds the case when the model text holds
+# one of these as whole words. The list is short and misses phrases that mean the same (D-08).
+RECOMMEND_COMMAND_PHRASES = tuple(_POLICY["command_phrases"])
+RECOMMEND_NEAR_MISS_PHRASES = tuple(_POLICY["near_miss_phrases"])
 
 
 def _label_pattern(name: str):
@@ -125,6 +134,56 @@ def _label_pattern(name: str):
 
 
 _LABEL_PATTERNS = {name: _label_pattern(name) for name in FORBIDDEN_LABELS}
+
+
+def _phrase_pattern(phrase: str):
+    """Whole-word match. Spaces inside the phrase match any run of white space."""
+    parts = [re.escape(word) for word in phrase.split()]
+    return re.compile(
+        r"(?<![A-Za-z0-9])" + r"\s+".join(parts) + r"(?![A-Za-z0-9])", re.IGNORECASE
+    )
+
+
+_COMMAND_PATTERNS = [_phrase_pattern(p) for p in RECOMMEND_COMMAND_PHRASES]
+_NEAR_MISS_PATTERNS = [_phrase_pattern(p) for p in RECOMMEND_NEAR_MISS_PHRASES]
+
+# The two reason ids the recommend route writes into the response body when a check on the
+# model text fires (PRD RQ-30, RQ-70, RQ-71). The audit row stores no reason.
+REASON_COMMAND_TEXT = "failmode.command_text_in_recommendation"
+# Open question for S03: the YAML has no failmode id for a forbidden value in the model
+# answer. Until one exists the body uses the id of the same check on the prompt (RQ-70).
+REASON_FORBIDDEN_IN_ANSWER = "failmode.forbidden_field_in_prompt"
+REASON_EXECUTE_CLAIMED = "rule.ai_output_cannot_execute"
+
+
+def answer_check_reasons(summary: str, recommendation: str, record: dict) -> list[str]:
+    """Reasons to hold a model answer that has the right shape. An empty list means it may be shown.
+
+    1. A forbidden field name or a credential name in the text.
+    2. A forbidden device value (mgmt_ip, credential_profile) as a whole word in the text.
+    3. A command phrase or a near-miss phrase as whole words in the text.
+
+    The reasons name the check. They never hold the text or a value.
+    Limit (D-08, SB-05): the lists are short and miss phrases that mean the same.
+    Limit (SB-14, D-09): a hidden instruction in an allowed field is not found.
+    Limit: the device values are plain words such as alpha or legacy, so a harmless
+    sentence that holds one of them is held too. A hold is the safe side.
+    """
+    text = _flat(f"{summary} {recommendation}")
+    reasons: list[str] = []
+    if any(pattern.search(text) for pattern in _LABEL_PATTERNS.values()):
+        reasons.append(REASON_FORBIDDEN_IN_ANSWER)
+    else:
+        for name in FORBIDDEN_DEVICE_FIELDS:
+            value = _flat(record.get(name, ""))
+            if value and _phrase_pattern(value).search(text):
+                reasons.append(REASON_FORBIDDEN_IN_ANSWER)
+                break
+    if any(p.search(text) for p in _COMMAND_PATTERNS) or any(
+        p.search(text) for p in _NEAR_MISS_PATTERNS
+    ):
+        reasons.append(REASON_COMMAND_TEXT)
+    return reasons
 
 
 def _flat(value) -> str:
@@ -198,8 +257,12 @@ def call_model(prompt: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-class ModelAnswer(BaseModel):
-    """What the model may write. An extra key, a wrong type, or EXECUTE fails."""
+class AnswerShape(BaseModel):
+    """What the model may write. An extra key, a wrong type, empty text, or EXECUTE fails.
+
+    The recommend route (S07) uses this class. It checks the text for command phrases
+    afterwards, so it can name the reason (`answer_check_reasons`).
+    """
 
     model_config = ConfigDict(extra="forbid", strict=True)
 
@@ -212,9 +275,18 @@ class ModelAnswer(BaseModel):
 
     @field_validator("summary", "recommendation")
     @classmethod
-    def _text_only(cls, value: str) -> str:
+    def _not_blank(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("empty text")
+        return value
+
+
+class ModelAnswer(AnswerShape):
+    """The shape the summarize route uses. It also rejects the one legacy command sentence."""
+
+    @field_validator("summary", "recommendation")
+    @classmethod
+    def _text_only(cls, value: str) -> str:
         lowered = _flat(value).lower()
         if any(phrase in lowered for phrase in COMMAND_PHRASES):
             raise ValueError("command text")
@@ -278,6 +350,8 @@ class _ModelRun:
     forbidden_field_in_prompt: bool = False
     output_schema_ok: bool | None = None
     timeout_hit: bool = False
+    # S07 (RQ-19). True when the model's JSON said outcome EXECUTE. The answer is discarded.
+    execute_claimed: bool = False
 
     def flags(self) -> dict:
         return {
@@ -287,7 +361,7 @@ class _ModelRun:
         }
 
 
-def _run_model(record: dict, timeout_seconds: float) -> _ModelRun:
+def _run_model(record: dict, timeout_seconds: float, answer_model=ModelAnswer) -> _ModelRun:
     prompt = build_prompt(record)
     if find_forbidden(prompt, record):
         # The model is not called. No hash, because nothing was sent.
@@ -302,14 +376,18 @@ def _run_model(record: dict, timeout_seconds: float) -> _ModelRun:
         # no failmode id for "the model path is closed". failmode.timeout is the nearest one.
         return _ModelRun(timeout_hit=True)
     try:
-        return _call_model_under_ticket(record, prompt, timeout_seconds, ticket)
+        return _call_model_under_ticket(record, prompt, timeout_seconds, ticket, answer_model)
     finally:
         # A no-op when the call already reported. Frees the slot on any other exit.
         ticket.neutral()
 
 
 def _call_model_under_ticket(
-    record: dict, prompt: str, timeout_seconds: float, ticket: "breaker.Ticket"
+    record: dict,
+    prompt: str,
+    timeout_seconds: float,
+    ticket: "breaker.Ticket",
+    answer_model=ModelAnswer,
 ) -> _ModelRun:
     run = _ModelRun(
         model_called=True,
@@ -338,10 +416,15 @@ def _call_model_under_ticket(
         # Do not wait for a call that missed the deadline.
         executor.shutdown(wait=False, cancel_futures=True)
 
+    parsed = None
     try:
-        answer = ModelAnswer.model_validate(json.loads(raw))
+        parsed = json.loads(raw)
+        answer = answer_model.model_validate(parsed)
     except (TypeError, ValueError, ValidationError):
         run.output_schema_ok = False
+        # A model that says EXECUTE is not a bad shape. It asks for what no route may do.
+        if isinstance(parsed, dict) and parsed.get("outcome") == "EXECUTE":
+            run.execute_claimed = True
         return run
     # The answer must be about the record that was looked up, not another row.
     if answer.record_id != _flat(record.get("device_id", "")):
@@ -473,6 +556,91 @@ def summarize_record(
         record_id=record_id,
         outcome="RECOMMEND_ONLY",
         reasons=list(final["reasons"]),
+        policy_version=final["policy_version"],
+        summary=run.answer.summary,
+        recommendation=run.answer.recommendation,
+        source_count=run.answer.source_count,
+        model_called=True,
+        prompt_hash=run.prompt_hash,
+        tokens=run.tokens,
+        latency_ms=run.latency_ms,
+    )
+
+
+# ---------------------------------------------------------------------------
+# The recommend route. Stage S07 (PRD RQ-18 to RQ-30, RQ-70, RQ-71).
+# ---------------------------------------------------------------------------
+
+# The reasons the policy gives to a healthy action.recommend call (row O2). A HOLD_FOR_REVIEW
+# whose reasons are all in this set came from no failure row, so the sentence may be shown.
+_O2_REASONS = frozenset(policy.AI["reasons_for_action"]["action.recommend"])
+NEXT_ACTION_USE = "ai_use.next_action_recommendation"
+
+
+def _is_text_hold(decision: dict) -> bool:
+    """True for the policy answer that lets the sentence through: HOLD_FOR_REVIEW from row O2."""
+    reasons = set(decision["reasons"])
+    return (
+        decision["outcome"] == "HOLD_FOR_REVIEW"
+        and bool(reasons)
+        and reasons <= _O2_REASONS
+    )
+
+
+def recommend_record(
+    record: dict,
+    *,
+    record_id: str,
+    role_id,
+    access: dict,
+    timeout_seconds: float | None = None,
+) -> GatewayResult:
+    """Run one recommendation call. `access` is the result of policy.check_recommend.
+
+    Order: policy pre-flight, prompt check, model under the breaker and the timeout, answer
+    shape, answer content checks, policy again. The outcome is HOLD_FOR_REVIEW with the
+    sentence when no failure row applies (row O2). It is HOLD_FOR_REVIEW with no text or
+    BLOCK on a stop. It is never RECOMMEND_ONLY and never EXECUTE.
+    """
+    preflight = policy.decide_recommend(role_id, record_id, record, access)
+    if not _is_text_hold(preflight):
+        return _stopped(record_id, preflight)
+
+    limit = configured_timeout_seconds() if timeout_seconds is None else timeout_seconds
+    run = _run_model(record, limit, answer_model=AnswerShape)
+
+    if run.execute_claimed:
+        # RQ-19. The model asked for EXECUTE. The route returns BLOCK with no text.
+        return _stopped(
+            record_id,
+            {
+                "outcome": "BLOCK",
+                "reasons": [REASON_EXECUTE_CLAIMED],
+                "policy_version": preflight["policy_version"],
+            },
+            run,
+        )
+
+    content_reasons = (
+        answer_check_reasons(run.answer.summary, run.answer.recommendation, record)
+        if run.answer is not None
+        else []
+    )
+    flags = run.flags()
+    if content_reasons:
+        # The policy decides the outcome. A failed content check counts as a failed
+        # output check, so the policy answers HOLD_FOR_REVIEW (row H2).
+        flags["output_schema_ok"] = False
+    final = policy.decide_recommend(role_id, record_id, record, access, gateway_flags=flags)
+    if content_reasons and final["outcome"] == "HOLD_FOR_REVIEW":
+        final = {**final, "reasons": list(content_reasons)}
+
+    if not _is_text_hold(final) or run.answer is None:
+        return _stopped(record_id, final, run)
+    return GatewayResult(
+        record_id=record_id,
+        outcome="HOLD_FOR_REVIEW",
+        reasons=[NEXT_ACTION_USE],
         policy_version=final["policy_version"],
         summary=run.answer.summary,
         recommendation=run.answer.recommendation,

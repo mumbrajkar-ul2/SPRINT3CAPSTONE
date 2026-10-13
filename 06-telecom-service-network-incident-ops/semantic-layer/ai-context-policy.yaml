@@ -1,10 +1,10 @@
-# ai-context-policy.yaml -- semantic layer 1.1.1
+# ai-context-policy.yaml -- semantic layer 1.2.0
 # What may enter a prompt, what must come back, where the answer came from, the four outcomes,
 # what happens when the call fails, and the agency and approval point for each AI use.
 # Stage S05R (1.1.0) added model_now, policy_inputs, one forbidden field, four failure ids, and corrected
 # sentences that described the gateway before stage S04-09. The two lists that code reads, prompt_fields.allowed
 # and output_schema.required, keep the same names in the same order.
-version: "1.1.1"
+version: "1.2.0"
 file: ai-context-policy
 description: >-
   The rules around every model call. Fields that may enter a prompt. Fields that never may. The shape every
@@ -425,6 +425,46 @@ outcomes:
   source: [docs/02-baseline/ai-qualification.md, ../Project_Intent.md]
 
 # ---------------------------------------------------------------------------
+# Command phrases. Added in S07 (1.2.0). The recommend route holds a model answer that holds one of these.
+# ---------------------------------------------------------------------------
+command_phrases:
+  id: policy.command_phrases
+  name: command phrases
+  description: >-
+    Words and phrases that tell a person to change a device. When the model text holds one of the phrases, or one of the
+    near-miss phrases, as whole words, POST /ai/recommend/{id} discards the text and holds the case for a person with the
+    reason failmode.command_text_in_recommendation. The near-miss phrases are forms of the same verbs, such as rebooting
+    for reboot. Both lists are short and miss phrases that mean the same. A harmless sentence that holds the word apply is
+    held too. The lists are PROPOSED. Owner Team-Force. The starting phrases come from decision D-08.
+  phrases: [reboot, restart, shut down, delete, clear config, push config, apply]
+  near_miss_phrases:
+    - reboots
+    - rebooting
+    - rebooted
+    - restarts
+    - restarting
+    - restarted
+    - shutdown
+    - shut-down
+    - shuts down
+    - shutting down
+    - deletes
+    - deleting
+    - deleted
+    - clear the config
+    - clearing config
+    - clears config
+    - push the config
+    - pushing config
+    - pushes config
+    - applies
+    - applying
+    - applied
+  proposed: true
+  owner: Team-Force
+  source: [apps/api/services/ai_gateway.py, docs/prd/prd.md, docs/ADR/0005-s07-yaml-additions.md, docs/ADR/0002-s05r-deferred-and-proposed-decisions.md]
+
+# ---------------------------------------------------------------------------
 # Fail to person. What happens when the call cannot give a safe answer.
 # ---------------------------------------------------------------------------
 fail_to_person:
@@ -503,6 +543,8 @@ fail_to_person:
         (COMMAND_PHRASES). The answer is discarded and the case goes to the person with no text. The tuple holds one
         sentence today. The full list is PROPOSED and is deferred to Team-Force. Today the reason string is
         failmode.schema_failure, because the answer check rejects the text.
+        Now (S07, 1.2.0): POST /ai/recommend/{id} checks the text against policy.command_phrases and returns this
+        id in the reasons list. POST /ai/summarize/{id} keeps the old behaviour and its reason string.
       proposed: true
       owner: Team-Force
       source: [apps/api/services/ai_gateway.py, docs/09-ai-guardrails/guardrail-test-pack.md, docs/09-ai-guardrails/evidence.md]

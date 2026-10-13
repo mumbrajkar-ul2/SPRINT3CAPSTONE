@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "file": "entities",
   "description": "The seven entities of this system. Six are CSV tables named in docs/domain-specific-spec.md. The seventh is the event log events.jsonl. Each field says what the cells hold today and whether the running API reads it. The API reads devices.csv only. It returns the whole device row.",
   "source": [
@@ -1054,16 +1054,47 @@
     {
       "id": "concept.approval",
       "name": "approval",
-      "description": "A named person's recorded yes or no to a recommended change. The system stores an approval id. No route writes that id today. The approval sits after a policy allow and before any change.",
+      "description": "A named person's recorded yes or no to a recommended change. The system stores an approval id. No route writes that id today. The approval sits after a policy allow and before any change. Now (S07, 1.2.0): POST /approvals/{id} stores one record for each decision. The record holds decision, approver, the approval id (a yes only), the device id and the correlation id. The server makes the id and sets approver. The caller sends only the word yes or no. See record_fields below.",
       "source": [
         "docs/00-contract/operating-contract.md",
         "docs/02-baseline/ai-qualification.md"
+      ],
+      "record_fields": [
+        {
+          "id": "field.approval.decision",
+          "name": "decision",
+          "type": "word",
+          "nullable": false,
+          "description": "The word yes or no that the person sent to POST /approvals/{id}. Any other word is refused with HTTP 422 and nothing is stored.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/approvals.py",
+            "docs/prd/prd.md",
+            "docs/ADR/0002-s05r-deferred-and-proposed-decisions.md"
+          ]
+        },
+        {
+          "id": "field.approval.approver",
+          "name": "approver",
+          "type": "word",
+          "nullable": false,
+          "description": "The persona id of the caller's role, set by the server. It is persona.noc_operator, the only role with an approve row. It is a claim, because the role is a header word the caller typed (see status.code.cannot_prove.caller_identity).",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/approvals.py",
+            "apps/api/main.py",
+            "docs/prd/prd.md",
+            "docs/ADR/0002-s05r-deferred-and-proposed-decisions.md"
+          ]
+        }
       ]
     },
     {
       "id": "concept.audit_row",
       "name": "audit row",
-      "description": "One JSON line in logs/audit.log. Before stage S04-08, it held ts, action, and details, with no actor, no correlation id, and no approval id. Now (S05R, 1.1.0): it holds the 15 keys in row_fields below, in that order. The keys have ids with the prefix field.audit_row. The keys are written by apps/api/services/audit.py (SCHEMA_KEYS). The row has no record_id key and no reasons key. Stages S04-08, S04-09, S04-12, and S05-14 made that change.",
+      "description": "One JSON line in logs/audit.log. Before stage S04-08, it held ts, action, and details, with no actor, no correlation id, and no approval id. Now (S05R, 1.1.0): it holds the 15 keys in row_fields below, in that order. Now (S07, 1.2.0): it holds 17 keys. record_id is the 16th and final_action is the 17th. The keys have ids with the prefix field.audit_row. The keys are written by apps/api/services/audit.py (SCHEMA_KEYS). The row has no reasons key. Stages S04-08, S04-09, S04-12, and S05-14 made that change. Stage S07 added record_id and final_action.",
       "source": [
         "apps/api/services/audit.py",
         "docs/02-baseline/defect-list.md",
@@ -1149,7 +1180,7 @@
           "type": "word",
           "position": 6,
           "nullable": false,
-          "description": "The resource id the call touched, either resource.device or resource.audit_log.",
+          "description": "The resource id the call touched. It is resource.device, resource.audit_log, resource.alarm (a storm read) or resource.ai_invocation (an approval).",
           "proposed": true,
           "owner": "Team-Force",
           "source": [
@@ -1179,7 +1210,7 @@
           "type": "identifier",
           "position": 8,
           "nullable": true,
-          "description": "The stored approval id. The key exists and is null on every row, because no route writes an approval id.",
+          "description": "The stored approval id. It is set on the row that POST /approvals/{id} writes for a yes. It is null on every other row, and on the row of a no.",
           "proposed": true,
           "owner": "Team-Force",
           "source": [
@@ -1285,6 +1316,37 @@
             "apps/api/services/audit.py",
             "docs/08-observability/log-schema.md",
             "docs/12-finops/finops-dashboard-fields.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.record_id",
+          "name": "record_id",
+          "type": "identifier",
+          "position": 16,
+          "nullable": true,
+          "description": "The device id the caller asked for, as the caller typed it. It is null on a row that names no device, such as a storm read or an audit read. Decision D-06 in docs/ADR/0002-s05r-deferred-and-proposed-decisions.md.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "apps/api/main.py",
+            "docs/prd/prd.md",
+            "docs/ADR/0002-s05r-deferred-and-proposed-decisions.md"
+          ]
+        },
+        {
+          "id": "field.audit_row.final_action",
+          "name": "final_action",
+          "type": "word",
+          "position": 17,
+          "nullable": false,
+          "description": "What last happened to a device. The value is none on every row, because no route in this app changes a device. Decision D-05 in docs/ADR/0002-s05r-deferred-and-proposed-decisions.md. This is the audit key. The existing id status.code.cannot_prove.final_action names a line in the list of things the log cannot prove.",
+          "proposed": true,
+          "owner": "Team-Force",
+          "source": [
+            "apps/api/services/audit.py",
+            "docs/prd/prd.md",
+            "docs/ADR/0002-s05r-deferred-and-proposed-decisions.md"
           ]
         }
       ]

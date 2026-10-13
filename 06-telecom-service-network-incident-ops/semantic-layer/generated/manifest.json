@@ -1,48 +1,48 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "schema": "schemas/semantic-layer.schema.json",
   "files": [
     {
       "yaml": "entities.yaml",
       "json": "generated/entities.json",
-      "yaml_sha256": "eb6da30fae854d8fb1eb346a601a9b86df51cb0128efd3e61bef1b35c9dc1976",
-      "json_sha256": "feed9bf6740e495241ead9980ea74907bdf3bce7e31f272a9252fea05ce9b1aa"
+      "yaml_sha256": "81d88d3d16655305412db3da3b770cc5cdf56f9323730bdefb14fdd7a952e28a",
+      "json_sha256": "eefa640a96b73128cd8eb639bfc1b27bee14ba7ceb3dc9c007c38e4c9bdad3eb"
     },
     {
       "yaml": "relationships.yaml",
       "json": "generated/relationships.json",
-      "yaml_sha256": "5491ed1fa881f2a448e02c9465e36721d9b7d86e1fbe2ec633ae38cf26653af9",
-      "json_sha256": "4afdb7cbb744000e1b76bc01468006d21b77f3deecdeee154b3ed04ffb2d7269"
+      "yaml_sha256": "e788f635fb8e1764c39434ae48f9461e2d3665bdf0cc6673458646f1aa831c59",
+      "json_sha256": "06437bea6c847b700c7fd2b7a837b5bbb9b80d0e50ac0249b6798decfaf1606c"
     },
     {
       "yaml": "status-taxonomy.yaml",
       "json": "generated/status-taxonomy.json",
-      "yaml_sha256": "fbd182a5cc0b3c26b5562bbcdfc7891b7c84c19c734ea843d4ed901b3d833bb1",
-      "json_sha256": "2c728deb675a85f05ed854a6df9024ced6f7695b3f245f43f989d3aba64bca8a"
+      "yaml_sha256": "4f44a53bc1cff13ae902436521ad8ac9f47b7a64e2ea43a026a2d5ea491044ee",
+      "json_sha256": "3767c732f6e7a84c0ba003e5e208f2be3085c51482050e6dad1d46700bf55302"
     },
     {
       "yaml": "business-rules.yaml",
       "json": "generated/business-rules.json",
-      "yaml_sha256": "d2a23d7e9aa7631cfd830443b19836cf14c89da8d6b79b3d21612ed66224f306",
-      "json_sha256": "5e866f1e56d570e4bee0f21978878033f9f9783349f5db6e82e2066a5c3cc3eb"
+      "yaml_sha256": "a08904411acb1b1f009e4728c4f17b236316f1196157f5bfb6b71a5e8f09f4dc",
+      "json_sha256": "808829750021ec810a25f8019123af129ed117a246024dd420fc7e5335bfab9d"
     },
     {
       "yaml": "metrics.yaml",
       "json": "generated/metrics.json",
-      "yaml_sha256": "287ddee72a207d7639832d50685b6d99a74fa4e54a5dab062c62318d0e761ef3",
-      "json_sha256": "5bde30d596fc1de4ae9b98f32cbe75924d811e84776237f56a2eadaf97007469"
+      "yaml_sha256": "4473f74b3fb2c1d5a3adc849777f0965b33a796a3d46cf6e9dffde59cdb3526f",
+      "json_sha256": "d72f57dc68c38fa7759b27df363c0ca0855dd1821716ed1c0eaa930c17f42ee1"
     },
     {
       "yaml": "access-semantics.yaml",
       "json": "generated/access-semantics.json",
-      "yaml_sha256": "27fe62c53aab30fc483adde8af7242bd0b911ddd7fec0d74b0def6ff1330dc2f",
-      "json_sha256": "376415b2b11cdc41396b043b15a9fa88c62d100ca4a17ab42fc2352650c53e11"
+      "yaml_sha256": "713466bf6c7a8a5151ab3eb3f34d1ea8d91022ea027034e00b6d5a197e728dd8",
+      "json_sha256": "befd847cded1f97893b6a9b816482eb05a890732bd9d3dc7c9de5151875afe7d"
     },
     {
       "yaml": "ai-context-policy.yaml",
       "json": "generated/ai-context-policy.json",
-      "yaml_sha256": "523a93dcc0e070413801c24c532cb4318dad83187a2ec4639fd2f418bdd86767",
-      "json_sha256": "23528ebb7c6c4a31b1827fab282d1de57c488ff5e7f62f012bdd921a3c00ef60"
+      "yaml_sha256": "2fab470a3e10a8079015824ae4d1858a0cc0b1ef22c4255ff56937d93afe0ca8",
+      "json_sha256": "9cd7427a6508f24b7d309f16234e3ff6c2b49204b57ae947762ac817c392ba66"
     }
   ]
 }

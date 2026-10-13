@@ -18,16 +18,20 @@ client = TestClient(app)
 REPO = Path(__file__).resolve().parents[2]
 
 
-def test_missing_id_returns_first_row():
-    """characterization: locks current behaviour; replace when the defect is fixed"""
-    row = domain_service.load_record("DOES-NOT-EXIST")
-    assert row["device_id"] == "REC-0001"
+def test_missing_id_returns_404(tmp_path, monkeypatch):
+    """Replaces test_missing_id_returns_first_row (S07, PRD O-4, RQ-03).
+
+    That test locked HTTP 200 and the first row, REC-0001, for an id that does not exist.
+    This test locks the fix. The loader returns nothing and the route returns 404.
+    """
+    monkeypatch.setattr(audit, "LOG", tmp_path / "audit.log")
+    assert domain_service.load_record("DOES-NOT-EXIST") is None
     response = client.get(
         "/records/DOES-NOT-EXIST",
         headers={"X-User-Role": "operator"},
     )
-    assert response.status_code == 200
-    assert response.json()["device_id"] == "REC-0001"
+    assert response.status_code == 404
+    assert response.json() == {"error": "not_found"}
 
 
 @pytest.mark.security

@@ -5,10 +5,13 @@ recommend route and no execute route. S04-06 is the stage that enforces them
 in policy. These tests record the target decision and check the live routes.
 """
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 
 from apps.api.main import app
+from apps.api.services import audit
 
 # Stage S05-13 Half B: every test in this file is part of the security suite.
 pytestmark = pytest.mark.security
@@ -174,18 +177,17 @@ def test_automation_service_may_not_execute_without_approval_id():
     assert response.json() == {"error": "forbidden"}
 
 
-def test_missing_role_header_keeps_operator_default():
-    """NA-06. A missing role header stays role.operator.
+def test_missing_role_header_is_refused(tmp_path, monkeypatch):
+    """NA-06. Replaces test_missing_role_header_keeps_operator_default (S07, PRD O-4, RQ-01).
 
-    The proposed change is to refuse this call. Owner: Team-Force. PROPOSED.
-    Half B leaves the default in place. rule.no_default_role. PB-04.
-    role: role.operator
-    action: action.read
-    resource: resource.device
-    purpose: purpose.incident_triage
-    scope: scope.all_records
-    risk: risk.read_only
+    That test locked HTTP 200 for a call with no role header, because the route
+    defaulted to role.operator. A call with no role has no caller. The route returns
+    403 and writes a policy.deny row with a null role. rule.no_default_role.
     """
+    monkeypatch.setattr(audit, "LOG", tmp_path / "audit.log")
     response = client.get("/records/REC-0001")
-    assert response.status_code == 200
-    assert response.json()["device_id"] == "REC-0001"
+    assert response.status_code == 403
+    assert response.json() == {"error": "forbidden"}
+    rows = [json.loads(line) for line in (tmp_path / "audit.log").read_text().splitlines()]
+    assert [row["action"] for row in rows] == ["policy.deny"]
+    assert rows[0]["role"] is None

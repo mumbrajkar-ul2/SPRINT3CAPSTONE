@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S03 — Semantic layer (Execution Plan Phase 3; product path step 1, D3) |
-| Date / version | 2026-10-12, semantic layer `1.1.1`. Written in S03 on 2026-10-10 and revised in S05R. One sentence changed in ADR 0002. |
+| Date / version | 2026-10-13, semantic layer `1.2.0`. Written in S03 on 2026-10-10 and revised in S05R. One sentence changed in ADR 0002. Eight rows added in S07 (ADR 0005). |
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | PASS. Every id with a glossary prefix has one row below. `tests/test_semantic_layer.py` checks that the Term and Id columns match the YAML. |
 | Evidence sources | The seven YAML files in this folder; `docs/domain-specific-spec.md`; `docs/01-discovery/`; `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/02-baseline/ai-qualification.md`; `apps/api/main.py`; `apps/api/services/ai_gateway.py`; `policy/opa/access.rego`; `data/synthetic/` |
@@ -45,7 +45,7 @@ Terms the docs use that have no table of their own.
 | `site` | `concept.site` | A physical place where devices sit. There is no site table. `site_id` sits on devices only. |
 | `alarm storm` | `concept.storm` | A burst of many alarms in a short time. Alarms that share `storm_batch_id` are one storm batch. How many alarms make a storm is Unknown. |
 | `approval` | `concept.approval` | A named person's recorded yes or no to a recommended change. The system stores an approval id. No route writes that id today. |
-| `audit row` | `concept.audit_row` | One JSON line in `logs/audit.log`. Since stage S04-08 it holds 15 keys in this order: ts, correlation_id, actor, role, action, resource, policy_decision, approval_id, model, model_version, prompt_hash, tokens, latency_ms, outcome, token_estimate_method. Each key has an id that starts with `field.audit_row`. |
+| `audit row` | `concept.audit_row` | One JSON line in `logs/audit.log`. Since stage S07 it holds 17 keys in this order: ts, correlation_id, actor, role, action, resource, policy_decision, approval_id, model, model_version, prompt_hash, tokens, latency_ms, outcome, token_estimate_method, record_id, final_action. Each key has an id that starts with `field.audit_row`. |
 | `prompt` | `concept.prompt` | The text sent to a model. Since stage S04-09 it is a fixed instruction plus one line for each allowed field the record holds. `mgmt_ip` and `credential_profile` stay out. |
 | `policy decision` | `concept.policy_decision` | The allow or deny answer from the access policy. Since stage S04-06 `apps/api/services/policy.py` runs `access.rego`, or its Python copy, on every route. |
 | `waiver` | `concept.waiver` | A dated exception to one rule id, granted by a named owner. No register, route, or audit action for it exists yet. PROPOSED. |
@@ -397,7 +397,7 @@ Provenance means where an answer came from. These nine fields travel on each mod
 
 ## Audit row fields
 
-The 15 keys of one audit row, in the order the code writes them. All are PROPOSED. Owner Team-Force.
+The 17 keys of one audit row, in the order the code writes them. The first 15 are from 1.1.0. `record_id` and `final_action` are added in 1.2.0 (stage S07). All are PROPOSED. Owner Team-Force.
 
 | Term | Id | Meaning |
 |---|---|---|
@@ -406,9 +406,9 @@ The 15 keys of one audit row, in the order the code writes them. All are PROPOSE
 | `actor` | `field.audit_row.actor` | The persona word for the role header. Null when the role has no persona. It is not a named person. |
 | `role` | `field.audit_row.role` | The role word the caller sent. Null when the header was missing. |
 | `action` | `field.audit_row.action` | What happened. One word from the audit action list. |
-| `resource` | `field.audit_row.resource` | What the call touched: `resource.device` or `resource.audit_log`. |
+| `resource` | `field.audit_row.resource` | What the call touched: `resource.device`, `resource.audit_log`, `resource.alarm` (a storm read) or `resource.ai_invocation` (an approval). |
 | `policy_decision` | `field.audit_row.policy_decision` | The policy answer, allow or deny. The key exists and is null on every row today. |
-| `approval_id` | `field.audit_row.approval_id` | The stored approval id. Null on every row, because no route writes one. |
+| `approval_id` | `field.audit_row.approval_id` | The stored approval id. Set on the row of a yes from the approvals route. Null on every other row and on the row of a no. |
 | `model` | `field.audit_row.model` | The model name. Null when the model did not run. |
 | `model_version` | `field.audit_row.model_version` | The model version. Null when the model did not run. |
 | `prompt_hash` | `field.audit_row.prompt_hash` | The SHA-256 code of the prompt text. Null when no prompt was sent. |
@@ -416,6 +416,17 @@ The 15 keys of one audit row, in the order the code writes them. All are PROPOSE
 | `latency_ms` | `field.audit_row.latency_ms` | Milliseconds the model call took. Null when the model did not run. |
 | `outcome` | `field.audit_row.outcome` | One of the four outcome words on an AI call. Null on a record read and on a refusal. |
 | `token_estimate_method` | `field.audit_row.token_estimate_method` | How `tokens` was worked out. Null when `tokens` is null. |
+| `record_id` | `field.audit_row.record_id` | The device id the caller asked for, as typed. Null on a row that names no device, such as a storm read. |
+| `final_action` | `field.audit_row.final_action` | What last happened to a device. The value is `none` on every row, because no route changes a device. |
+
+## Approval record fields
+
+Added in 1.2.0 (stage S07). Both are PROPOSED. Owner Team-Force.
+
+| Term | Id | Meaning |
+|---|---|---|
+| `decision` | `field.approval.decision` | The word `yes` or `no` that the person sent to the approvals route. |
+| `approver` | `field.approval.approver` | The persona id of the caller's role, set by the server. It is a claim, because the role is a header word the caller typed. |
 
 ## Policy inputs and policy items
 
@@ -424,6 +435,7 @@ Names that the policy files read and that no other list had. All are PROPOSED. O
 | Term | Id | Meaning |
 |---|---|---|
 | `live model now` | `policy.model_now` | The live gateway as it is after stage S04-09. `policy.model_today` keeps the state before it. |
+| `command phrases` | `policy.command_phrases` | The short list of command words, and the list of near-miss forms of them, that make the recommend route hold a model answer. Both lists are PROPOSED. |
 | `access matrix rows` | `policy.opa.access_matrix` | The 35 allow rows TA-01 to TA-35 in `policy_data.json`. This replaces the two removed OPA rules. |
 | `policy_version` | `field.policy_input.policy_version` | The version text of the policy that decided. A different version sends the call to a person. |
 | `output_schema_ok` | `field.policy_input.output_schema_ok` | True when the model answer matched the output schema. |
@@ -445,6 +457,9 @@ Exact text that code writes or returns. Each row shows the text in the Term colu
 | `audit.read` | `status.code.audit_action.audit_read` | The audit action the audit route writes when it returned a case. |
 | `audit.not_found` | `status.code.audit_action.audit_not_found` | The audit action the audit route writes when no row has the id. HTTP 404. |
 | `audit.id_refused` | `status.code.audit_action.audit_id_refused` | The audit action the audit route writes when the id is over 128 characters. HTTP 400. |
+| `record.storm_read` | `status.code.audit_action.storm_read` | The audit action the storm route writes after an allowed read of one storm. Added in 1.2.0. |
+| `ai.recommendation` | `status.code.audit_action.ai_recommendation` | The audit action the recommend route writes when it returned the sentence. It proves a recommendation was shown. Added in 1.2.0. |
+| `ai.approval` | `status.code.audit_action.ai_approval` | The audit action the approvals route writes first, before it stores the decision. Added in 1.2.0. |
 | `not_found` | `status.code.error.not_found` | The error body of the audit route for an id with no rows. |
 | `id_too_long` | `status.code.error.id_too_long` | The error body of the audit route for an id over the limit. It also holds `max_length`. |
 | `enforced` | `status.code.guardrail_status.enforced` | The word the live gateway returns when the prompt and answer checks ran. |

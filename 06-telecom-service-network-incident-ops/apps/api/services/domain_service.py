@@ -38,13 +38,17 @@ def reset_cache():
 
 
 def load_record(record_id: str):
-    rows, index = _load()
+    """The device row whose device_id equals `record_id`, or None when there is none.
+
+    S07 (PRD RQ-03). The old behaviour returned the first row for a missing id. That
+    masked data defects (defect F01). The routes now turn None into HTTP 404 or BLOCK.
+    """
+    _rows, index = _load()
     row = index.get(record_id)
     if row is not None:
         # A copy, so a caller that edits the result cannot change the stored row.
         return dict(row)
-    # Brownfield behavior: silently returns first row, masking data defects.
-    return dict(rows[0]) if rows else {"error":"missing"}
+    return None
 
 def list_recent(limit=20):
     with (DATA_DIR / PRIMARY).open(newline='', encoding='utf-8') as f:

@@ -28,7 +28,10 @@ from apps.api.services import ai_gateway, audit
 
 # PROPOSED. Owner: Team-Force. Accepted for S05-14 Half B on 2026-10-12.
 # The limit applies to the id in the path of GET /audit/{correlation_id}.
-MAX_ID_LENGTH = 128
+MAX_ID_LENGTH = audit.MAX_CORRELATION_ID_LENGTH
+
+# S07 (PRD RQ-34). The action word of the row that proves a recommendation was shown with text.
+RECOMMENDATION_SHOWN_ACTION = "ai.recommendation"
 
 WITHHELD = "<withheld: forbidden name>"
 
@@ -100,6 +103,37 @@ def read_case(correlation_id: str) -> CaseRead:
     return result
 
 
+def recommendation_was_shown(correlation_id: str, record_id: str) -> bool:
+    """True when the log holds, under this correlation id, one row with the action
+    `ai.recommendation` whose `record_id` equals `record_id` (PRD RQ-34).
+
+    That row is written only when the recommend route returned text. Read only.
+    """
+    if not isinstance(correlation_id, str) or not correlation_id:
+        return False
+    if not isinstance(record_id, str) or not record_id:
+        return False
+    path = audit.LOG
+    if not path.exists():
+        return False
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if (
+                isinstance(row, dict)
+                and row.get("correlation_id") == correlation_id
+                and row.get("action") == RECOMMENDATION_SHOWN_ACTION
+                and row.get("record_id") == record_id
+            ):
+                return True
+    return False
+
+
 def _item(name: str, reason: str) -> dict:
     return {"item": name, "reason": reason}
 
@@ -109,7 +143,12 @@ def cannot_prove(case: CaseRead) -> list:
     rows = case.rows
     items = []
     if rows and all(row.get("approval_id") is None for row in rows):
-        items.append(_item("approval_id", "approval_id is null on every row. No approval route exists until S07."))
+        items.append(
+            _item(
+                "approval_id",
+                "approval_id is null on every row. No yes was stored in this case. A no also leaves it null.",
+            )
+        )
     if rows and all(row.get("policy_decision") is None for row in rows):
         items.append(
             _item(
@@ -123,8 +162,14 @@ def cannot_prove(case: CaseRead) -> list:
         items.append(_item("actor", "At least one row has no actor. The role has no persona, or the header was missing."))
     items.extend(
         [
-            _item("final_action", "No column holds the final action. By the code no route changes a device."),
-            _item("record_asked_for", "No column holds the record id the caller asked for."),
+            _item(
+                "final_action",
+                "final_action is none on every row, because no route in this app changes a device. The log cannot show a change made outside this app.",
+            ),
+            _item(
+                "record_asked_for",
+                "record_id is null on a row that names no device, such as a storm read or an audit read. For other rows it holds the id as the caller typed it.",
+            ),
             _item("policy_reasons_and_version", "The reasons and the policy version are not stored on any row."),
             _item("caller_identity", "The role is a header word the caller typed. Nothing proves who the caller was."),
             _item(
