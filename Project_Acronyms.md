@@ -2,14 +2,14 @@
 
 | Field | Value |
 |---|---|
-| Stage | Reader guide. Written while S04-03 Half A was in progress. Updated on 2026-10-12 after S05-13, S05-14, and S05R. |
-| Date / version | 2026-10-12, v1.3. v1.0 (2026-10-10) covered S04-03 Half A. v1.1 added the labels from S04-03 Half B through S04-07 Half B, and corrected five rows that the later stages made out of date (`OPA`, `CI`, `IaC`, `SBOM`, and the comment rows for `main.tf` and `access.rego`). v1.2 added the labels from S04-08 through S04-12 Half B, and updated the rows for `EDUCATIONAL`, `HOLD_FOR_REVIEW`, `BLOCK`, `SLO`, and the comment rows for `ai_gateway.py` and `audit.py`. v1.3 adds the labels from S05-13 (security validation), S05-14 (audit chain), and S05R (semantic layer revision to version `1.1.0`). It also corrects the rows for `CI`, `PATH`, `Rego`, `TA-xx`, `AC-`, `S05R`, the scan codes, and the YAML prefix table. |
+| Stage | Reader guide. Written while S04-03 Half A was in progress. Updated on 2026-10-12 after S05-13, S05-14, and S05R. Updated again on 2026-10-12 after the S05R decisions (ADR 0002), S06, the risk follow-up (ADR 0003), and S06R. |
+| Date / version | 2026-10-12, v1.4. v1.0 (2026-10-10) covered S04-03 Half A. v1.1 added the labels from S04-03 Half B through S04-07 Half B, and corrected five rows that the later stages made out of date (`OPA`, `CI`, `IaC`, `SBOM`, and the comment rows for `main.tf` and `access.rego`). v1.2 added the labels from S04-08 through S04-12 Half B, and updated the rows for `EDUCATIONAL`, `HOLD_FOR_REVIEW`, `BLOCK`, `SLO`, and the comment rows for `ai_gateway.py` and `audit.py`. v1.3 adds the labels from S05-13 (security validation), S05-14 (audit chain), and S05R (semantic layer revision to version `1.1.0`). It also corrects the rows for `CI`, `PATH`, `Rego`, `TA-xx`, `AC-`, `S05R`, the scan codes, and the YAML prefix table. v1.4 adds the labels from the S05R decisions (`P-xx`, `N-xx`, the `D-xx` outcomes), S06 (`RQ-xx`, `RK-xx`), and S06R (`P1` to `P13`, `F-x`, `O-x`). It updates the rows for `S05R`, `S06`, `S06R`, `ADR`, `PRD`, `D5`, `OB-01`, `DECIDED`, `PROPOSED`, `REAL`, `PRECOMPUTED`, `SIMULATED`, `HTTP`, `HOLD_FOR_REVIEW`, `APR-`, and the YAML prefix table. It adds a section for the routes and names that the PRD plans for S07. |
 | Author | Mangesh (FDE), drafted with Cursor |
-| Status | Current for the files on disk after S05R. Stage ids S06 and later have not run, so no label from them is listed. A later stage that adds a new short code should add a row here. |
-| Evidence sources | Documents under the project root and `06-telecom-service-network-incident-ops/docs/`; `playbook/`; `semantic-layer/README.md`; comments in `apps/`, `etl/`, `legacy/`, `policy/opa/`, `infra/terraform/`, `scripts/`, `Dockerfile`, and `semantic-layer/`. v1.1 also read `docs/04-secrets/`, `docs/05-iac/`, `docs/06-policy/`, `docs/07-cicd/`, `policy/tests/fixtures/`, and `playbook/STATUS.md`. v1.2 also read `docs/08-observability/`, `docs/09-ai-guardrails/`, `docs/10-performance/`, `docs/11-reliability/`, `docs/12-finops/`, `docs/runbooks/`, `apps/api/services/breaker.py`, `apps/api/services/dedupe.py`, and `.env.example`. v1.3 also read `docs/13-security-validation/`, `docs/14-audit/`, `docs/02-baseline/semantic-layer-revision.md`, `apps/api/services/audit_query.py`, `scripts/check_junit_no_skips.py`, `evidence/ruff.json`, `evidence/bandit.json`, `evidence/pip-audit.json`, and the ten fixture files added since v1.2. The synthetic CSV files and the chat transcript were left out of the scan. |
+| Status | Current for the files on disk after S06R. Stage ids S07 and later have not run, so no label from them is listed. The names in the section "Planned for S07" have no code yet. A later stage that adds a new short code should add a row here. |
+| Evidence sources | Documents under the project root and `06-telecom-service-network-incident-ops/docs/`; `playbook/`; `semantic-layer/README.md`; comments in `apps/`, `etl/`, `legacy/`, `policy/opa/`, `infra/terraform/`, `scripts/`, `Dockerfile`, and `semantic-layer/`. v1.1 also read `docs/04-secrets/`, `docs/05-iac/`, `docs/06-policy/`, `docs/07-cicd/`, `policy/tests/fixtures/`, and `playbook/STATUS.md`. v1.2 also read `docs/08-observability/`, `docs/09-ai-guardrails/`, `docs/10-performance/`, `docs/11-reliability/`, `docs/12-finops/`, `docs/runbooks/`, `apps/api/services/breaker.py`, `apps/api/services/dedupe.py`, and `.env.example`. v1.3 also read `docs/13-security-validation/`, `docs/14-audit/`, `docs/02-baseline/semantic-layer-revision.md`, `apps/api/services/audit_query.py`, `scripts/check_junit_no_skips.py`, `evidence/ruff.json`, `evidence/bandit.json`, `evidence/pip-audit.json`, and the ten fixture files added since v1.2. v1.4 also read `docs/prd/prd.md`, `docs/prd/traceability.md`, `docs/prd/Risk Management.md`, `docs/prd/prd-review.md`, `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`, `docs/ADR/0003-s06-risk-recommendations.md`, `docs/02-baseline/S05R_Decisions.md`, `docs/02-baseline/S05R_Decisions_Taken.md`, `Project_Intent - Appendix B.md`, and `playbook/STATUS.md`. The synthetic CSV files and the chat transcript were left out of the scan. |
 | Assumptions | A sample id such as `DEV-00013` is one row of a prefix. This file lists the prefix once. |
-| Unresolved issues | `security/threat-model.md` names STRIDE/MAESTRO and does not spell those letters out. The letters of MAESTRO are Unknown in this repo. |
-| Residual risks | Two lists can share a letter. `R07` is a risk. `R7` is a review check. Since v1.1, six more pairs share a label: `BL-01` (identity and CI/CD), `CM-01` (secrets and IaC), `H1` (a Half B run and a HOLD row), `R1` (a setup run and a review check), `AI-01` (a fixture and the words AI), and `OS-01` (a fixture and the letters OS). The tables below say which file each one lives in. Since v1.2, four more labels are shared: `PB-xx` (identity backlog and performance baseline), `HB-xx` (S04-06 Half B and S04-10 Half B), `DR-xx` (dependency register and reliability drills), and `B1` to `B9` (AI outcome rows and trust boundaries). The `D-1` to `D-7` decisions in `docs/11-reliability/` look like `D1` to `D8`, the hand-back ids, but they are a different list. Since v1.3, more labels are shared: `EV-xx` (S04-09 Half B and S05-13), `R3` to `R7` (S05-14 probe runs and review checks), `D-01` to `D-20` (S05R deferred items, with a leading zero) and `D-1` to `D-7` (reliability decisions), `SB-xx` (the S05-13 security backlog) and `BL-xx` (rows of the CI/CD backlog that the security backlog repeats), and `AR-xx` with `AR-Rx` (S05-14 findings and risks). The S05-13 file `docs/13-security-validation/remediation-backlog.md` uses both `SB-xx` and `BL-xx`. |
+| Unresolved issues | `security/threat-model.md` names STRIDE/MAESTRO and does not spell those letters out. The letters of MAESTRO are Unknown in this repo (`D-20`). The S06R review found seven PRD words that have no glossary row and no YAML id (see the section "Words the PRD uses that the semantic layer lacks"). This file explains those words for a reader. It does not define them for the project. |
+| Residual risks | Two lists can share a letter. `R07` is a risk. `R7` is a review check. Since v1.1, six more pairs share a label: `BL-01` (identity and CI/CD), `CM-01` (secrets and IaC), `H1` (a Half B run and a HOLD row), `R1` (a setup run and a review check), `AI-01` (a fixture and the words AI), and `OS-01` (a fixture and the letters OS). The tables below say which file each one lives in. Since v1.2, four more labels are shared: `PB-xx` (identity backlog and performance baseline), `HB-xx` (S04-06 Half B and S04-10 Half B), `DR-xx` (dependency register and reliability drills), and `B1` to `B9` (AI outcome rows and trust boundaries). The `D-1` to `D-7` decisions in `docs/11-reliability/` look like `D1` to `D8`, the hand-back ids, but they are a different list. Since v1.3, more labels are shared: `EV-xx` (S04-09 Half B and S05-13), `R3` to `R7` (S05-14 probe runs and review checks), `D-01` to `D-20` (S05R deferred items, with a leading zero) and `D-1` to `D-7` (reliability decisions), `SB-xx` (the S05-13 security backlog) and `BL-xx` (rows of the CI/CD backlog that the security backlog repeats), and `AR-xx` with `AR-Rx` (S05-14 findings and risks). The S05-13 file `docs/13-security-validation/remediation-backlog.md` uses both `SB-xx` and `BL-xx`. Since v1.4, more labels are shared: `P-01` to `P-12` (S05R proposed bundles, with a hyphen), `P1` to `P11` (reliability probes) and `P1` to `P13` (S06R review checks); `F-1` to `F-9` (S06R fixes) and `F01` to `F23` (defects); `O-1` to `O-5` (S06R other findings) and `O1` to `O3` (AI outcome rows); `RK-01` to `RK-17` (PRD risks) and `R01` to `R24` (discovery risks). A hyphen or a leading zero is the only difference in several pairs, so read the file name next to the label. |
 
 ## What this file is
 
@@ -90,7 +90,7 @@ These labels number a row in one file. The letters say which list. The number sa
 | `AB-xx` | A finding about the AI cost baseline. | `docs/12-finops/ai-cost-baseline.md` | `AB-01` to `AB-06` |
 | `CW-xx` | A finding about cost per workflow. | `docs/12-finops/cost-per-workflow.md` | `CW-01` to `CW-05` |
 | `RC-xx` | A finding about retry cost. | `docs/12-finops/retry-cost-analysis.md` | `RC-01` to `RC-04` |
-| `OB-xx` | One item in the cost optimization backlog. Example: `OB-01` caches repeated prompts by `prompt_hash`. Its cache lifetime is decided at 300 seconds, to be built in S07. `OB-05` is the stop before the model, already built. | `docs/12-finops/optimization-backlog.md` | `OB-01` to `OB-05` |
+| `OB-xx` | One item in the cost optimization backlog. Example: `OB-01` caches repeated prompts by `prompt_hash`. Its cache lifetime is decided at 300 seconds. ADR 0004 defers the build, so S07 does not build it. ADR 0003 keeps it and adds two limits for a later build: the store never holds an answer that has no text (a BLOCK, or a HOLD_FOR_REVIEW with no sentence), and the cap on stored answers is PROPOSED with no number (`RQ-31`). `OB-05` is the stop before the model, already built. | `docs/12-finops/optimization-backlog.md` | `OB-01` to `OB-05` |
 | `OB-Fx` | A finding about that backlog. | Same file | `OB-F1` to `OB-F2` |
 | `FD-xx` | A finding about the FinOps dashboard fields. | `docs/12-finops/finops-dashboard-fields.md` | `FD-01` to `FD-04` |
 | `FB-xx` | A finding that S04-12 Half B recorded. | `docs/12-finops/evidence.md` | `FB-01` to `FB-06` |
@@ -100,7 +100,7 @@ These labels number a row in one file. The letters say which list. The number sa
 | `NG-xx` | One negative test design. Example: `NG-01` is `write_event` refusing an empty correlation id. `NG-04` is the secret scan finding a planted secret. | `docs/13-security-validation/negative-tests.md` | `NG-01` to `NG-04` |
 | `NG-Fx` | A finding about those designs. | Same file | `NG-F1`, `NG-F2` |
 | `SC-xx` | A finding about the scanning checklist. Example: `SC-05` says the secret scan has three blind spots. | `docs/13-security-validation/scanning-checklist.md` | `SC-01` to `SC-05` |
-| `SB-xx` | One row of the security remediation backlog. Example: `SB-01` is a call with no role header being treated as `operator`. `SB-10` is a security test that skips without failing the build. `SB-21` is the workflow runner image, pinned to `ubuntu-24.04` on 2026-10-12. | `docs/13-security-validation/remediation-backlog.md` | `SB-01` to `SB-21` |
+| `SB-xx` | One row of the security remediation backlog. Example: `SB-01` is a call with no role header being treated as `operator`. ADR 0003 decided to refuse that call, and `RQ-68` builds the refusal in S07. `SB-10` is a security test that skips without failing the build. `SB-21` is the workflow runner image, pinned to `ubuntu-24.04` on 2026-10-12. | `docs/13-security-validation/remediation-backlog.md` | `SB-01` to `SB-21` |
 | `EV-xx` (security) | A finding that S05-13 Half B recorded. Example: `EV-01` says a record read takes a median 150 ms when the app starts `opa` for each decision, and 10 ms with the Python copy. This is a different list from the S04-09 `EV-xx` above. | `docs/13-security-validation/evidence.md` | `EV-01` to `EV-09` |
 | `AG-xx` | A finding in the audit gap report. Example: `AG-01` says 96 of 240 lines had 3 keys and no `correlation_id`. `AG-08` says `role` and `actor` hold a claim and not a proven fact. | `docs/14-audit/audit-gap-report.md` | `AG-01` to `AG-08` |
 | `DP-xx` | A finding about the decision provenance model. Example: `DP-01` says 15 of 24 facts have a column on the row and 9 do not. | `docs/14-audit/decision-provenance-model.md` | `DP-01` to `DP-02` |
@@ -111,11 +111,22 @@ These labels number a row in one file. The letters say which list. The number sa
 | `CE-xx` | A finding about the compliance evidence mapping. Example: `CE-01` says all five control areas have stored evidence with a test name. | `docs/14-audit/compliance-evidence-mapping.md` | `CE-01` to `CE-03` |
 | `Rx` (audit probe) | One call in the S05-14 Half B run against the audit route. Example: `R3` is `operator` asking for an existing case and getting 403. `R7` is `admin` sending an id of 129 characters and getting 400. | `docs/14-audit/evidence.md` | `R3` to `R7` |
 | `C-xx` | One row of the S05R collection table. It names a place where a design, policy, test, or comment asked for a term the YAML lacked, and the decision taken. | `docs/02-baseline/semantic-layer-revision.md` | `C-01` to `C-65` |
-| `D-xx` (deferred) | One question that S05R left open with owner Team-Force. It has a leading zero. This is a different list from the reliability `D-x` decisions and from the hand-back ids `D0` to `D8`. | `docs/02-baseline/semantic-layer-revision.md` | `D-01` to `D-20` |
+| `D-xx` (deferred) | One question that S05R left open with owner Team-Force. It has a leading zero. This is a different list from the reliability `D-x` decisions and from the hand-back ids `D0` to `D8`. After the owner's decisions: `D-03`, `D-06`, `D-08`, `D-12`, `D-16` are decided (ADR 0002). `D-13` is closed. `D-07` is decided in ADR 0003: login is out of scope and the role stays a word the caller types. Thirteen stay deferred: `D-01`, `D-02`, `D-04`, `D-05`, `D-09`, `D-10`, `D-11`, `D-14`, `D-15`, `D-17`, `D-18`, `D-19`, `D-20`. | `docs/02-baseline/semantic-layer-revision.md`, `docs/02-baseline/S05R_Decisions.md`, `docs/02-baseline/S05R_Decisions_Taken.md`, `docs/ADR/` | `D-01` to `D-20` |
+| `P-xx` (bundle) | One bundle of items marked `proposed: true` in the YAML, which the owner accepted as a group. It has a hyphen. `P-01` is the seven personas. `P-07` is the 15 audit keys. `P-12` is the 35 access rows. `P-01` to `P-11` hold 120 items. | `docs/02-baseline/S05R_Decisions.md`, `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md` | `P-01` to `P-12` |
+| `N-xx` | One PROPOSED number that the owner accepted. `N-01` is the case id limit of 128 characters. `N-04` is the 10 second model timeout. `N-05` is the breaker (5 failures, 30 seconds open, 10 calls at once). `N-06` holds the three service levels. Each keeps the word PROPOSED and the owner Team-Force. | `docs/02-baseline/S05R_Decisions_Taken.md`, ADR 0002, `docs/prd/prd.md` section 13 | `N-01` to `N-06` |
+| `RQ-nn` | One requirement in the PRD. Each has the YAML ids it cites, one acceptance test, and one design file. Example: `RQ-03` is the 404 for a missing device id. `RQ-68` to `RQ-73` came from ADR 0003. | `docs/prd/prd.md` section 10, `docs/prd/traceability.md` | `RQ-01` to `RQ-73` (29 tests exist, 43 are planned for S07, 1 is deferred) |
+| `RK-nn` | One risk in the PRD that the app leaves visible or closes. Example: `RK-02` is `GET /records/{id}` filling in `operator` when no header arrives. `docs/prd/Risk Management.md` has one section for each. | `docs/prd/prd.md` section 12, `docs/prd/Risk Management.md` | `RK-01` to `RK-17` |
+| `P1` to `P13` (review check) | One check in the PRD review. `P2` is "every PRD term is in the glossary or the YAML". `P12.1` to `P12.8` are the eight items of the failure list in `playbook/README.md`. This is a different list from the reliability probes `P1` to `P11` and the bundles `P-01` to `P-12`. | `docs/prd/prd-review.md` | `P1` to `P13`, `P12.1` to `P12.8` |
+| `F-x` (review fix) | One fix the PRD review asks for. It has a hyphen and no leading zero. This is a different list from the defects `F01` to `F23`. | `docs/prd/prd-review.md` section 6 | `F-1` to `F-9` |
+| `O-x` (review finding) | One other finding in the PRD review, outside checks `P1` to `P13`. Example: `O-1` says nothing links the storm step to the device lookup. This is a different list from the outcome rows `O1` to `O3`. | `docs/prd/prd-review.md` section 7 | `O-1` to `O-5` |
 
 Worked example. `F03`, `R07`, and `CR-01` all talk about the header word `clinician`. `F03` is the defect row. `R07` is the risk row. `CR-01` is the current-access finding. `TA-01` is a different fact: the target allow for `persona.noc_operator` to read a device. `NA-02` is the test that will check the `clinician` deny after Half B.
 
 Worked example for the shared labels. `BL-01` in `docs/03-identity/privilege-reduction-backlog.md` is a finding about the privilege backlog. `BL-01` in `docs/07-cicd/pipeline-improvement-plan.md` is "move the workflow to the repo root". `CM-01` in `docs/04-secrets/` is about the example file. `CM-01` in `docs/05-iac/configuration-ownership-map.md` says the example file does not list the name the legacy script reads. Always read the file name next to the label.
+
+Worked example for the PRD labels. The no-header call on the record route has four names. `F15` is the defect row. `SB-01` is the security backlog row. `RK-02` is the PRD risk. `RQ-68` is the requirement that fixes it. ADR 0003 is the decision. `P-01` to `P-12` are bundles of YAML items. `P1` to `P13` are review checks. `P-02` and `P2` are not the same thing: `P-02` is the bundle of eight purposes and four scopes, and `P2` is the check that PRD terms exist in the YAML.
+
+A line that starts "Open question for S03:" marks a term, id, or status word that a design needs and the YAML lacks. The design does not define it. Stage S05R collects each line and folds the accepted ones into the YAML. The PRD has five such lines, in its section 15.
 
 The review file uses the letter R for a different list. `R1`, `R7`, and `R14.7` in `docs/02-baseline/semantic-layer-review.md` are review checks. `R07` in the risk register is a risk. The review number has no leading zero. The risk number has two digits.
 
@@ -134,7 +145,7 @@ The review file uses the letter R for a different list. `R1`, `R7`, and `R14.7` 
 | `D2` | The baseline, the defect list, and the characterization tests. |
 | `D3` | The semantic layer, after review, including the later revision. |
 | `D4` | The Phase 4 control folders, `docs/03-identity/` through `docs/12-finops/`, each with a design half and a code half. |
-| `D5` | The PRD and its traceability file. |
+| `D5` | The PRD and its traceability file. S06 wrote both on 2026-10-12. The review `docs/prd/prd-review.md` found the PRD BLOCKED until fixes `F-1` to `F-9` are applied. |
 | `D6` | The running demo of one flow that ends in a human decision. |
 | `D7` | The second-model comparison. |
 | `D8` | The filled production evidence pack and the readiness note. |
@@ -156,10 +167,10 @@ A stage id starts with `S`. The playbook file of the same name holds the prompt.
 | `S04-03` to `S04-12` | Phase 4. The number after the hyphen is the challenge number, 3 through 12. |
 | `S05-13` | Phase 5, challenge 13. Security validation: a security test suite plan, abuse cases, negative tests, a scanning checklist, and a remediation backlog. Half B added the skip guard `scripts/check_junit_no_skips.py` and the `security` test marker. |
 | `S05-14` | Phase 5, challenge 14. The audit chain: gaps in the audit row, the decision provenance model, compliance evidence mapping, and the read route `GET /audit/{correlation_id}`. Half B added `TA-35`. |
-| `S05R` | The revision that folds open questions into the YAML and raises the version. It ran on 2026-10-12 and raised the layer from `1.0.0` to `1.1.0`: 92 ids added, 0 removed, 2 deprecated. The result is CONDITIONAL PASS, with 20 deferred questions. The record is `docs/02-baseline/semantic-layer-revision.md`. |
-| `S06` | The PRD. |
-| `S06R` | The review of the PRD. |
-| `S07` | The application and the demo. |
+| `S05R` | The revision that folds open questions into the YAML and raises the version. It ran on 2026-10-12 and raised the layer from `1.0.0` to `1.1.0`: 92 ids added, 0 removed, 2 deprecated. The result is CONDITIONAL PASS, with 20 deferred questions. The record is `docs/02-baseline/semantic-layer-revision.md`. Later on 2026-10-12 the owner decided the open items (ADR 0002 and `S05R_Decisions_Taken.md`). One YAML sentence changed (p95 for model delay), so the layer is now `1.1.1`. The id count stays at 757. |
+| `S06` | The PRD. It ran on 2026-10-12 and wrote `docs/prd/prd.md` and `docs/prd/traceability.md`. Result: CONDITIONAL PASS, because 44 of 73 tests are planned for S07. `docs/prd/Risk Management.md` and ADR 0003 followed. They gave PRD v1.1, which adds `RQ-68` to `RQ-73`. |
+| `S06R` | The review of the PRD. It ran on 2026-10-12 and wrote `docs/prd/prd-review.md`. Result: BLOCKED. Check `P2` is FAIL (seven PRD words have no glossary row or YAML id). Checks `P7`, `P8`, and `P11` are also FAIL. The other rows pass. The file lists nine fixes, `F-1` to `F-9`. |
+| `S07` | The application and the demo. It builds only what the PRD names. It may start after S06R has no FAIL in `P1`, `P2`, `P3`, `P4`, `P9`, or `P13`. |
 | `S08` | The second model and the comparison. |
 | `S09` | Readiness and the evidence pack. |
 | `S10` | The defence. |
@@ -199,7 +210,7 @@ Each row says what the letters stand for in this project, then where they show u
 | `GenAI` | A language model that writes new text from a prompt. | `docs/02-baseline/ai-qualification.md`. |
 | `ML` | A model trained on past examples to predict a number or a class. The qualification file calls this classical ML. | `ai-qualification.md`. |
 | `API` | The service other programs call. In this repo that service is `apps/api/`. | `main.py` and the docs that describe the three routes. |
-| `HTTP` | The web call and its status number. A refused role today still returns HTTP 200. | Replay log, defect list. |
+| `HTTP` | The web call and its status number. A refused role returns HTTP 403 and writes a `policy.deny` row (since S04-06 Half B). Before that change a refused role returned HTTP 200. The PRD uses 200 for RECOMMEND_ONLY, 202 for HOLD_FOR_REVIEW, 403 for BLOCK, 404 for a missing id, 500 for a missing data file, and 503 for a failed readiness check. | Replay log, defect list, `docs/prd/prd.md` sections 7 and 11. |
 | `GET` | A read call. `GET /records/{id}` reads a device row. | `main.py`. |
 | `POST` | A call that asks the service to do a step. `POST /ai/summarize/{id}` asks for a summary. | `main.py`. |
 | `JSON` | A text shape for an object. Audit lines and the policy input use it. | `audit.py`, `docs/03-identity/policy-input-model.md`. |
@@ -213,8 +224,8 @@ Each row says what the letters stand for in this project, then where they show u
 | `CI/CD` | The path that builds, tests, and releases the software. Challenge 7. `CD` is the release half of that path. | `How the product spine addresses the 16 challenges - plain speak.md`, `playbook/S04-07-cicd.md`. |
 | `ETL` | The batch job that reads a file, counts rows, and writes a count. The guide's words are: extract data, change it, and load it. The comment in `etl/run_daily_batch.py` says malformed rows are counted and left in the file. | `etl/run_daily_batch.py`, the spine note. |
 | `IaC` | Infrastructure as code. The Terraform file `infra/terraform/main.tf` builds no cloud resource. S04-05 Half B corrected it to write one local settings file with no secret. The first comment of the file no longer uses these letters. | `infra/terraform/main.tf`, `docs/05-iac/`, `playbook/S04-05-iac.md`. |
-| `ADR` | Architecture decision record. `docs/ADR/0001-partial-modernization.md` is ADR 0001. `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md` is ADR 0002. It records the owner's decisions on the S05R open items and raised the semantic layer to `1.1.1`. | That file. Project Intent uses the full words "Architecture Decision Record". |
-| `PRD` | The product requirements document. Stage S06 writes it. | `playbook/S06-prd.md`. |
+| `ADR` | Architecture decision record. `docs/ADR/0001-partial-modernization.md` is ADR 0001. `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md` is ADR 0002. It records the owner's decisions on the S05R open items and raised the semantic layer to `1.1.1`. `docs/ADR/0003-s06-risk-recommendations.md` is ADR 0003. It records three decisions: login is out of scope (`D-07`), `GET /records/{id}` refuses a call with no header, and the 300 second answer store never holds an answer that has no text. It added no YAML id, so the layer stays `1.1.1`. `docs/ADR/0004-defer-rq-31-answer-store.md` is ADR 0004. It moves the build of that answer store (`RQ-31`) out of S07. It also added no YAML id. | Those files. Project Intent uses the full words "Architecture Decision Record". |
+| `PRD` | The product requirements document. Stage S06 wrote it: `docs/prd/prd.md`, version v1.1, with 73 requirements. | `playbook/S06-prd.md`, `docs/prd/`. |
 | `FDE` | Forward Deployed Engineer. `Project_Intent.md` says a Forward Deployed Engineer works at the customer site, uses AI under written rules, and leaves a system people can run and explain. Team-Force is the FDE team Mangesh belongs to. | `Project_Intent.md`, operating contract row 10. |
 | `SLA` | The service promise on a circuit. The files use it in `sla_tier` and `sla_breach_risk`. | Domain spec, defect `F19`. |
 | `SLO` | A stated target for the running service, such as how often a request finishes in time. The spine note calls this a service level objective. S04-08 Half A proposes three of them. Each number is PROPOSED, owner Team-Force, and none is a target in `metrics.yaml` yet. | `playbook/S04-08-observability.md`, `docs/08-observability/slo-proposal.md`. |
@@ -253,22 +264,25 @@ These are written in capitals. They are status words, not file-row ids.
 | Word | What it means here |
 |---|---|
 | `RECOMMEND_ONLY` | Show the model text. Leave the stored row unchanged. |
-| `HOLD_FOR_REVIEW` | Stop for a person. A timeout, a bad output shape, or a blank stale topology flag uses this outcome. A held call that never reached the model has `model`, `tokens`, and `latency_ms` empty in its audit row. |
+| `HOLD_FOR_REVIEW` | Stop for a person. A timeout, a bad output shape, or a blank stale topology flag uses this outcome. A held call that never reached the model has `model`, `tokens`, and `latency_ms` empty in its audit row. The PRD returns HTTP 202 for it, with `summary` and `recommendation` empty. A call to the planned `POST /ai/recommend/{id}` to which no failure row applies also ends as HOLD_FOR_REVIEW, with the recommendation sentence, because a person must accept or reject it. |
 | `BLOCK` | Stop the call before the model runs. A missing id or a true stale topology flag is a block. S04-09 Half B follows the YAML on this, and the playbook sentence that says HOLD_FOR_REVIEW was set aside. The audit log writes a block as a `policy.deny` row with `outcome` BLOCK. |
-| `EXECUTE` | Carry out a live change. The model never has this outcome. The summary route never returns it. |
+| `EXECUTE` | Carry out a live change. The model never has this outcome. The summary route never returns it. The PRD builds no route that returns it. EXECUTE needs four gates: a policy allow, a human approval id, an audit row written first, and a reversible and validated change. The fourth gate does not exist in this packet. |
 | `PASS` | The stage or the review check met its gate. |
 | `CONDITIONAL PASS` | The stage met the gate with a named condition still open. |
 | `BLOCKED` | A required piece is missing. The next stage waits. |
 | `FAIL` | A review check did not pass. |
 | `NOT APPLICABLE` | That review check does not apply to this packet. |
 | `DONE` | A playbook or owner-decision row in `playbook/STATUS.md` that is finished. |
-| `PROPOSED` | A design or a number the owner has not accepted in writing. Owner: Team-Force. |
+| `PROPOSED` | A design or a number that is not in the inherited repo. It carries `proposed: true` and the owner Team-Force. ADR 0002 accepted the 120 items and six numbers in writing. The flag stays on after acceptance, because it records where the item came from. The PRD keeps the word on every number, such as the 128 character limit. |
 | `PROVISIONAL` | A contract row the packet left open until the owner confirmed it. Operating contract v1.4 has no remaining provisional row. |
-| `REAL` | A number or a file measured from a run on this machine. Every file in `evidence/`, except its `README.md`, carries this label. |
-| `PRECOMPUTED` | A number calculated ahead of the demo and stored. |
-| `SIMULATED` | A lab figure, such as the token sum in the cost file. It is not a bill. |
+| `REAL` | `Project_Intent - Appendix B.md`: the running app computed this value from the case in front of you. Every file in `evidence/`, except its `README.md`, also carries this label. In the PRD the raw, deduped, and flagged counts of one storm are REAL. |
+| `PRECOMPUTED` | Appendix B: a script computed this value earlier and the screen reads it back. The PRD says the page shows no PRECOMPUTED number. |
+| `SIMULATED` | Appendix B: the value stands in for a live service you did not call. A `local-sim-v1` summary is SIMULATED until a real model is called. The token sum in the cost file is also a lab figure and not a bill. In the PRD `latency_ms` is SIMULATED. |
 | `EDUCATIONAL` | A teaching formula or rate. The token estimate `len(prompt.split()) * 2` stays educational until a real tokenizer is used. The audit field `token_estimate_method` holds the value `word_count_x2_EDUCATIONAL` to say so. The cost rate is 1.0 unit per 1000 tokens. It is a teaching number, not a price. |
-| `DECIDED` | A backlog item whose open choice the owner has settled, with a build stage named. Example: `OB-01` is DECIDED with a cache lifetime of 300 seconds, built in S07. |
+| `DECIDED` | A backlog item whose open choice the owner has settled, with a build stage named. Example: `OB-01` is DECIDED with a cache lifetime of 300 seconds. The build is deferred (ADR 0004). The PRD also uses it in its service level table. "Decided" means the choice is written down. It does not mean the code or the test exists. |
+| `existing` | In the PRD and `traceability.md`: the test is in the repo and was run on 2026-10-12. 29 of the 73 acceptance tests are existing. One of them skips when the `opa` program is missing. |
+| `planned S07` | In the PRD and `traceability.md`: the test does not exist yet. Stage S07 writes it under the name written in the table. 43 tests are planned. A planned test is not evidence until it exists and passes. One more test (`RQ-31`) is marked deferred (ADR 0004). No stage writes it yet. |
+| `Open question for S03:` | The start of a line that names a term a design needs and the YAML lacks. A word on such a line is listed and not defined. S05R decides whether to add it. |
 | `REVISED-S2Q` | The status of `docs/00-contract/cost-envelope.md` after the qualification stage rewrote the hosted-model rows. |
 | `Verified Fact` | A claim that names a file and line, a YAML id, a test name, or a command output the writer ran. The reviews and `semantic-layer-revision.md` use this label. |
 | `Inference` | A claim drawn from facts, with no direct proof. |
@@ -295,7 +309,7 @@ These letters start an id in the synthetic data. The form is in `semantic-layer/
 | `STO-` | An alarm storm batch. | `STO-00002` |
 | `TOP-` | A topology snapshot id on an AI invocation row. | `TOP-00001` |
 | `EVT-` | An event id in `events.jsonl`. | `EVT-0000000` |
-| `APR-` | An approval id. It appears only in the policy fixtures and tests, as a made-up value. No approval store exists, so no real id is checked against a stored yes. | `APR-EXAMPLE-0001` |
+| `APR-` | An approval id. It appears only in the policy fixtures and tests, as a made-up value. No approval store exists yet, so no real id is checked against a stored yes. The PRD (`RQ-32`) says the server makes the approval id for a yes when `POST /approvals/{id}` is built in S07. A no gets no id. The caller never sends one (`RQ-38`). | `APR-EXAMPLE-0001` |
 | `corr-` | A correlation id, when the event has one. The letters are lower case in the data. | `corr-00273` |
 | `-BAD1` | The blank row in a CSV file. The letters in front say which file. | `DEV-BAD1`, `CIR-BAD1`, `ALA-BAD1`, `INC-BAD1`, `SER-BAD1` |
 
@@ -316,6 +330,11 @@ Every item in `semantic-layer/` has an id in dot form. The first word is the kin
 | `policy.` | A named policy block. The ids `policy.opa.admin_any` and `policy.opa.operator_read` are deprecated since 1.1.0. Both name `policy.opa.access_matrix` as the replacement. | `policy.opa.access_matrix` |
 | `status.word.` | A word that appears in a status column of the data. | `status.word.gold` |
 | `status.code.` | A word the code writes, such as an audit action, an error, or a reason. S05R added 47. | `status.code.audit_action.audit_read` |
+| `status.<entity>.<column>.<word>` | One word in one status column of the data. | `status.incident.severity.gold` |
+| `valueset.` | A pool of words that a status column draws from. | `valueset.severity_words` |
+| `relationship.` | A link between two entities. | `relationship.device_has_alarms` |
+| `agency.` | One of four words for how far a step may go: analyse, recommend, decide, execute. | `agency.recommend` |
+| `pick.` | One of four words for what kind of tool does a step: rules, deterministic code, workflow automation, GenAI. | `pick.deterministic_code` |
 | `collision.` | A word used with two meanings. | `collision.gold_bronze_as_severity` |
 | `metric.` | A number the system can report. No metric has a target. | `metric.api_availability` |
 | `field.audit_row.` | One of the 15 keys of the audit row, added in S05R. | `field.audit_row.correlation_id` |
@@ -356,6 +375,39 @@ These names come from S04-08 to S04-12. They are field names, setting names, and
 | `enforced_today` | A flag on each rule in `business-rules.yaml`. It is true when code in `apps/` or `etl/` runs the rule on a live route or in the batch. At `1.1.0` it is true on 9 of 20 rules. | `semantic-layer/business-rules.yaml`. |
 | `deprecated`, `replaced_by` | Two YAML keys added to the schema in S05R. An id marked `deprecated: true` keeps its meaning and names the id that replaces it. | `semantic-layer/schemas/semantic-layer.schema.json`. |
 | `local-sim-v1` | The stub model. Its text is SIMULATED. The repo has no second model version, so `model` and `model_version` hold the same string. | `ai_gateway.py`, `docs/09-ai-guardrails/evidence.md`. |
+
+## Planned for S07
+
+The PRD (`docs/prd/prd.md`) names these routes and names. No code for them exists yet, except `GET /health`, `GET /records/{id}`, `POST /ai/summarize/{id}`, and `GET /audit/{correlation_id}`, which exist today. Stage S07 builds the rest.
+
+| Name | What it is | Requirements |
+|---|---|---|
+| `GET /ready` | A readiness check. It looks at `devices.csv`, `alarms.csv`, a writable audit log, and a loaded policy. It returns HTTP 503 when one check fails. `/health` stays HTTP 200. | `RQ-73` |
+| `GET /alarms/storms/{storm_batch_id}` | Reads one alarm storm. The reply has the keys `raw_count`, `deduped_count`, `flagged_count`, `rows` and `held_aside`. A row with a blank `dedupe_key` is in `held_aside`. Every other row is in `rows`. A row whose `last_seen_at` is before its `first_seen_at` stays in `rows` with a flag word. The key names are PROPOSED. It changes no data and opens no incident. | `RQ-08` to `RQ-15` |
+| `POST /ai/recommend/{id}` | A new model route that the demo page calls. When no failure row applies, the route returns HOLD_FOR_REVIEW with one recommendation sentence. A stop returns BLOCK or HOLD_FOR_REVIEW with no text. | `RQ-18` to `RQ-30`, `RQ-70` and `RQ-71` (`RQ-31` is deferred, ADR 0004) |
+| `POST /approvals/{id}` | The one human decision. `persona.noc_operator` stores yes or no. The server makes the approval id for a yes only. A no has no approval id. Nothing on any device changes. | `RQ-32` to `RQ-41` |
+| `GET /` | One page that walks the demo: pick a storm, read the counts, look up a device, ask for a recommendation, decide, and read the audit chain. It shows an honesty label next to each number. | `RQ-62` to `RQ-65` |
+| `X-User-Role` | The header the caller types to name its role. The words in use are `operator` (`persona.noc_operator`), `engineer` (`persona.network_engineer`), `ai_agent` (`persona.ai_agent`), and `admin` (`role.admin`). The map is `HEADER_ROLE_IDS` in `apps/api/services/policy.py`. The PRD calls the stored role and approver a "claimed role", because nothing proves who typed the word. | `RQ-65`, `RQ-68` |
+| `decision`, `approver` | The two fields of an approval record (`D-03`). `decision` is yes or no. `approver` is a persona id. The YAML ids come in S07 under a new ADR. | `RQ-32` |
+| `record_id` | The 16th key of the audit row (`D-06`). It holds the device id that a call asked for. | `RQ-41` |
+| final-action key | A key on the audit row (`D-05`) that says what finally happened to a device. Its value is `none` on every route in the PRD, because no route changes a device. The PRD does not give the key a name. | `RQ-40` |
+| answer store | The 300 second store of model answers (`OB-01`). It is not built in S07 (`RQ-31` is deferred, ADR 0004). Once built, two calls that build the same `prompt_hash` inside 300 seconds call the model once. It never holds an answer that has no text (a BLOCK, or a HOLD_FOR_REVIEW with no sentence). It does hold a HOLD_FOR_REVIEW answer that has a sentence. | `RQ-31` |
+| near-miss list | A PROPOSED list of phrases that mean the same as a command phrase but use other words. A hit is held with no text. The first list is written in S07 under a later ADR. | `RQ-71` |
+| command-phrase list | A short PROPOSED list of phrases such as reboot, restart, shut down, delete, clear config, push config, and apply (`D-08`). A model answer that holds one is held with no text. | `RQ-30` |
+
+## Words the PRD uses that the semantic layer lacks
+
+The S06R review (`docs/prd/prd-review.md`, check `P2`) found these words in the PRD. None has a glossary row or a YAML id. Each is now on an "Open question for S03:" line in `docs/prd/prd.md` section 15, so the PRD lists it and gives it no YAML id. The rows above explain them so a reader can follow the PRD. They are not definitions for the project. S05R settles each word if Team-Force wants a YAML id for it.
+
+| Word | Where the PRD uses it |
+|---|---|
+| answer store, stored answer, cache | `RQ-31` |
+| near-miss phrase, near-miss list | `RQ-71` |
+| claimed role | `RQ-65`, `RK-01` |
+| raw count, flagged count | `RQ-08`, the label table in section 8 |
+| `decision` and `approver` fields | `RQ-32` |
+| `record_id` as the 16th audit key | `RQ-41` |
+| the final-action key | `RQ-40` |
 
 ## Code comments
 

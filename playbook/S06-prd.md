@@ -55,7 +55,7 @@ Exclude: code; any term or status word that is not in the YAML; any requirement 
    - D-12: production would keep rotation records in a secret manager. The lab uses `docs/04-secrets/rotation-log.md`, which has no entries.
    - P-02: four scopes need data that the CSV files do not hold.
    - P-10: three rules have `enforced_today: false` (`rule.policy_copies_agree`, `rule.repeat_event_is_one_event`, `rule.order_attempt_same_retry_is_one_attempt`).
-   - The 14 deferred items (D-01, D-02, D-04, D-05, D-07, D-09, D-10, D-11, D-14, D-15, D-17, D-18, D-19, D-20) listed as open items, each with its trigger.
+   - The 13 deferred items (D-01, D-02, D-04, D-05, D-09, D-10, D-11, D-14, D-15, D-17, D-18, D-19, D-20) listed as open items, each with its trigger. D-07 is decided in ADR 0003 and is not on this list.
    Every number the PRD cites that is in ADR 0002 keeps the word PROPOSED, with owner Team-Force, unless the table says it is decided.
 For each requirement: id, text, YAML id, test, source design.
 
@@ -92,7 +92,7 @@ For each requirement: id, text, YAML id, test, source design.
 PASS when every requirement has a YAML id and a named test, the PRD and the YAML do not disagree on any term, the demo flow is picked with a reason, and the two required "will not implement" sentences are present. CONDITIONAL PASS when one acceptance test is "planned" with the stage that writes it. BLOCKED when any requirement has no YAML id or the PRD defines a term on its own.
 
 ## Lifecycle linkage
-Cite ai-qualification.md, `semantic-layer/README.md` and semantic-layer-revision.md for the version, ADR 0002 for the decisions, the semantic-layer files by id, and the Phase 4 and 5 design files. ADR 0002 is the last YAML change before this PRD. Any later YAML change needs a new ADR, and the version in the PRD header must then change with it. Stage S06R reviews this PRD before S07. Stage S07 builds only what this PRD names. Stage S08 gives the same PRD and the same YAML version to the second model.
+Cite ai-qualification.md, `semantic-layer/README.md` and semantic-layer-revision.md for the version, ADR 0002 for the decisions, the semantic-layer files by id, and the Phase 4 and 5 design files. ADR 0002 is the last YAML change before this PRD. Any later YAML change needs a new ADR, and the version in the PRD header must then change with it. Stage S06R reviews this PRD before S07. When S06R has a FAIL row, stage S06F applies its "Fixes required" list, then S06R runs again. Stage S07 builds only what this PRD names. Stage S08 gives the same PRD and the same YAML version to the second model.
 
 ## Required final response
 1. Stage status: PASS, CONDITIONAL PASS, or BLOCKED, with one sentence why.

@@ -21,7 +21,7 @@ Claim labels: **Verified Fact**, **Inference**, **Assumption**, **Unknown**. Num
 
 | Id | Item | Saving mechanism | Metric that shows it | Saving figure | Owner | Status |
 |---|---|---|---|---|---|---|
-| OB-01 | Cache repeated prompts by `prompt_hash` | Same prompt text gets the stored answer. No second model call. | `metric.tokens_per_invocation` (sum over a window) | 4 of 5 calls saved in the DR-3 case. EDUCATIONAL. | Team-Force | DECIDED lifetime 300 s. Build in S07. |
+| OB-01 | Cache repeated prompts by `prompt_hash` | Same prompt text gets the stored answer. No second model call. | `metric.tokens_per_invocation` (sum over a window) | 4 of 5 calls saved in the DR-3 case. EDUCATIONAL. | Team-Force | DECIDED lifetime 300 s. Build deferred (ADR 0004). |
 | OB-02 | Batch alarm summaries per `storm_batch_id` | One call for the whole batch, not one per alarm. | `metric.alarm_storm_size`, `metric.tokens_per_invocation` | 3 of 353 calls in the file. EDUCATIONAL. | Team-Force | PROPOSED |
 | OB-03 | No model call for the eight capabilities S2Q gave to rules | A guard allows a model call only for the three GenAI capabilities. | `metric.ai_outcome_count`, `metric.retry_count` | Avoids the retry what-if of 84,878.46 educational units. EDUCATIONAL. | Team-Force | PROPOSED |
 | OB-04 | Replace the word-count formula and the teaching rate | A real tokenizer and a real price turn EDUCATIONAL numbers into REAL ones. | `metric.tokens_per_invocation`, `metric.cost_per_correlated_incident` | None. This item makes the others measurable. | Team-Force | PROPOSED only |
@@ -34,7 +34,7 @@ Every saving figure above is explained in its own section.
 | | |
 |---|---|
 | What happens today | **Verified Fact.** The summary route has no idempotency key. Five identical calls make five model calls and five audit rows (`recovery-evidence.md` DR-3, test `test_dr3_the_summary_route_has_no_key_so_five_calls_cost_five_model_calls_and_five_rows`, REAL). |
-| Proposed change | Before a model call, look up the `prompt_hash` of the prompt. If a stored answer exists for that hash, return it. Run the output policy on that answer again. Write an audit row that says no model ran. |
+| Proposed change | Before a model call, look up the `prompt_hash` of the prompt. If a stored answer exists for that hash, return it. Run the output checks on that answer again. Write an audit row that says no model ran. |
 | Saving mechanism | A repeat of the same prompt costs 0 tokens. The first call pays. In the DR-3 case, 1 call instead of 5. That saves 4 calls and, at 90 tokens a call, 360 tokens. Both figures EDUCATIONAL. |
 | Metric | `metric.tokens_per_invocation`, read as the sum of `tokens` over a window. The sum falls when repeats are served from the cache. |
 | Measured repeat rate in stored data | 0 repeated `payload_hash` values in `events.jsonl` (SIMULATED). `payload_hash` is the hash of an event, not of a prompt, so this says nothing about prompts. `ai_invocations.csv` has no `prompt_hash` column. The live repeat rate is **Unknown**. |
@@ -119,16 +119,16 @@ Mangesh (FDE) asked for final values. Owner of both: Team-Force. Neither value i
 | | |
 |---|---|
 | Value | A stored answer may be reused for 300 seconds (5 minutes) from the moment it was stored. |
-| Status | DECIDED. Not measured. Built in stage S07. Owner: Team-Force. |
+| Status | DECIDED. Not measured. The build is deferred (ADR 0004). Owner: Team-Force. |
 | Why 300 seconds | The cache exists to stop the same person or system asking the same question again and again in a short time. The S04-11 drill DR-3 shows that case: five identical calls in a row. In a network operations centre a person watches one incident for a few minutes, refreshes, and asks again. Five minutes covers that. It is also short against the life of an alarm storm, so an answer about a changing situation does not stay long. It is 30 times the 10 second model timeout and 10 times the 30 second breaker window, so one outage does not outlive the cache by much. |
-| What goes in the cache | An answer is stored only when the outcome is `RECOMMEND_ONLY`. A `BLOCK`, a `HOLD_FOR_REVIEW`, a timeout, and a bad answer are never stored. |
-| What the key holds | `prompt_hash`, `model_version`, and the policy version. A change in any one gives a new key. |
+| What goes in the cache | An answer is stored only when it has text and passed every output check. A BLOCK, a HOLD_FOR_REVIEW with no text, a timeout and a bad answer are never stored. |
+| What the key holds | `prompt_hash` alone (RQ-31 in the PRD). One stub model and one policy version exist in this packet, so no other key part is needed. |
 | What runs before the cache | The access check and the stale-flag check run first, every time. A true or blank stale flag stops the call before the cache is read. The output check runs again on a stored answer before it is shown. |
-| Clear at once | The cache is emptied when the policy version or the model version changes. |
-| Size limit | 500 stored answers in memory, oldest removed first. One process only, like the dedupe memory and the audit lock (`recovery-evidence.md`). A restart empties it. |
-| Audit | A cache hit writes an audit row with `model` null, `tokens` null, `latency_ms` null, and `outcome` `RECOMMEND_ONLY`. The row must say a stored answer was used. Open question for S03: the audit row has no field for "served from cache". This design needs one, so a cache hit is not counted as a held row or a model call. |
+| Clear at once | No rule empties the store before its 300 seconds are up. A restart empties it. |
+| Size limit | The cap on stored answers is PROPOSED. Owner: Team-Force. No number is set (ADR 0003 decision 3). One process only, like the dedupe memory and the audit lock (`recovery-evidence.md`). A restart empties it. |
+| Audit | A cache hit writes an audit row with `model` null, `tokens` null, `latency_ms` null, and `outcome` `HOLD_FOR_REVIEW`. The row must say a stored answer was used. Open question for S03: the audit row has no field for "served from cache". This design needs one, so a cache hit is not counted as a held row or a model call. |
 | What it saves | In the DR-3 case, 4 of 5 calls and 360 tokens. EDUCATIONAL. The live repeat rate is Unknown. |
-| Review trigger | Stage S07 traffic shows the real gap between repeat calls. `metrics_from_audit.py` already prints the share of calls that repeat a `prompt_hash`. If most repeats come after more than 300 seconds, lengthen it. If the policy or the device data changes more often than every 5 minutes, shorten it. |
+| Review trigger | Traffic after the store is built (ADR 0004 defers the build) shows the real gap between repeat calls. `metrics_from_audit.py` already prints the share of calls that repeat a `prompt_hash`. If most repeats come after more than 300 seconds, lengthen it. If the policy or the device data changes more often than every 5 minutes, shorten it. |
 
 Telecom reason for the short lifetime. A device summary describes alarms and topology that can change within minutes during a fault. A stale recommendation is worse than a repeated model call, because a person may act on it. The cost of the extra call is small (0.09 educational units on the live prompt).
 
@@ -138,7 +138,7 @@ PROPOSED order. Owner: Team-Force. The order is by effort and risk, and it is no
 
 1. OB-03. A guard and a test. It stops the worst cost mistake.
 2. OB-04. It makes every later saving measurable. It needs a chosen model.
-3. OB-01. The lifetime is decided. The build waits for stage S07.
+3. OB-01. The lifetime is decided. The build is deferred (ADR 0004).
 4. OB-02. It waits for stage S07 and for allowed alarm fields.
 
 ## Findings
@@ -167,4 +167,4 @@ PROPOSED order. Owner: Team-Force. The order is by effort and risk, and it is no
 
 ## Lifecycle
 
-`finops-dashboard-fields.md` lists the audit fields behind each metric named above. Half B computes `metric.tokens_per_invocation` and counts held rows. Stage S07 builds the route that would use OB-01 and OB-02. Stage S09 cites OB-05 as a cost guard.
+`finops-dashboard-fields.md` lists the audit fields behind each metric named above. Half B computes `metric.tokens_per_invocation` and counts held rows. Stage S07 builds the route that would use OB-02. OB-01 is deferred (ADR 0004). Stage S09 cites OB-05 as a cost guard.

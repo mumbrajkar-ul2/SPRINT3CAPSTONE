@@ -262,7 +262,7 @@ Mangesh (FDE) asked for final values for the two PROPOSED items. Owner: Team-For
 | Item | Decision | Label |
 |---|---|---|
 | Educational rate | Keep 1.0 educational unit per 1000 tokens. Not money. | EDUCATIONAL |
-| Cache lifetime for OB-01 | 300 seconds. Only `RECOMMEND_ONLY` answers are stored. The cache is emptied when the policy version or the model version changes. At most 500 answers. Built in S07. | DECIDED, not measured |
+| Cache lifetime for OB-01 | 300 seconds. The build is deferred (ADR 0004), so S07 does not build the answer store. The rules for a later build are in RQ-31 of `docs/prd/prd.md`. The cap on stored answers is PROPOSED. Owner: Team-Force. No number is set. | DECIDED, not measured |
 
 The reasons and the review triggers are in `optimization-backlog.md`, section "Decisions". No code changed for these decisions. The rate was already 1.0. The cache is not built.
 

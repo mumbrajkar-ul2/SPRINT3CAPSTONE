@@ -61,7 +61,7 @@ Exclude: fixing either app; changing the YAML.
 ## Required analysis
 1. Confirm the SHA-256 of every file under semantic-layer/ and prd.md is unchanged. Write docs/model-comparison/yaml-hashes-after.md and compare.
 2. Run the same suites against both apps: semantic-layer tests, policy tests, guardrail tests, app tests. Record pass and fail counts per suite per app.
-3. Compare, one table per item: status words used (any word not in status-taxonomy.yaml is drift); rule ids honoured (grep both apps for rule. ids); routes built versus the PRD list; test pass counts; guardrail outcomes on the same abuse inputs (hostname injection, mgmt_ip present, timeout); latency and token cost on the same calls (labels); places where the second model invented meaning (quote the run log).
+3. Compare, one table per item: status words used (any word not in status-taxonomy.yaml is drift); rule ids honoured (grep both apps for rule. ids); routes built versus the PRD list; test pass counts; guardrail outcomes on the same abuse inputs (hostname injection, mgmt_ip present, timeout); latency and token cost on the same calls (labels); places where the second model invented meaning (quote the run log).For each difference between the two apps, say whether S07 listed a related gap in the 'PRD gaps' section of docs/demo/evidence.md. Mark each difference 'listed gap' or 'unlisted'. An unlisted difference is evidence that S07 resolved something quietly or read a file the second model did not get.
 4. Verdict: did meanings drift? Where did the apps differ, and does the difference matter to a user? What did the YAML prevent, and what did it fail to prevent?
 For each finding: finding, evidence, impact, risk, confidence, open questions.
 

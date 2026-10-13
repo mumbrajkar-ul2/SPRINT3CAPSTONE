@@ -8,7 +8,7 @@
 | Status | Accepted on 2026-10-12. Mangesh (FDE) decided for Team-Force by the instruction "Proceed with the recommended decisions in S05R_Decisions.md". Each decision below is the recommendation in that file. |
 | Evidence sources | `docs/02-baseline/S05R_Decisions.md` (the options and the reasons for each item); `docs/02-baseline/semantic-layer-revision.md` (the deferred list D-01 to D-20); `docs/00-contract/operating-contract.md` row 10 (Team-Force owns open choices) |
 | Assumptions | (1) Mangesh (FDE) speaks for Team-Force on these choices. (2) The word "decided" here means the choice is made and written down. It does not mean the code or the test exists. |
-| Unresolved issues | The letters of MAESTRO (D-20) are Unknown. Whether a login system is in scope (D-07) is Unknown. A real model is not in use, so every time and cost number is from a stub. |
+| Unresolved issues | The letters of MAESTRO (D-20) are Unknown. Whether a login system is in scope (D-07) is Unknown. **Update, 2026-10-13.** ADR 0003 decided D-07: login is out of scope for this packet. A real model is not in use, so every time and cost number is from a stub. |
 | Residual risks | Three decisions (D-03, D-06, D-08) are made here but built in stage S07. Until S07 the code does not match them. |
 
 Claim labels: **Verified Fact**, **Inference**, **Assumption**, **Unknown**.
@@ -91,7 +91,7 @@ Each number came from a design or a stub. None was measured with a real model. *
 
 - Version `1.1.1` is the layer that stage S06 and later stages cite.
 - Stage S07 has three decided items to build (D-03, D-06, D-08). Each needs code, a test, and an ADR for its new YAML ids.
-- 14 deferred items stay open, each with a named trigger.
+- 14 deferred items stay open, each with a named trigger. Update 2026-10-13: ADR 0003 later decided D-07 (login is out of scope for this packet), so 13 items stay deferred.
 - No AI use gains execute agency from any decision here.
 - No code, Rego, CI file, Terraform, fixture, or `policy_data.json` changes.
 

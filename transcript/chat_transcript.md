@@ -5958,3 +5958,1826 @@ I applied the updates. Nothing was run, because only playbook and record files c
 I checked one fact while editing. The three audit action words are `audit.read`, `audit.not_found`, and `audit.id_refused`, from `apps/api/main.py` and the S05R playbook. I had first written them wrongly in my own draft and corrected the row.
 
 I left `S03R`, `S05R`, and the `README.md` row D7 as they were. They still say "S05R version" in a few places. That wording is harmless, because S08 now checks the version against the README.
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT for S06 â€” Product Requirements Document. Write the PRD for the governed application in `06-telecom-service-network-incident-ops`. Create `docs/prd/prd.md` and `docs/prd/traceability.md`. Every requirement cites at least one semantic-layer YAML id. Every acceptance check names a test (existing, or planned with the stage that writes it). Classify the four flows and three AI products (Project_Intent 5.2, with `ai-qualification.md` as the only source for AI pick and agency). Pick the demo flow (recommended: topology lookup, AI recommendation, human decision, with alarm-storm dedupe as the deterministic step). Write Users, Workflows, AI limits, Data, Risk, Non-functional needs, Acceptance checks and Success metrics. List the routes to implement (`/health`, `/records/{id}` with 404, `/alarms/storms/{storm_batch_id}`, `/ai/recommend/{id}`, `/approvals/{id}`, `/audit/{correlation_id}`, `POST /ai/summarize/{id}`) and the routes it will not implement, with a reason each, including the two required sentences. No EXECUTE route unless all four gates exist. Carry in the decisions and limits from ADR 0002 and `S05R_Decisions_Taken.md` (D-07, D-03, D-06, D-08, D-05, D-12, P-02, P-10, the 14 deferred items, PROPOSED numbers). Use the semantic-layer version from the README in the header. Plain speech. Do not define terms. No invented thresholds. Each artifact starts with a header table. Give the 7-part final response.
+
+### Assistant
+
+**1. Stage status: CONDITIONAL PASS.** All 67 requirements cite a YAML id and name a test. 29 of those tests exist and 38 are planned for stage S07, so the gate is conditional.
+
+**2. Key findings**
+
+- **Version gate passes.** The semantic layer is `1.1.1` in the README, the revision file header, ADR 0002 and all seven YAML files. `build.py --check` passed and 41 semantic-layer tests passed.
+- **Demo flow.** Topology lookup, then an AI recommendation, then a human decision. Alarm-storm dedupe is the first step. The reason: the recommendation changes no device, and most of the code and tests for it already exist.
+- **Routes.** S07 builds seven routes and a page. Two are new (`/alarms/storms/{storm_batch_id}`, `/ai/recommend/{id}`) and one is new in behaviour (`/approvals/{id}`). `GET /records/{id}` gains a 404 and leaves out `mgmt_ip` and `credential_profile` for everyone except the network engineer (TA-15). The not-built list has 13 rows, each with a reason. Both required sentences are in section 9.
+- **No EXECUTE route.** Three of the four gates will exist after S07. The fourth (a reversible validated change) does not exist, so no route is built.
+- **Policy detail the S07 playbook gets wrong.** Policy row O2 makes a healthy recommendation HOLD_FOR_REVIEW (HTTP 202). The playbook lists RECOMMEND_ONLY as a result of `/ai/recommend`. The PRD follows the policy.
+- **The 14 deferred items** each appear with their trigger. D-03, D-06, D-08, D-12 and D-16 become requirements. D-05's log-mix limit has direct evidence: running the 67 cited tests appended 4 lines to `logs/audit.log`. I reverted that file with `git checkout`.
+- **Every YAML id was looked up** in the seven YAML files (0 missing). Every existing test name was found in its file. Running the existing tests gave 101 passed, 2 skipped (both need `opa`).
+
+**3. Major risks**
+
+- The role is a word the caller types, so `approver` and `actor` are claims, not proof of who the person is.
+- `GET /records/{id}` still fills in `operator` when no header arrives (F15). I left it visible and did not change it.
+- The command-phrase list is short and misses phrases. The model answer is not checked for forbidden values.
+- The audit log is a plain file. Test rows and real rows are mixed.
+- Eleven rules still say `enforced_today: false`. The PRD lists each and says which ones S07 turns on.
+- 38 tests are planned, so most acceptance checks are not evidence until S07 writes them.
+
+**4. Assumptions and unknowns**
+
+- **Proposed, needs your confirmation:** a login system is out of scope (D-07). Owner: Team-Force.
+- **Judgment calls I made:**
+  - RQ-05 and RQ-06 require leaving `mgmt_ip` and `credential_profile` out of the record body for every role except the network engineer. This enforces TA-15, which ADR 0002 accepted but the route does not enforce yet.
+  - RQ-31 adds the 300 second answer store. `OB-01` decided it and says "build in S07", but the S07 playbook does not list it.
+  - Who may call each route is my reading of access matrix rows TA-01 to TA-35.
+- **Unknown:** how `/approvals/{id}` finds the recommendation it decides on (left to S07, RQ-34). Whether the answer store key needs the route name. The MAESTRO letters. Any real model time or cost.
+- **Open question for S03 (two, non-blocking):** the four honesty labels have no YAML id. "Degraded mode" has no concept id. I cannot rerun S05R from here. The PRD uses both without defining them.
+- **Stale text found, not edited:** `semantic-layer-revision.md` line 442 still says "S06 writes `1.1.0`". The S07 playbook says the approval takes "a reason", but D-03 names only `decision` and `approver`.
+
+**5. Artifacts created**
+
+- `06-telecom-service-network-incident-ops/docs/prd/prd.md`
+- `06-telecom-service-network-incident-ops/docs/prd/traceability.md`
+
+**6. Blocking issues:** None. No requirement lacks a YAML id, and the PRD defines no term.
+
+**7. Recommended next action:** Run S06R (the PRD review). Before it, decide three things: the D-07 login scope, whether `GET /records/{id}` should refuse a call with no header (SB-01), and whether RQ-31 (the answer store) stays in S07 scope. Then run S07 and write the 38 planned tests under `tests/app/`.
+
+## 2026-10-12 19:57
+
+**Model:** Cursor Grok 4.6
+
+### User
+
+Risk Management.md: recommendations for PRD section 12. Implement the plan as specified. Do NOT edit the plan file itself.
+
+### Assistant
+
+I wrote `06-telecom-service-network-incident-ops/docs/prd/Risk Management.md`. The PRD is unchanged. The new file gives a recommendation for each of the 17 risks in section 12 (RK-01 to RK-17).
+
+| Action | Risks |
+|---|---|
+| Decide, then Accept for the lab | RK-01 (login out of scope) |
+| Fix | RK-02 (no-header default), RK-03 (header text stored as sent), RK-16 (`opa` in CI) |
+| Fix and Accept | RK-08 (split the test log now; accept the file store) |
+| Build | RK-04 (check the model answer), RK-11 (readiness route) |
+| Accept, with a process | RK-05 (short phrase list) |
+| Accept, small or optional Build | RK-09 (size limits after Team-Force names them), RK-10 (optional held-case list) |
+| Accept | RK-12, RK-15, RK-17 |
+| Defer | RK-06, RK-07 |
+| Fix by process | RK-13 (update YAML flags after S07) |
+| Decide | RK-14 (keep or drop RQ-31) |
+
+First five to act on: RK-02, the RK-08 test-log split, the RK-01 decision, RK-04 and RK-05, then RK-11.
+
+Three Team-Force decisions stay open: D-07 login scope, F15 on `/records`, and whether RQ-31 stays in S07. Section 6 lists the seven proposed PRD requirements that follow if those decisions go the recommended way. Section 7 is the accepted-risk table S09 can copy into `risk-owner-table.md`.
+
+I checked the cited YAML ids, SB ids and the two existing test names. They exist. The planned tests are named as planned. Status of this file: CONDITIONAL PASS, because the three decisions and the seven proposed requirements are still open.
+
+Recommended next action: confirm the three decisions at S06R, then add the matching rows from section 6 to the PRD before S07.
+
+## 2026-10-12 20:03
+
+**Model:** Cursor Grok 4.6
+
+### User
+
+proceed with the recommendations for the Risks
+
+### Assistant
+
+I applied the recommended risk actions. The code stays for S07. The records and the PRD now name the work.
+
+**Decisions (ADR 0003)**
+- D-07: login is out of scope for the lab. `approver` and `actor` are shown as claimed role.
+- F15: `GET /records/{id}` refuses a call with no header (RQ-68).
+- RQ-31: the 300 second answer store stays. It never holds BLOCK or HOLD. The cap is PROPOSED and has no number.
+
+**New requirements in PRD v1.1**
+- RQ-68 no-header 403 on `/records`
+- RQ-69 unknown role word is not stored as sent
+- RQ-70 forbidden value in the model answer is held
+- RQ-71 near-miss command phrase is held
+- RQ-72 app tests do not write to `logs/audit.log`
+- RQ-73 `GET /ready` returns 503 when a dependency is down
+
+The PRD now has 73 requirements. 29 tests exist. 44 are planned for S07. The two required "will not implement" sentences are still present. Three Open questions for S03 stay open (unknown-role word, answer failmode, readiness status id). No YAML id was invented.
+
+**Files**
+- `06-telecom-service-network-incident-ops/docs/ADR/0003-s06-risk-recommendations.md`
+- `06-telecom-service-network-incident-ops/docs/prd/prd.md` (v1.1)
+- `06-telecom-service-network-incident-ops/docs/prd/traceability.md` (v1.1)
+- `06-telecom-service-network-incident-ops/docs/prd/Risk Management.md` (v1.1)
+- `06-telecom-service-network-incident-ops/docs/02-baseline/S05R_Decisions_Taken.md` (D-07 note)
+
+**Stage status: CONDITIONAL PASS.** Every requirement has a YAML id and a named test. The new tests are planned for S07.
+
+**Recommended next action:** Run S06R on PRD v1.1, then run S07 and write the 44 planned tests, starting with RQ-68, RQ-72, RQ-70, RQ-71 and RQ-73.
+
+## 2026-10-12 21:21
+
+**Model:** Cursor Grok 4.6
+
+### User
+
+Switched to Agent mode for those inputs and checks to be written in @playbook/S06R-prd-review.md. Proceed.
+
+### Assistant
+
+Updated `playbook/S06R-prd-review.md` so the reviewer sees PRD v1.1 and ADR 0003. The stage is still review-only. It still writes only `docs/prd/prd-review.md`.
+
+**Inputs added**
+- `docs/prd/Risk Management.md`
+- `docs/02-baseline/semantic-layer-revision.md`
+- `docs/02-baseline/S05R_Decisions_Taken.md`
+- `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`
+- `docs/ADR/0003-s06-risk-recommendations.md`
+- `Project_Intent.md` Appendix B
+
+**Prompt changes**
+- Scope now includes those files. Exclude now covers the PRD, the risk file, the ADRs, and the YAML.
+- P1 names RQ-01 to RQ-73 and says a planned S07 test name still counts.
+- P2 PASSes two listed-and-not-defined cases only: an "Open question for S03" line, and the four honesty labels from Appendix B.
+- P6 and P10 now require `GET /ready`, the no-header 403 on `/records`, and login off the implement list.
+- P13 is new: version `1.1.1` matches across the PRD, the README, and the revision file; ADR 0003 added no YAML id; the three ADR 0003 decisions and the 13 deferred items match the PRD.
+- Locked facts table added. Version mismatch marks P13 FAIL and the stage BLOCKED.
+- BLOCKED now includes P2 and P13, as well as P1, P3, P4, and P9.
+- Expected output is thirteen check rows plus the eight failure-list rows.
+
+The next step is to run S06R in a fresh chat with this prompt.
+
+
+
+## 2026-10-12 21:50
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT for S06R — PRD review (stage prompt from `playbook/S06R-prd-review.md`): review the PRD as an independent reader and decide whether a builder could build the governed application from the PRD plus the semantic layer with no other source. Do not fix anything. Report. Checks P1 to P13 (requirement ids, YAML ids and tests; terms in glossary or YAML; AI limits quoted from ai-qualification.md; no EXECUTE route without four gates; demo flow with verbs and personas; routes-not-implemented list; honesty labels; PROPOSED and owner on every number; acceptance checks; inherited gaps; plain speech on three random requirements; failure list items 1 to 8; version match 1.1.1 and ADR 0003 meaning). Required artifact: `06-telecom-service-network-incident-ops/docs/prd/prd-review.md`. Gate: PASS when no row is FAIL; CONDITIONAL PASS when every FAIL is in P8 or P11; BLOCKED when any of P1, P2, P3, P4, P9 or P13 is FAIL. Required final response: seven items. Inputs attached: prd.md, traceability.md, Risk Management.md, semantic-layer, ai-qualification.md, semantic-layer-review.md, semantic-layer-revision.md, S05R_Decisions_Taken.md, docs/ADR, Project_Intent - Appendix B.md, playbook/README.md.
+
+### Assistant
+
+**1. Stage status: BLOCKED.** P2 is FAIL: the PRD uses seven words that are in neither `glossary.md` nor a YAML file, and none is on an "Open question for S03:" line. P7, P8 and P11 are also FAIL.
+
+**2. Key findings**
+- **PASS rows:** P1, P3, P4, P5, P6, P9, P10, P12 rows 1 to 7, and P13.
+- **P1:** All 73 requirements (RQ-01 to RQ-73) have a YAML id that resolves among the 757 ids, and a test name. `traceability.md` matches the PRD on all 73 rows. I ran the 29 existing tests: 40 items passed and 1 skipped (the `opa` test). `build.py --check` and the 41 semantic-layer tests pass.
+- **P13:** The version is `1.1.1` in `semantic-layer/README.md`, the PRD header and the `semantic-layer-revision.md` header. The id count is unchanged at 757, so ADR 0003 added none. The 13 deferred items are correct, and D-07 is decided.
+- **P2 (FAIL):** The undefined words are: answer store; near-miss phrase; claimed role; raw count and flagged count; the `decision` and `approver` fields; `record_id`; the final-action key. The last three come from ADR 0002 and are mild. The PRD's own gate row (line 578) says "No term is defined here", which is wrong.
+- **P7 (FAIL):** RQ-65 puts the `cannot_prove` list on the page. Two of its lines print a log-line count (`audit_query.py` lines 138 to 147). The label table has no row for those numbers.
+- **P8 (FAIL, minor):** RQ-69 states the 128 limit with no PROPOSED word and no owner in that row.
+- **P11 (FAIL):** From three random picks, RQ-40 (final-action key) and RQ-54 (breaker) leave a reader without a picture. RQ-72 is clear.
+- **Builder gaps:** Nothing links the storm step to the device lookup, because the storm response is not required to carry `device_id`. The approval route has no input or output spec. The final-action key and the new audit action words have no names. Four existing tests lock the behaviour that RQ-03 and RQ-68 remove, and the PRD names none of them.
+
+**3. Major risks**
+- Two builders, or the S08 second model, would fill the gaps in section 7 differently.
+- The layer version will change in S07, because new YAML ids need a new ADR. The PRD header, `traceability.md` and the S08 hash step then need the new version.
+- 44 of 73 tests are planned. A planned test is not evidence until it exists.
+
+**4. Assumptions and unknowns**
+- I read "term" as a domain or status word. Labels such as `existing` and `DECIDED` do not count.
+- The old caveat in `Risk Management.md` said the challenge guide PDF was not searched. I searched its text and found no login requirement. This supports D-07.
+- Running the 29 tests appended to `logs/audit.log`. I saved the file first and restored it (240 lines before and after).
+- Unknown: whether Team-Force wants YAML ids for the four words in F-1, or prefers rewording.
+
+**5. Artifacts created**
+- `06-telecom-service-network-incident-ops/docs/prd/prd-review.md`. It has the header table, the P1 to P13 rows, the P2 and P11 detail, "Fixes required" (F-1 to F-9), other findings (O-1 to O-5) and a verdict on the build question.
+- I edited no PRD, ADR, `Risk Management.md` or `semantic-layer/` file.
+
+**6. Blocking issues**
+- F-1 to F-3 (P2): undefined words. Add Open question lines, or reword with glossary terms.
+- F-4 (P7): add a label row for the `cannot_prove` counts.
+- F-5 (P8): add PROPOSED and the owner to RQ-69.
+- F-6 and F-7 (P11): rewrite RQ-40 and RQ-54.
+- F-9 (O-1 to O-5): close the five builder gaps.
+
+**7. Recommended next action**
+Re-run S06 in a fresh chat with F-1 to F-9 as its input. Apply the fixes to `prd.md` and `traceability.md`, then re-run S06R. Start S07 only when that run has no FAIL in P1, P2, P3, P4, P9 or P13.
+
+
+## 2026-10-12 22:10
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+update @Project_Acronyms.md based on the last set of playbook stages that were run
+
+### Assistant
+
+I updated `Project_Acronyms.md` to v1.4. It now covers the S05R decisions (ADR 0002), S06, ADR 0003, and S06R.
+
+**New labels**
+- `P-01` to `P-12` (S05R bundles) and `N-01` to `N-06` (PROPOSED numbers).
+- `RQ-01` to `RQ-73` (PRD requirements) and `RK-01` to `RK-17` (PRD risks).
+- `P1` to `P13` and `P12.1` to `P12.8` (S06R checks), `F-1` to `F-9` (S06R fixes), and `O-1` to `O-5` (S06R other findings).
+
+**Updated rows**
+- `D-xx`: five decided, one closed, `D-07` decided in ADR 0003, 13 still deferred.
+- `S05R`: layer is now `1.1.1`.
+- `S06`: CONDITIONAL PASS, 73 requirements, 44 planned tests.
+- `S06R`: BLOCKED. Check `P2` is FAIL, and `P7`, `P8` and `P11` are FAIL.
+- `S07`: may start after S06R has no FAIL in `P1`, `P2`, `P3`, `P4`, `P9` or `P13`.
+- `ADR` (adds ADR 0003), `PRD`, `D5`, `OB-01`, `SB-01`, `PROPOSED`, `DECIDED`, `APR-`, `EXECUTE` and `HOLD_FOR_REVIEW`.
+- `REAL`, `PRECOMPUTED` and `SIMULATED` now use the Appendix B meanings.
+- `HTTP`: it said a refused role returns 200, which has been wrong since S04-06 Half B. It now says 403 and lists the status numbers the PRD uses.
+
+**New rows and sections**
+- Words `existing`, `planned S07` and `Open question for S03:`.
+- YAML prefixes `valueset.`, `relationship.`, `agency.`, `pick.` and the status column forms.
+- A section "Planned for S07": `GET /ready`, the storm route, `POST /ai/recommend/{id}`, `POST /approvals/{id}`, the page, the `X-User-Role` word map, and the planned audit fields.
+- A section that lists the seven PRD words with no glossary row or YAML id, as found by S06R.
+
+**Shared labels**
+The header now lists the new pairs that differ only by a hyphen or a leading zero: `P-xx` and `P1`, `F-x` and `F01`, `O-x` and `O1`, and `RK-xx` and `R01`.
+
+`playbook/STATUS.md` has no lines for S06, ADR 0003 or S06R. I did not change it.
+
+
+## 2026-10-12 22:15
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+how can the Expected output section  in@playbook/S06R-prd-review.md propose that it must contain thirteen check rows plus eight failure-lost rows? it should be left to the prompt to analyse and get this data based on its analysis using AI, correct?
+
+### Assistant
+
+Partly. The counts are not AI findings, but the results in each row are.
+
+**Where the counts come from**
+- The "Expected output" table sits outside the fenced prompt block. The model never sees it.
+- The README tells you to use it as a checklist: "Check the output against **Expected output** and the **Done test**" (`playbook/README.md`, step 4).
+- The thirteen rows are the checks P1 to P13 that the prompt defines. The prompt says "Write one row per check."
+- The eight rows are the failure list in `playbook/README.md`. P12 in the prompt says "items 1 to 8, one row each."
+- So "thirteen plus eight" describes the shape the prompt already asks for. It is not a conclusion the model reaches.
+
+**What the AI decides**
+- For each row: PASS, FAIL or NOT APPLICABLE.
+- The file and line it cites.
+- The reason, labelled Verified Fact or Inference.
+- The fixes list.
+- The final status.
+
+**Where you have a point**
+- The row counts are written as fixed numbers in a second place. If someone adds or removes a check, as happened when P13 was added, the table goes stale and the prompt and the checklist disagree.
+- The same cell also says what P6, P10 and P13 must cite. That lists the sources the review must use. It does not say what the verdict must be, so it does not pre-decide a result. It would still be cleaner to leave it to the prompt.
+
+**Suggested rewording for the cell**
+> Header. One row per check in the prompt, and one row per item in the failure list in `playbook/README.md`. Each row has a result, a citation, and a reason. A "Fixes required" list for every FAIL.
+
+That keeps the checklist but takes the counts from the prompt. I'm in Ask mode, so I haven't edited the file. Switch to Agent mode if you want me to make that change.
+
+## 2026-10-12 22:17
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+should we create a S06-Rerun-prd.md to address the "Fixes required" and any other items needed?
+
+### Assistant
+
+Yes, a separate stage is the right move. I'd name it `S06F-prd-fixes.md`, not "S06-Rerun". I haven't created it because I'm in Ask mode.
+
+**Why a new file instead of re-running S06**
+- `S06R-prd-review.md` says: "If any row is FAIL, return to S06 with the fix list, then re-run S06R."
+- `S06-prd.md` is a drafting prompt. It writes the PRD from scratch and has no step for applying a fix list.
+- Re-running it risks rewriting parts of the PRD that passed review.
+- Phase 3 already has this problem solved. `S03R` finds FAIL rows, `S03F-semantic-layer-fixes.md` applies only the "Fixes required" list, and then `S03R` runs again in a fresh chat.
+- Using the same pattern for Phase 6 keeps the playbook consistent. The name `S06F` matches `S03F`.
+
+**What S06F should do**
+- It reads the newest `docs/prd/prd-review.md` and copies the numbered "Fixes required" list (F-1 to F-9) word for word.
+- It marks each fix as apply, waiting for a decision, or cannot apply. It does not choose an option for the owner.
+- It has a "Decisions for this round" block, so you can answer any fix that offers choices before pasting.
+- It edits only the files and lines each fix names, and it records old text and new text.
+- It keeps the PRD version header. It checks that no YAML id was invented.
+- It updates `traceability.md` only where a fix changes a requirement.
+- It re-runs the existing tests and the PRD-to-traceability row check.
+- It writes `docs/prd/prd-fixes.md` with one section per round. It does not review the PRD. S06R does that again in a fresh chat.
+
+**The "any other items" part**
+- Keep other items out by default. S03F skips advisories unless the Decisions block says to apply one.
+- Do the same here. The review's "Other findings" (O-1 to O-5) would stay out unless you name them in the block.
+- That keeps the fix round small and easy to check.
+
+**Files to touch once it exists**
+- Add the S06F row to the stage table in `playbook/README.md`.
+- Change the S06R "Done test" line to say "return to S06F with the fix list".
+- Add an S06F line to `S07-application-and-demo.md` and to `STATUS.md` if you track stages there.
+
+Switch to Agent mode if you want me to write `S06F-prd-fixes.md`, using `S03F-semantic-layer-fixes.md` as the template, and make those three small edits.
+
+## 2026-10-12 22:25
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Create the S06F-prd-fixes.md with the required sections
+
+### Assistant
+
+I created `playbook/S06F-prd-fixes.md`. It follows `S03F-semantic-layer-fixes.md`, adapted for the PRD.
+
+**What the file holds**
+- "When to run it" table. Three cases: S06R has a FAIL row; a fix needs a YAML change (goes to S05R with an ADR, then S06F again); S07 has started (stage does not run).
+- "Before you paste". It explains the "Decisions for this round" block with a worked example from round 1 (F-1 rows 3 and 4, and the optional F-8).
+- Inputs.
+- The prompt, with the eight parts: Decisions block, Objective, Scope, Required analysis (10 steps), Evidence rules, Constraints, Locked facts, Required artifacts, Completion gate, Lifecycle linkage, and the seven-item final response.
+- Expected output and Done test.
+
+**How it works**
+- It reads the fix list from `docs/prd/prd-review.md`, word for word, including the "Other findings" rows a fix names.
+- It edits only `prd.md`, `traceability.md` and the new `docs/prd/prd-fixes.md`. It never edits `semantic-layer/`, ADRs, `Risk Management.md`, code or tests.
+- It marks each fix as apply, waiting for a decision, needs S05R, or cannot apply. It does not choose an option for the owner.
+- It keeps the semantic-layer version at `1.1.1`. It raises the PRD document version once per round (v1.1 to v1.2) in both files.
+- It re-runs the script checks from S06R: row count, YAML id lookup, PRD-to-traceability compare, existing-test run (with `logs/audit.log` restored), and `git status` before and after.
+- The done test changes one YAML id to a name that does not exist, shows the check fail, restores it, and shows the check pass.
+- It never marks a row PASS. S06R does that in a fresh chat.
+
+**Other files I changed**
+- `playbook/README.md`: new S06F row, S06R and S07 "Depends on" wording, and step 6 now names the S06F route.
+- `playbook/S06R-prd-review.md`: "Done test" and "Lifecycle linkage" now point to S06F instead of "return to S06".
+- `playbook/S06-prd.md`: lifecycle sentence added.
+- `playbook/STATUS.md`: one "Playbook change" row.
+
+**Before you run it**
+- The block says `None`. With `None`, some round 1 fixes stop as "waiting for a decision" and the stage ends BLOCKED. These are F-1 rows 3 and 4 (open question line or replace the word), F-9 items O-1 to O-3 (how step 1 links to step 2, what the approval route takes and returns, whether to name the audit keys now), and F-8 (optional).
+- Write a line for each of those you want applied.
+- F-1 gives the owner an option to ask for YAML ids. If the owner picks that, S06F stops on that row and S05R plus a new ADR run first.
+- O-5 names stale lines in `semantic-layer-revision.md` and `S05R_Decisions_Taken.md`. S06F cannot edit those unless the block names the file and the edit.
+- I did not change the "Expected output" row counts in `S06R-prd-review.md` that we discussed earlier. Say so if you want that reworded.
+- The earlier two Ask-mode turns were not logged at the time. I added them to this transcript now.
+
+## 2026-10-12 22:34
+
+**Model:** Cursor Grok 4.6
+
+### User
+
+PROMPT for # S06F — PRD fixes:
+# Stage S06F — PRD fixes
+
+## Decisions for this round
+None
+
+## Objective
+Apply the "Fixes required" list from the newest PRD review to `prd.md` and `traceability.md`. Change nothing else. Keep the semantic-layer version. Re-run the PRD checks that a script can run. Record each edit so the next S06R reviewer can check it. Do not review the PRD. S06R does that in a fresh chat.
+
+(Inputs: S06-prd.md, S06R-prd-review.md, README.md, prd-review.md, prd.md, traceability.md, Risk Management.md, semantic-layer, ai-qualification.md, semantic-layer-revision.md, S05R_Decisions_Taken.md, ADR 0002, ADR 0003, operating-contract.md, Project_Intent - Appendix B.md, and every design file and test file that a fix names.)
+
+### Assistant
+
+I read `docs/prd/prd-review.md` (2026-10-12, review v1.0, BLOCKED). All version strings read `1.1.1`. I asked three owner choices and you answered: Open question lines for all four F-1 words; skip optional F-8; Open question lines for O-1 and O-2. I wrote the S06F round 1 plan. No files were edited in that turn.
+
+## 2026-10-12 22:46
+
+**Model:** Cursor Grok 4.6
+
+### User
+
+S06F round 1: apply the PRD review fixes
+
+Implement the plan as specified, it is attached for your reference. Do NOT edit the plan file itself.
+
+### Assistant
+
+Round 1 applied the review fixes to `prd.md` and `traceability.md`, raised both documents to v1.2, and recorded the work in `prd-fixes.md`. The semantic layer version stays `1.1.1`.
+
+1. Stage status: **CONDITIONAL PASS.** Fixes F-1 to F-7 and F-9 are applied. F-8 is optional and was left alone. Checks 8a to 8g match the locked counts. The done test failed, then passed.
+
+2. Key findings.
+- The review was BLOCKED on P2. P7, P8 and P11 were also FAIL.
+- Section 15 now has fifteen Open question lines. Four name answer store, near-miss list, claimed role, and raw and flagged count. Three name the planned `decision`/`approver` fields, `record_id`, and the final-action key. Three name O-1, O-2 and O-3.
+- The label table has a REAL row for the `cannot_prove` counts.
+- RQ-69 now states the 128 limit as PROPOSED with owner Team-Force.
+- RQ-40 now says the final-action key records what last happened to a device, and that the value is `none` on every row because no route changes a device.
+- RQ-54 now says what the breaker does. The numbers stay PROPOSED (N-05).
+- The PRD and `traceability.md` name the four existing tests that S07 must change.
+- Section 15 says S07 YAML additions raise the layer version and that the PRD header, `traceability.md` and the S08 hash step must follow.
+- Checks: 73 RQ rows in both files, 757 YAML ids, all cited ids resolve, 29 existing tests found, 44 planned tests absent, `build.py --check` passed at `1.1.1`, 41 semantic-layer tests passed, 40 existing PRD tests passed and 1 skipped, `logs/audit.log` had 240 lines before and after.
+
+3. Major risks.
+- 44 of 73 tests are still planned.
+- S07 will add YAML ids under a new ADR. A stale header would send S08 the wrong version.
+- O-1 is still an Open question. Two builders can still pick different ways for the page to get a `device_id`.
+- Four existing tests still lock the old first-row and missing-header behaviour. S07 must change them.
+
+4. Assumptions and unknowns.
+- The chat answers on 2026-10-12 count as the Decisions for this round.
+- F-8 stays open because it is optional and the Decisions block did not apply it.
+- The stale lines in `semantic-layer-revision.md` and `S05R_Decisions_Taken.md` stay. S05R owns those files.
+- The fifteen Open questions stay open until S03 or S07 acts on them.
+
+5. Artifacts created, with paths.
+- `06-telecom-service-network-incident-ops/docs/prd/prd.md` (v1.2)
+- `06-telecom-service-network-incident-ops/docs/prd/traceability.md` (v1.2)
+- `06-telecom-service-network-incident-ops/docs/prd/prd-fixes.md` (Round 1, 2026-10-12)
+
+6. Blocking issues.
+- None that stop this stage. F-8 is optional. The stale baseline files wait for S05R. The Open questions wait for S03 or S07.
+
+7. Recommended next action.
+- Open a fresh chat and run S06R against `prd.md` v1.2 and `traceability.md` v1.2 at semantic layer `1.1.1`. S07 waits until that review reads PASS, or CONDITIONAL PASS with fixes applied.
+
+
+## 2026-10-12 23:05
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT: @S06R-prd-review.md (23-87) (Stage S06R, PRD review).
+
+INPUTS: `docs/prd/prd.md`, `docs/prd/traceability.md`, `docs/prd/Risk Management.md`, `semantic-layer/`, `docs/02-baseline/ai-qualification.md`, `semantic-layer-review.md`, `semantic-layer-revision.md`, `S05R_Decisions_Taken.md`, ADR 0002, ADR 0003, `Project_Intent - Appendix B.md`, `playbook/README.md`.
+
+### Assistant
+
+**1. Stage status: BLOCKED.** P2 is FAIL. The PRD uses the phrase "output policy" (RQ-31 and RK-14). The phrase is not in `glossary.md` or any YAML file, and no "Open question for S03:" line names it.
+
+**2. Key findings.**
+- Four rows are FAIL: P2, P11, P12.4, and P12.8 (repeats P2). P1, P3, P4, P5, P6, P7, P8, P9, P10 and P13 are PASS.
+- P1: all 73 requirements (RQ-01 to RQ-73) have a YAML id that resolves, and a test name. 29 tests exist and 44 are planned. The 67 existing test ids that `traceability.md` cites gave 101 passed and 2 skipped. Both skips need `opa`. I restored `logs/audit.log` after the run (240 lines, same hash).
+- P13: all three version strings read `1.1.1`. The YAML has 757 ids, so ADR 0003 added none. The 13 deferred items are listed and D-07 is not one of them.
+- P2: the seven words that blocked round 1 are now on Open question lines. One new phrase fails: "output policy".
+- P11: RQ-02 and RQ-48 give a clear picture. RQ-54 does not. "Stays open 30 seconds, allows 10 calls at once" reads as a rule about the open state. In `breaker.py` the 10 means at most 10 model calls run at the same time.
+- P12.4: PRD line 74 is labelled Verified Fact and has no file path. Lines 245 and 257 state a fact with no label.
+- Round 1 fixes F-1 to F-7 and F-9 are confirmed closed, except the new RQ-54 wording.
+
+**3. Major risks.**
+- Three design points stay open by owner decision: how the page learns a `device_id`, the input and reply of `POST /approvals/{id}`, and the audit action words. The S07 builder and the S08 second model will choose differently.
+- The route tables leave RQ-70 and RQ-71 out of the recommend route.
+- `Risk Management.md` line 95 says three routes already refuse a call with no header. Those routes are not built.
+- Two other files still carry old state: `S05R_Decisions_Taken.md` line 26 and `semantic-layer-revision.md` line 442.
+
+**4. Assumptions and unknowns.**
+- The prompt says the PRD is v1.1. The PRD is v1.2 after S06F. The requirement set did not change, so I reviewed v1.2.
+- The 300 second store lifetime is labelled DECIDED, not PROPOSED. The locked facts accept that.
+- The three random picks for P11 were RQ-02, RQ-48, RQ-54.
+- F-8 from round 1 (approval points for the six other AI uses) is still not applied.
+
+**5. Artifacts created.**
+- `06-telecom-service-network-incident-ops/docs/prd/prd-review.md` (v2.0, replaces the round 1 review).
+
+**6. Blocking issues.**
+- F-1: replace "the output policy" at `prd.md` lines 316 and 466 with words the YAML has, or add an Open question line.
+- F-2: rewrite the last sentence of RQ-54 so the 10 is a separate limit. Change section 11 line 426 and N-05 line 535 to match.
+- F-3: add file paths at `prd.md` line 74, and a label at lines 245 and 257.
+
+**7. Recommended next action.** Run S06F with the "Fixes required" list in `prd-review.md` section 6, then run S06R again in a fresh chat.
+
+
+## 2026-10-12
+
+**Model:** Claude Sonnet 5.5 (claude-sonnet-5-5-high)
+
+*Logged late. This turn and the next three were answered in Ask mode, where files could not be edited.*
+
+### User
+
+Provide your advice on fixing F1, F2 and F3 with the most apt solution without leaving any ambiguity to be addressed in a subsequent cycle.
+
+### Assistant
+
+Advice for F-1, F-2 and F-3 in `prd-review.md`. Nothing was edited (Ask mode). All three fixes touch only `prd.md`, which S06F may edit.
+
+**F-1: "the output policy" is not a YAML word.** Choose: replace the phrase with the checks it stands for. Do not add an "Open question" line, because that only moves the problem to S03.
+
+A second problem found while doing this: RQ-31 says the store "never holds a BLOCK or HOLD answer". But a healthy recommend call returns HOLD_FOR_REVIEW with a sentence (RQ-18). Read literally, the store could never hold a healthy answer, and the RQ-31 test could not pass. The only reading that works is that the store skips answers that have no text.
+
+Four edits:
+1. Line 316 (RQ-31): the second answer comes from the stored answer and goes through the same checks as a fresh answer: the answer shape (`policy.output_schema`), the forbidden-value check (RQ-70) and the command-phrase checks (RQ-30, RQ-71). It returns HOLD_FOR_REVIEW with the same sentence. The store holds an answer only when it has text and passed those checks. It never holds an answer that stopped with no text (BLOCK, or HOLD_FOR_REVIEW with no sentence).
+2. Line 466 (RK-14): "The store stays. It never holds an answer that stopped with no text. A stored answer goes through the same checks again (RQ-31, ADR 0003)."
+3. Line 498 (ADR 0003 table, RQ-31 row): same "stopped with no text" wording.
+4. Line 124 needs no change.
+
+Add RQ-70 and RQ-71 to the recommend route ranges in `prd.md` lines 124 and 232 and in `traceability.md` line 158 (closes F-5). ADR 0003 line 46 and `Risk Management.md` lines 219 and 221 keep "output policy"; S06F cannot edit them, and P2 checks the PRD's words.
+
+**F-2: RQ-54 mixes two limits.** The code has two separate refusals. The breaker opens after 5 failed calls in a row, stays open 30 seconds, then lets one test call through. Separately, at most 10 model calls run at once; the 11th is refused. `failmode.model_unreachable` covers both. Line 366 (RQ-54) is rewritten as two cases, both returning HOLD_FOR_REVIEW with no text. Line 426 and N-05 (line 535) get matching words. YAML ids stay.
+
+**F-3: missing file pointers and unlabeled claims.** Line 74 names `apps/api/main.py`, `apps/api/services/policy.py`, `tests/ai/test_guardrails.py` and `apps/api/services/audit_query.py`. Lines 245 and 257 are split into a Verified Fact (the policy input builder sets `change_plan_ok` to false; `apps/api/main.py` has four routes and none changes a device) and an Unknown (what "validated" means).
+
+Bundle before the rerun: grep `prd.md` for `output policy` and `BLOCK or HOLD`; decide R2-1 and R2-3 with the owner; note R2-5 in `playbook/README.md`.
+
+
+## 2026-10-12 23:36
+
+**Model:** Claude Sonnet 5.5 (claude-sonnet-5-5-high)
+
+### User
+
+Explain in layman terms for someone who is not an expert in governance or telecommunication the reason for "BLOCKED. P2 is FAIL. The PRD uses the phrase "output policy" (RQ-31 and RK-14). The phrase is not in glossary.md or any YAML file, and it is not on an "Open question for S03:" line. P11 and P12.4 are also FAIL, and P12.8 repeats P2. "
+
+### Assistant
+
+The review stopped the project because the requirements document uses one phrase that the project's dictionary does not define. Other, smaller problems also need fixing. This is a wording problem. It does not mean the software is broken.
+
+Background:
+- The project is a tool for a phone and internet company. Network operators use it to handle service problems. An AI model suggests what to do. The tool decides whether the suggestion is allowed.
+- The PRD is the requirements document. Builders follow it word for word in the next stage (S07).
+- The glossary and the YAML files are the project's agreed dictionary. Every important term is defined once, with an id. The PRD may only use words the dictionary defines.
+- The review has 13 checks (P1 to P13). Check P2 asks whether every term in the PRD is in the dictionary.
+
+Why P2 failed: two lines (RQ-31 and RK-14) say a saved answer "passes the output policy again". The words "output policy" are not in the glossary or any YAML file, and the PRD does not mark them as an open question. A builder must guess what the output policy checks. Builder A might check only the answer shape. Builder B might also check forbidden values and command phrases. Both would think they followed the PRD.
+
+Why BLOCKED: P1, P2, P3, P4, P9 and P13 are gates. If any gate fails, the PRD cannot go to the build stage.
+
+The other failures:
+- P12.8 is the same problem as P2, counted a second time.
+- P11 is about the circuit breaker, which stops the app from calling the AI for a while after several failures. RQ-54 puts two limits in one sentence (opens after 5 failures in a row; at most 10 AI calls at the same time). A builder could read the 10 as part of the breaker. The fix is two separate rules.
+- P12.4 is about proof. Some statements do not say where the proof is (no tool exists to change a device; the list of existing parts has no file names). The fix is to add file names and label each claim as a checked fact or unknown.
+
+The fix is a few sentences in the PRD. No code changes. After the edit, the review runs again in a fresh chat.
+
+
+## 2026-10-12 23:45
+
+**Model:** Claude Sonnet 5.5 (claude-sonnet-5-5-high)
+
+### User
+
+you say - "All of it is a few sentences in the PRD: Replace "the output policy". Name the actual checks instead: the answer shape, the forbidden-value check and the command-phrase check. Split the breaker sentence in two. Add file names and labels." Can you provide the right input to insert in the @playbook/S06F-prd-fixes.md file under "## Decisions for this round" to fix the PRD?
+
+### Assistant
+
+I gave one line per fix for the "Decisions for this round" block, replacing the `None` line and keeping the HTML comment:
+- F-1: use the YAML words, not an Open question line. Exact replacement wording for RQ-31, RK-14 and the section 13 ADR 0003 table row, with an owner decision that ADR 0003's "BLOCK or HOLD" means an answer that stopped with no text. Afterwards search for "output policy" and "BLOCK or HOLD".
+- F-2: apply, with the exact two-case RQ-54 wording, plus the section 11 Breaker row and N-05. Keep the RQ-54 YAML ids and test name. Do not add tests to the test cell.
+- F-3: Verified Fact for the change tool claim, with Unknown for what "validated" means. Exact wording for line 74 and for the EXECUTE table row and "Rule for EXECUTE" paragraph.
+- F-4: leave alone.
+- F-5: apply. Add RQ-70 and RQ-71 to the recommend route list, the step 3 row and `traceability.md` section 3.
+
+Notes: F-1 includes one decision beyond the review's wording (the store skips answers with no text). F-2 adds no tests to the test cell because no PRD row lists two tests today. F-4 is optional and does not change the stage status. S06F cannot fix R2-1 or R2-3.
+
+
+## 2026-10-12 23:51
+
+**Model:** Claude Sonnet 5.5 (claude-sonnet-5-5-high)
+
+### User
+
+should i keep the same input file list currently existing in @playbook/S06F-prd-fixes.md ?
+
+### Assistant
+
+Yes, keep the Inputs list as it is. Every file the fixes need is already on it, and nothing on it is extra. Files that a fix names (`apps/api/main.py`, `policy.py`, `test_guardrails.py`, `audit_query.py`, the breaker design file, `test_breaker.py`) are covered by the last bullet. The stage excludes `apps/` and `tests/` from editing only, so it may read them.
+
+One change to make elsewhere: the F-1 decision conflicts with the "Locked facts" row for ADR 0003 decision 3 ("It never holds BLOCK or HOLD"). The Constraints say the three ADR 0003 decisions stay as the locked facts state them, so S06F could end BLOCKED. Change that row to say the store never holds an answer that stopped with no text, and that the owner confirmed this reading in round 2.
+
+Two optional checks: the locked facts still say "PRD version before round 1: v1.1" (the PRD is v1.2), and check 8g should not count files already untracked before the run (`.pytest_cache`, `__pycache__`, `logs/audit.log`).
+
+
+## 2026-10-12 23:53
+
+**Model:** Claude Sonnet 5.5 (claude-sonnet-5-5-high)
+
+### User
+
+revise the @playbook/S06F-prd-fixes.md with your recommended changes after careful review.
+
+### Assistant
+
+I revised `playbook/S06F-prd-fixes.md` with five edits.
+
+1. **Locked facts, ADR 0003 decision 3.** The row now says the store never holds an answer that stopped with no text (BLOCK, or HOLD_FOR_REVIEW with no sentence). It says the owner confirmed this reading in round 2 and that a healthy recommend answer (HOLD_FOR_REVIEW with a sentence, RQ-18) is stored. This removes the conflict with the F-1 decision and with the Constraints line that keeps the ADR 0003 decisions as the locked facts state them.
+2. **Locked facts, new row.** "PRD version before round 2: v1.2, set by round 1. Round 2 raises it to v1.3 in `prd.md` and `traceability.md`."
+3. **Locked facts intro.** It now says the values are those at S06R round 1, with the changes that round 2 adds.
+4. **Check 8g.** It now says to compare the two `git status --short` outputs. Files already present in the first output (`.pytest_cache`, `__pycache__`, `logs/audit.log`) are named as already present and not counted as differences.
+5. **Required analysis step 1.** The example of "Other findings" rows now reads "O-1 to O-5 in round 1, or R2-2 in round 2". F-5 names R2-2, so S06F will copy that row.
+
+The Inputs list, the Decisions block, and every other section are unchanged. Next: run S06F in a fresh chat with the prompt block, then run S06R again in another fresh chat.
+
+
+## 2026-10-12 23:58
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Ran the S06F prompt (`playbook/S06F-prd-fixes.md` lines 48 to 144) with the inputs: S06-prd, S06R-prd-review, playbook README, `prd-review.md`, `prd.md`, `traceability.md`, `prd-fixes.md`, `Risk Management.md`, the semantic layer, `ai-qualification.md`, `semantic-layer-revision.md`, `S05R_Decisions_Taken.md`, ADR 0002, ADR 0003, `operating-contract.md`, `Project_Intent - Appendix B.md`, and every design and test file a fix names. The Decisions block says: F-1 use the YAML words (exact text given); F-2 apply with exact words; F-3 use Verified Fact and say what is Unknown; F-4 leave alone; F-5 apply.
+
+### Assistant
+
+I applied F-1, F-2, F-3 and F-5 to `prd.md` and `traceability.md`, and left F-4 alone. I added a "Round 2" section to `prd-fixes.md`. The semantic layer is unchanged at `1.1.1`. The PRD and traceability version is now v1.3 in both files.
+
+1. **Stage status: CONDITIONAL PASS.** Every fix in the Decisions block is applied, the version strings are equal, checks 8a to 8g match the locked counts, and the done test failed and then passed. The only open item is F-4, which is optional.
+2. **Key findings.**
+   - F-1: RQ-31, RK-14 and the ADR 0003 table row in section 13 now say the store never holds an answer that stopped with no text. A stored answer goes through the same checks as a fresh answer: `policy.output_schema` (RQ-25), the forbidden field check (RQ-70) and the command phrase checks (RQ-30, RQ-71). A search for "output policy" finds nothing. A search for "BLOCK or HOLD" as a whole phrase finds nothing. A plain-text search finds one line, `prd.md` line 124, which reads "BLOCK or HOLD_FOR_REVIEW with no text". That line uses the full outcome name and has the same meaning, so it stays.
+   - F-2: RQ-54, the section 11 Breaker row and N-05 now describe two cases. The breaker is open (5 failed calls in a row, open 30 seconds), or 10 calls are already running. The numbers stay PROPOSED (N-05), owner Team-Force.
+   - F-3: I checked the claim first. `apps/api/services/policy.py` line 396 sets `"change_plan_ok": False`, and `apps/api/main.py` has four routes. Section 4 reason 2 now names the files. The EXECUTE table row and the "Rule for EXECUTE" paragraph carry a Verified Fact and an Unknown (what "validated" means).
+   - F-5: RQ-70 and RQ-71 are in the recommend route lists at `prd.md` lines 124 and 232 and `traceability.md` line 158.
+   - Checks: 73 requirement rows in both files; 757 YAML ids and all cited ids resolve; rows match; 29 existing tests found and 44 planned; `build.py --check` passed with 41 semantic-layer tests; the PRD tests gave 40 passed and 1 skipped (the `opa` test); `logs/audit.log` had 240 lines before and after; `git status` is unchanged.
+3. **Major risks.** A planned test is not evidence until it exists and passes, and 44 of 73 are planned. S07 adds YAML ids under a new ADR, so the layer version will move. The three design points in `prd.md` section 15 (how the page learns a `device_id`, the input and reply of `POST /approvals/{id}`, the audit action words) stay open by owner decision.
+4. **Assumptions and unknowns.** What "validated" means for a change is Unknown. The cap on stored answers is PROPOSED and has no number. The "10 calls at the same time" meaning comes from `breaker.py` as the review reported it, and the Decisions block gave the words. I did not re-read `breaker.py`.
+5. **Artifacts created, with paths.** Edited: `06-telecom-service-network-incident-ops/docs/prd/prd.md` (v1.3), `06-telecom-service-network-incident-ops/docs/prd/traceability.md` (v1.3), and `06-telecom-service-network-incident-ops/docs/prd/prd-fixes.md` (Round 2 section, v2.0 of the file).
+6. **Blocking issues.** None. The review's R2-3 and R2-4 need edits in `Risk Management.md`, `S05R_Decisions_Taken.md` and `semantic-layer-revision.md`. This stage may not edit those files. S05R owns the last two.
+7. **Recommended next action.** Run S06R again in a fresh chat against v1.3. It should confirm P2, P11, P12.4 and P12.8 are PASS. After that, S07 may start if S06R gives PASS or CONDITIONAL PASS.
+
+## 2026-10-13 00:45
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Ran the S06R prompt (`playbook/S06R-prd-review.md` lines 23 to 87) with the inputs: `prd.md`, `traceability.md`, `Risk Management.md`, the `semantic-layer` folder, `ai-qualification.md`, `semantic-layer-review.md`, `semantic-layer-revision.md`, `S05R_Decisions_Taken.md`, ADR 0002, ADR 0003, `Project_Intent - Appendix B.md` and `playbook/README.md`.
+
+### Assistant
+
+I reviewed PRD v1.3 and rewrote `docs/prd/prd-review.md` as round 3 (v3.0). I changed no PRD, ADR, `Risk Management.md` or semantic-layer file.
+
+1. **Stage status: PASS.** No row is FAIL. All three version strings read `1.1.1`. The four round 2 FAIL rows (P2, P11, P12.4, P12.8) are now PASS.
+2. **Key findings.**
+   - P1 to P13 are PASS. 73 of 73 requirements have a YAML id that resolves (757 ids) and a test name. `traceability.md` matches the PRD on all 73 rows. 29 tests exist and 44 are planned.
+   - Checks I ran: `build.py --check` passed. 41 semantic-layer tests passed. The 29 existing acceptance tests gave 40 passed and 1 skipped (`opa` missing). The 71 test ids from `traceability.md` plus the four old O-4 tests gave 105 passed and 2 skipped. `logs/audit.log` was restored (240 lines, same hash).
+   - "Output policy" is gone. RQ-54 now matches `breaker.py`. The Verified Facts at PRD lines 74, 245 and 257 name files. The data counts and the `STO-00005` example match the CSV files.
+   - P3: the five quoted rows equal the S2Q table, word for word.
+   - P11: the three random picks were RQ-06, RQ-61 and RQ-64. All three give a clear picture. RQ-06 does not say what `mgmt_ip` and `credential_profile` hold.
+3. **Major risks.**
+   - **R3-1, needs your answer.** RQ-31 says the answer store may hold a HOLD_FOR_REVIEW answer that has text. ADR 0003 and the design file `docs/12-finops/optimization-backlog.md` (line 124) say HOLD is never stored and only RECOMMEND_ONLY is. Your S06F round 2 decision chose the PRD reading, and it is written only in the S06F files. I scored P13 PASS on that basis. If you read the locked fact "never holds BLOCK or HOLD" word for word, P13 is FAIL and the stage is BLOCKED.
+   - **R3-2.** RQ-08 and RQ-09 do not say whether a flagged row counts in the deduped count. 166 of 354 alarm rows are flagged. Two builders will count differently.
+   - **R3-6.** The three design points left to S07 stay open. The S08 comparison will compare two designs.
+4. **Assumptions and unknowns.** The prompt says PRD v1.1. The PRD is v1.3 and the requirement set is the same. I read "no AI use has execute agency" as "no model has it", because `ai_use.remediation_execution` is workflow automation. What "validated" means for a change is Unknown. The cap on stored answers has no number.
+5. **Artifacts created, with paths.** `06-telecom-service-network-incident-ops/docs/prd/prd-review.md` (replaces v2.0). Scratch scripts sit in the temp folder, outside the repo.
+6. **Blocking issues.** None under the gate as written. R3-1 is the only item I would clear before S07.
+7. **Recommended next action.** Answer R3-1: record the "no text" reading in one place (an ADR note and one sentence in RQ-31) and fix `optimization-backlog.md` line 124. Then decide which of R3-2 to R3-8 to apply. If you apply any, run S06F with a Decisions block and run S06R again in a fresh chat. If you apply none, S07 may start. Record the status in `playbook/STATUS.md`.
+
+## 2026-10-13 01:30
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Update @playbook/S06F-prd-fixes.md sections with the recommended solutions for fixing the issues above to ensure next round fixes all PRD issues.
+
+### Assistant
+
+I updated `playbook/S06F-prd-fixes.md`. The previous five turns were in Ask mode and were not logged here, because Ask mode does not allow edits.
+
+**What changed in the file**
+
+- **Decisions block.** It now holds the round 3 lines, in place of the round 2 lines F-1 to F-5.
+  - R3-1: answer store.
+  - R3-2: flagged rows and the deduped count.
+  - R3-6: device id, approvals input and reply, audit words and the `final_action` key.
+  - R3-8: the limit of 10 running calls. This line uses the corrected text. The reasons list holds `failmode.schema_failure` and `failmode.timeout`, and the RQ-24 test checks no reason string.
+  - R3-5, R3-7, R3-4 and R3-3. R3-3 uses the narrower precedence sentence.
+  - R3-9: S07 gap reporting.
+  - An "Owner edits outside this stage" line, which S06F must not carry out.
+  - A closing paragraph with the version bump (1.3 to 1.4), the locked counts and the search list.
+- **Top of the file and "When to run it".** The stage now also runs when the review says "Fixes required: None" and the owner chooses to settle "Other findings".
+- **Inputs.** Added `alarms.csv`, `apps/api/` and the S07 playbook, all read only, so S06F can check the rows and lines a decision cites.
+- **Required analysis.**
+  - Step 1 says that when the fix list is None, each Decisions line is one fix.
+  - Check 8b allows three expected misses: `record.storm_read`, `ai.recommendation` and `ai.approval` have no YAML id yet, and each must sit on an Open question line.
+  - New check 8h counts the Open question lines (15 before, 13 after) and every place that states the count.
+  - Step 9 maps Decisions lines to "Other findings" when there is no FAIL row.
+- **Constraints.** A decision may give exact words, and the file wins if a cited line differs. New section 7 rows are quoted word for word. The owner-edits line is not a fix.
+- **Locked facts.** Added PRD v1.3 to v1.4, the Open question count, the review's fix list, and the answer store's route and key.
+- **Gate and outputs.** Every reference to checks "8a to 8g" now says "8a to 8h".
+
+**Before you run S06F**
+
+1. The owner edits are listed in the Decisions block. They are the ADR 0003 line, `optimization-backlog.md`, `S06R` lines 47 and 66, `Risk Management.md`, `S05R_Decisions_Taken.md`, `semantic-layer-revision.md`, the S07 and S08 playbooks and `playbook/README.md` line 46. Make them by hand first. They are the other half of R3-1 and R3-9.
+2. Paste the Decisions block with the rest of the prompt into a fresh chat.
+3. Then run S06R again in a fresh chat. The reviewer must read R3-9 as part of the PRD, because the review did not list it.
+
+**Two points you may want to change**
+
+- **Approval overwrite.** A second approval call for the same device and correlation id stores a second record. It does not overwrite the first, and it does not return 409.
+- **404 audit rows.** No audit word is named for a 404 on the storm or approvals routes.
+
+I did not run S06F itself. The PRD still reads v1.3 until you do.
+
+## 2026-10-13 01:41
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+fix the two problems mentioned above in playbook/S06R-prd-review.md
+
+### Assistant
+
+I fixed both problems in `playbook/S06R-prd-review.md`.
+
+- **Check P1 (line 35).** "The current PRD is v1.3" now reads "Read the PRD version from the Date / version row of the `prd.md` header, and record it." The line cannot go stale after S06F round 3 raises the PRD to v1.4.
+- **Locked facts (line 63).** "PRD version: v1.1" now reads "The version in the Date / version row of the `prd.md` header. `traceability.md` must carry the same version." It also keeps "Requirements RQ-01 to RQ-73."
+
+Lines 47 and 66 still say the answer store "never stores BLOCK or HOLD". They are on the owner-edit list in the S06F Decisions block, and you asked for the two version problems only, so I left them. Make that edit before the next S06R run. Otherwise the reviewer reads the old wording and scores P13 FAIL.
+
+I changed no other file.
+
+
+## 2026-10-13 02:00
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT:
+@playbook/S06F-prd-fixes.md:52-241 (the Stage S06F prompt, including the round 3 Decisions block R3-1 to R3-9 and the "Owner edits outside this stage" list)
+
+INPUTS:
+@playbook/S06-prd.md @playbook/S06R-prd-review.md @playbook/README.md @06-telecom-service-network-incident-ops/docs/prd/prd-review.md @06-telecom-service-network-incident-ops/docs/prd/prd.md @06-telecom-service-network-incident-ops/docs/prd/traceability.md @06-telecom-service-network-incident-ops/docs/prd/prd-fixes.md @06-telecom-service-network-incident-ops/docs/prd/Risk Management.md @06-telecom-service-network-incident-ops/semantic-layer @06-telecom-service-network-incident-ops/docs/02-baseline/ai-qualification.md @06-telecom-service-network-incident-ops/docs/02-baseline/semantic-layer-revision.md @06-telecom-service-network-incident-ops/docs/02-baseline/S05R_Decisions_Taken.md @06-telecom-service-network-incident-ops/docs/ADR/0002-s05r-deferred-and-proposed-decisions.md @06-telecom-service-network-incident-ops/docs/ADR/0003-s06-risk-recommendations.md @06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md @06-telecom-service-network-incident-ops/data/synthetic/alarms.csv @06-telecom-service-network-incident-ops/apps/api @playbook/S07-application-and-demo.md @Project_Intent - Appendix B.md
+- Every design file and test file that a fix names
+
+### Assistant
+
+**1. Stage status: CONDITIONAL PASS.** All nine fixes (R3-1 to R3-9) are applied, and every check matches the locked counts. One conflict stays open that the fix list did not name (see item 3).
+
+**2. Key findings**
+
+- `prd.md` and `traceability.md` moved from v1.3 to v1.4 together. The semantic layer stays at `1.1.1`.
+- The counts did not change: 73 requirement rows, 757 YAML ids, 29 existing tests, 44 planned tests. The Open question lines went from 15 to 13, because O-1 and O-2 are deleted.
+- Checks 8a to 8h pass. `semantic-layer/tests`: 41 passed. The PRD tests: 40 passed, 1 skipped (the `opa` test). `logs/audit.log` had 240 lines before and after. `git status` shows no new difference.
+- The done test failed on a made-up id in RQ-01, then passed after I restored the file.
+- I read each place a decision cites before I wrote it. The `alarms.csv` rows for `STO-00019` and `STO-00002` match the example numbers. The lines in `policy.py`, `ai_gateway.py` and `audit_query.py` match the new section 7 paragraph. The six new quotes in section 7 equal `ai-qualification.md`. `playbook/S07-application-and-demo.md` names `docs/demo/evidence.md` as artifact 6 and "Blocking issues" as item 6, so R3-9 could apply.
+- Where I used my own words, `prd-fixes.md` records it:
+  - RQ-62. I kept the block's phrase word for word and changed only the words after it, so the sentence still reads.
+  - Section 6, steps 1 and 4, and two rows of section 8. I changed them so they agree with R3-2 and R3-6.
+  - R3-3, bullet 2. I named the lines the way the files read: lines 219 and 221 hold "output policy". Lines 221 and 223 hold "never store BLOCK or HOLD".
+
+**3. Major risks**
+
+- **RQ-30 and RQ-70 conflict with the new section 7 paragraph.** RQ-30 says the route "writes the reason in the audit row". RQ-70 says the audit row uses `failmode.forbidden_field_in_prompt`. The new paragraph says the audit row stores no reasons and that S07 keeps this behaviour. The audit row has no key for a reason today (`audit_query.py` line 128). The decisions do not say which statement wins, so I changed none of the three.
+- **The owner edits outside this stage are mostly not made.** The S07 line 53 and evidence row, and the S08 comparison step 3, already carry the new words. The rest still carry the old words. `playbook/S07-application-and-demo.md` lines 34, 36 and 37 still say RECOMMEND_ONLY is possible on the recommend route and that the approval takes a reason. The PRD now says the opposite. An S07 builder who reads the playbook first gets the old rule.
+- **The four new names are PROPOSED.** They are `record.storm_read`, `ai.recommendation`, `ai.approval` and `final_action`. They have no YAML id. S07 must add the ids under a new ADR before it ships the routes. That raises the layer version, and the PRD and `traceability.md` must follow.
+- **A search for "output policy" finds two hits** in `prd.md` section 15. Both quote stale lines in other files.
+
+**4. Assumptions and unknowns**
+
+- Assumption: the Decisions block is the fix list, because the review says "Fixes required: None".
+- Assumption: Team-Force owns every PROPOSED name (`operating-contract.md` row 10).
+- Assumption: the words "raw count" and "flagged count" have no YAML id. RQ-08 keeps them as an Open question for S03.
+- Unknown: which statement wins in the RQ-30 and RQ-70 conflict.
+- Unknown: whether S07 will add the ids for the four PROPOSED names in one ADR or in several.
+
+**5. Artifacts created, with paths**
+
+- `06-telecom-service-network-incident-ops/docs/prd/prd.md` (v1.4)
+- `06-telecom-service-network-incident-ops/docs/prd/traceability.md` (v1.4)
+- `06-telecom-service-network-incident-ops/docs/prd/prd-fixes.md` (round 3 added: fix source, Decisions block, decision per fix, 61 recorded edits, RQ ids touched, agreement check, version check, checks 8a to 8h, done test, map to review rows)
+
+The check scripts are temporary files outside the repo.
+
+**6. Blocking issues**
+
+None in this stage. Before S07 starts, two things need the owner: the eight hand edits listed in the Residual risks row of `prd-fixes.md`, and an answer to the RQ-30 and RQ-70 conflict.
+
+**7. Recommended next action**
+
+1. Make the eight owner edits by hand. Start with `playbook/S07-application-and-demo.md` lines 34, 36 and 37, `docs/ADR/0003-s06-risk-recommendations.md` line 46 and `docs/12-finops/optimization-backlog.md` line 124.
+2. Decide the RQ-30 and RQ-70 conflict. Either the PRD asks for a new audit key for the reason, or it drops "writes the reason in the audit row". A new key needs S05R and an ADR first.
+3. Run S06R in a fresh chat against v1.4. S07 starts when that run reads PASS.
+
+
+## 2026-10-13 07:30
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+how do we address the major risks related to 1. RQ-30 and RQ-70 conflict with the new section 7 paragraph. 2.The owner edits outside this stage are mostly not made.
+
+### Assistant
+
+**1. RQ-30 and RQ-70 against the section 7 paragraph**
+
+The conflict is real. I checked the code and the PRD.
+
+- `audit_query.py` line 128 already lists "The reasons and the policy version are not stored on any row" as something the log cannot prove.
+- RQ-64 shows the reason on the page. That reason comes from the reasons list in the response body, not from the audit row.
+- RQ-30 says the route "writes the reason in the audit row". RQ-70 says "the audit row uses `failmode.forbidden_field_in_prompt`". Both promise something the audit row has no place to hold.
+
+There are three ways to settle it.
+
+| Option | What changes | Cost |
+|---|---|---|
+| A. Move the reason to the response body | Reword RQ-30, RQ-70 and the Open question at `prd.md` line 583. The reasons list in the response body holds the reason. The audit row holds the action word (`policy.hold`) and the outcome only. | Three sentences in the PRD. No YAML id, no code and no test name change. |
+| B. Add a reason key to the audit row | The audit row gets an 18th key for the reasons. | A new YAML id, a new ADR, a layer version bump, S07 code, and a change in `audit_query.py`. This is a design change, not a fix. |
+| C. Leave it for S07 to report | S07 lists it under "PRD gaps". | The builder and the second model in S08 pick differently. This is the risk I raised. |
+
+**My recommendation is A.** It matches how the code works today, how RQ-64 already behaves, and the section 7 paragraph. B can wait as a later ADR if the team wants reasons in the audit log. The S10 defence list already accepts "cannot prove" for this item.
+
+To do A:
+
+1. Run a short round 4 of S06F. Edit only `prd.md`, `traceability.md` and `prd-fixes.md`.
+2. Raise the version to v1.5 in both documents, as the round rules require.
+3. Re-run checks 8a to 8h. The counts do not move.
+
+**2. Owner edits outside the stage**
+
+The eight edits are written word for word in `playbook/S06F-prd-fixes.md` lines 136 to 144. A search of the files shows this:
+
+- **Still carry the old words:**
+  - `docs/12-finops/optimization-backlog.md` lines 37 and 124.
+  - `docs/prd/Risk Management.md` lines 219, 221 and 223.
+  - `playbook/S07-application-and-demo.md` lines 36 and 37.
+  - `playbook/README.md` line 46.
+- **Look already done:** my search finds no old words in `playbook/S06R-prd-review.md` or in `docs/ADR/0003-s06-risk-recommendations.md`. Please open both to confirm.
+- **Not on the owner's list, but old:**
+  - `optimization-backlog.md` line 129 says the cache hit outcome is `RECOMMEND_ONLY`.
+  - `Risk Management.md` line 263 says "Never store BLOCK or HOLD".
+  - `playbook/S06-prd.md` line 58 lists D-07 among the 14 deferred items, though ADR 0003 decided it.
+
+Do them in this order, because the first group is the one an S07 builder reads first:
+
+1. `playbook/S07-application-and-demo.md` lines 34, 36 and 37. This stops the builder following the old route rules.
+2. `optimization-backlog.md` (lines 24, 37, 121, 124, and 129) and `Risk Management.md` (lines 95, 219, 221, 223, and 263). These are the design files that RQ-31 cites.
+3. `S05R_Decisions_Taken.md` line 26, `semantic-layer-revision.md` lines 8 and 442, `playbook/README.md` line 46, and `playbook/S06-prd.md` line 58.
+
+After the edits, search those files for "output policy", "never stores or holds", "BLOCK or HOLD", "14 stay deferred" and "1.1.0" in a next-step line. Then run S06R in a fresh chat.
+
+I can make the round 4 edits for risk 1, the owner edits for risk 2, or both. The owner edits need your go-ahead, because S06F said this stage may not make them. Tell me which to do.
+
+
+## 2026-10-13 07:55
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Do the fixes for Risk 1 and Risk 2 to all the required files and provide steps that I need to execute to resolve these issues.
+
+### Assistant
+
+Both risks are fixed. All checks pass.
+
+## What I changed
+
+**Risk 1. RQ-30 and RQ-70 against the section 7 paragraph (option A).**
+
+The reason of a held answer is now in the response body. The audit row holds the action word `policy.hold` and the outcome, and no reason.
+
+- `prd.md` RQ-30, RQ-70, the section 7 paragraph, and the Open question line about RQ-70 all say the same thing now.
+- RQ-64 (the page shows the reason) and `audit_query.py` line 128 already agreed with this.
+- `prd.md` and `traceability.md` are now v1.5, raised once, with the same number in both. No RQ row, YAML id or test name changed.
+
+**Risk 2. Owner edits, in nine files outside the PRD.**
+
+| File | Lines |
+|---|---|
+| `playbook/S07-application-and-demo.md` | 34, 36, 37 |
+| `docs/ADR/0003-s06-risk-recommendations.md` | 46 |
+| `docs/12-finops/optimization-backlog.md` | 37, 124, and 129 (129 was not on your list) |
+| `docs/prd/Risk Management.md` | 95, 219, 221, 223, and 263 and 279 (263 and 279 were not on your list) |
+| `docs/02-baseline/S05R_Decisions_Taken.md` | 26 |
+| `docs/02-baseline/semantic-layer-revision.md` | 8, 442 |
+| `playbook/S06R-prd-review.md` | 47, 66 |
+| `playbook/README.md` | 46 |
+| `playbook/S06-prd.md` | 58 (not on your list; it listed D-07 as deferred) |
+
+The "Stale text found while writing" list in `prd.md` section 15 is now one paragraph that says round 4 closed it. `prd-fixes.md` has a Round 4 section with all 31 edits (old and new words), the agreement check, the checks and the done test.
+
+**Corrections to my last answer.**
+
+- I said `ADR 0003` and `S06R-prd-review.md` "look already done". That was wrong. Both still had the old words. They are fixed now.
+- `optimization-backlog.md` lines 24 and 121 were on the list but hold no stale text, so I left them alone.
+
+## Checks
+
+| Check | Result |
+|---|---|
+| 8a to 8d, 8h | 73 rows, 757 ids, no mismatch, 29 existing and 44 planned tests, 13 Open question lines |
+| 8e | `build.py --check` ok, 41 passed |
+| 8f | 40 passed, 1 skipped (`opa`). `logs/audit.log` back to 240 lines, same hash |
+| 8g | Only the intended files changed |
+| Done test | A made-up id in RQ-01 failed check 8b. It passed after the restore. |
+| Old words | No hit for "output policy", "BLOCK or HOLD" (stale use), "14 stay deferred" or "writes the reason in the audit row" |
+
+## Left alone on purpose
+
+- `ADR 0002` line 94, `S05R_Decisions.md` line 649 and `playbook/STATUS.md` lines 63 and 64 say "14 deferred items". They record what was true on the day they were written.
+- `playbook/S06-prd.md` line 51 still tells the old S06 run to decide D-07. That is a prompt for a run that is done.
+- `S07` item 3 says the page lets a person "approve or reject". The route takes `yes` or `no`. This is a page label, so I did not change it.
+- The audit row still has no key for a reason (option B). It needs a new ADR, and that is S07 or later work.
+
+## Steps for you
+
+1. **Look at the changes.** In PowerShell, from `C:\MangeshStudy\FDE\Labs\SPRINT3CAPSTONE`, run `git diff --stat`. Then open `06-telecom-service-network-incident-ops/docs/prd/prd-fixes.md` and read the Round 4 section. Check the three files where the wording matters most: `playbook/S07-application-and-demo.md` lines 34 to 37, `docs/ADR/0003-s06-risk-recommendations.md` line 46 and `docs/prd/prd.md` RQ-30 and RQ-70.
+2. **Confirm option A.** If you want the reason in the audit row (option B), tell me now. It needs a new ADR and a version change. Otherwise do nothing.
+3. **Decide the four older records.** Add a one-line note to `ADR 0002` line 94, `S05R_Decisions.md` line 649 and `playbook/STATUS.md` lines 63 and 64, or leave them as records.
+4. **Add a row to `playbook/STATUS.md`** for S06F rounds 3 and 4: PRD v1.5, CONDITIONAL PASS, next step S06R.
+5. **Run S06R in a fresh chat.** Give it `docs/prd/prd.md` v1.5, `traceability.md` v1.5, `prd-fixes.md` and the playbook files. It must confirm that RQ-30, RQ-70 and section 7 agree, and that no stale line remains in section 15.
+6. **Start S07 only when S06R reads PASS.** S07 then adds the YAML ids for `record.storm_read`, `ai.recommendation`, `ai.approval` and `final_action` under a new ADR.
+7. **Optional: save the work.** Run `git add` on the changed files and make one commit named "S06F round 4: PRD v1.5 and owner edits".
+
+I can add the `STATUS.md` row and the notes in step 3 if you want. Both are quick edits.
+
+
+## 2026-10-13 08:10
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+For 2, I confirm option A.
+for 3, update the notes as mentioned in the respective files including playbook/STATUS.md
+for 4,  add row to playbook/STATUS.md
+
+### Assistant
+
+Steps 2, 3 and 4 are done.
+
+**Step 2. Option A is confirmed.** I recorded the confirmation in `docs/prd/prd-fixes.md`, in the Round 4 "Decisions for this round" paragraph and in the header Assumptions row. The PRD needs no change, because it already follows option A.
+
+**Step 3. Notes added.** Each note says: "Update 2026-10-13: ADR 0003 later decided D-07 (login is out of scope for this packet), so 13 items stay deferred."
+
+| File | Line | What the note does |
+|---|---|---|
+| `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md` | 94 | Follows "14 deferred items stay open". |
+| `docs/02-baseline/S05R_Decisions.md` | 649 | Follows "The 14 items that stay deferred ...". |
+| `playbook/STATUS.md` | 63 (S05R follow-up) | Follows "Kept deferred: 14 items". |
+| `playbook/STATUS.md` | 64 (S06-prd playbook change) | Says `S06-prd.md` line 58 now lists 13 deferred items, because ADR 0003 decided D-07. |
+
+The old numbers stay in each line, so each record still shows what was true on its day.
+
+**Step 4. Three rows added at the end of `playbook/STATUS.md`:**
+
+1. 2026-10-13, S06F round 3, CONDITIONAL PASS. PRD v1.4. The RQ-30 and RQ-70 conflict stayed open.
+2. 2026-10-13, Owner decision, DONE. Option A confirmed. The reason is in the response body. The audit row stores no reason.
+3. 2026-10-13, S06F round 4, CONDITIONAL PASS. PRD v1.5. R4-1 and R4-2 done. All checks pass. Next step is S06R.
+
+`prd.md` and `traceability.md` have the same hashes as after round 4, so the checks I ran then still hold.
+
+**Things I did not do:**
+- `playbook/STATUS.md` has no rows for the S06 run, the S06R runs, or S06F rounds 1 and 2. I did not guess their text. I can add them from `prd-fixes.md` and `prd-review.md` if you want.
+- `playbook/S06-prd.md` line 51 still tells the old S06 run to decide D-07. It is a prompt for a run that is finished, so I left it.
+
+**Your remaining steps:**
+1. Read the changes. Run `git diff --stat`, and read the Round 4 section of `prd-fixes.md`.
+2. Run S06R in a fresh chat against `prd.md` v1.5 and `traceability.md` v1.5.
+3. Start S07 when S06R reads PASS.
+4. Optional: commit the changes with the message "S06F round 4: PRD v1.5 and owner edits".
+
+
+## 2026-10-13 08:20
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Should we address the "Unknown: which statement wins in the RQ-30 and RQ-70 conflict.
+Unknown: whether S07 will add the ids for the four PROPOSED names in one ADR or in several." before we proceed with "Run S06R"?
+
+### Assistant
+
+No. Neither one needs to be settled before S06R. I checked the files, and I made no edits.
+
+**1. "Which statement wins in the RQ-30 and RQ-70 conflict": already settled.**
+
+- That Unknown came from my first final response. Round 4 closed it, and you confirmed option A.
+- `prd.md` RQ-30, RQ-70, the section 7 paragraph and the RQ-70 Open question line now say the same thing. The reason is in the response body. The audit row stores no reason.
+- The only places that still show the conflict are the Round 3 section of `prd-fixes.md` (line 1011, "I changed neither") and its Round 4 section, which says it is closed. The Round 3 text is a record of what that round found.
+- Tell S06R that round 4 closed this item. Then it will not report the Round 3 note as open.
+
+**2. "One ADR or several for the four PROPOSED names": S07 can decide it.**
+
+- The four names are `record.storm_read`, `ai.recommendation`, `ai.approval` and `final_action`.
+- The PRD says "S07 adds the ids under a new ADR" in several places. It does not say how many ADRs.
+- No requirement, test name or YAML id depends on the count.
+- S06R compares the PRD with the YAML at version `1.1.1`. Both agree today, so S06R can pass without this answer.
+- The count matters only for the layer version in S07. One ADR gives one version raise. Several ADRs give several. The PRD already says the PRD header, `traceability.md` and the S08 hash step must carry the last version. S08 starts only after the version stops changing.
+
+**If you still want it closed first**, I can add one sentence to `prd.md` section 15: "S07 may use one ADR for all four names or several. The layer version is final after the last one." That changes the PRD to v1.6. It needs a round 5 in `prd-fixes.md`, a re-run of the checks and a new entry in `playbook/STATUS.md`. It also moves the version S06R reviews. I do not recommend it. S07 will record the choice in its own ADR, and a reviewer can check it there.
+
+**Next step:** run S06R in a fresh chat against `prd.md` v1.5 and `traceability.md` v1.5.
+
+
+## 2026-10-13 08:45
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT: `playbook/S06R-prd-review.md` lines 23-87 (Stage S06R, PRD review).
+
+INPUTS: `06-telecom-service-network-incident-ops/docs/prd/prd.md`, `traceability.md`, `Risk Management.md`, the `semantic-layer` folder, `docs/02-baseline/ai-qualification.md`, `semantic-layer-review.md`, `semantic-layer-revision.md`, `S05R_Decisions_Taken.md`, `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`, `docs/ADR/0003-s06-risk-recommendations.md`, `Project_Intent - Appendix B.md`, `playbook/README.md`.
+
+### Assistant
+
+**1. Stage status: BLOCKED.** One row is FAIL. The PRD defines the words "healthy call" at line 157 of `prd.md`. The glossary and the YAML do not have those words, and no "Open question for S03:" line lists them. P2 is in the BLOCKED list.
+
+**2. Key findings**
+
+- **P1 PASS.** The PRD is v1.5 and `traceability.md` is v1.5. All 73 requirements (RQ-01 to RQ-73) have a YAML id that resolves and a test name. 29 tests exist and 44 are planned.
+- **P2 FAIL (and failure-list item 8).** Line 157 says "In this PRD, a healthy call is...". Lines 40 and 620 say the PRD defines no term. Round 3 fix R3-7 (d) added the sentence. Fix F-1: take out the defining sentence and write the plain condition where the words are used.
+- **P3 PASS.** Pick, agency and approval-point quote match the S2Q table on all 11 rows.
+- **P4 PASS.** The two AI uses the app builds have agency recommend. No EXECUTE route is listed. The four gates are written down and the fourth does not exist.
+- **P5, P6, P7, P8, P9, P10, P11 PASS.** Both required sentences are at lines 259 and 260. `GET /ready`, the no-header 403 and the login not-built row are there.
+- **P13 PASS.** All three version strings read `1.1.1`. The id count is 757, so ADR 0003 added none. The answer store rule and the 13 deferred items match ADR 0003.
+- **Checks I ran.** `build.py --check` passes. 41 semantic-layer tests pass. The 29 existing acceptance tests give 40 passed and 1 skipped (`opa` is missing). I restored `logs/audit.log` after the runs. The SHA-256 hash is the same as before.
+
+**3. Major risks**
+
+- **X-1.** RQ-31 cites `docs/12-finops/optimization-backlog.md`. That file gives a different cache key and a cap of 500 stored answers with no PROPOSED label. The PRD says the cap is PROPOSED and has no number. The owner should settle this before S07.
+- **X-2.** RQ-69 does not say what the caller gets when a correlation id is over 128 characters on a write.
+- **X-3.** Two alarm rows in the data have no matching device or no storm id. The "held aside" rule in RQ-08 needs a test fixture, because the only blank-key row has a blank storm id.
+- X-4 to X-8 are small. They cover one wrong outcome cell, an unlabelled "10", the D-18 wording, three plain-speech items and the persona on steps 5 and 6.
+
+**4. Assumptions and unknowns**
+
+- I read "no AI use has execute agency" as "no use where a model acts". `ai_use.remediation_execution` has agency execute but its pick is workflow automation, and the PRD builds no route for it.
+- If you read line 157 as a usage note, P2 is PASS and the stage is PASS. I scored it FAIL because the sentence is a definition.
+- I did not open `playbook/S06-prd.md`.
+- The random picks for P11 were RQ-32, RQ-44 and RQ-52.
+
+**5. Artifacts created**
+
+- `06-telecom-service-network-incident-ops/docs/prd/prd-review.md`, v4.0. It replaces the round 3 review at the same path.
+- No other repo file changed. I made scratch scripts in a temp folder outside the repo.
+
+**6. Blocking issues**
+
+- F-1 (P2 and P12.8). It is a small edit in `prd.md` at lines 157, 162, 317 and 319.
+
+**7. Recommended next action**
+
+Run S06F with F-1. Add X-1 and X-2 to the "Decisions for this round" block if you want them closed too. Then run S06R again in a fresh chat. Record this BLOCKED result in `playbook/STATUS.md`.
+
+
+## 2026-10-13 08:31
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+explain "1. Stage status: BLOCKED. One row is FAIL. prd.md line 157 defines the words "healthy call". The glossary and YAML don't have them, and no "Open question for S03:" line lists them. P2 is on the BLOCKED list." how do we fix it?
+
+### Assistant
+
+## What the check says
+
+P2 says every term in the PRD must be in `glossary.md` or a YAML file with the same meaning. It allows two exceptions:
+
+1. A word that sits on an "Open question for S03:" line, if the PRD does not define it.
+2. The four honesty labels (REAL, PRECOMPUTED, SIMULATED, EDUCATIONAL).
+
+## What went wrong
+
+Line 157 of `prd.md` reads: "In this PRD, a healthy call is a call from a caller with an allow row to which no row of the failure table below applies."
+
+- The words "healthy call" are not in the glossary or the YAML. The YAML has `status.code.health.ok`, but that covers `GET /health` only.
+- No "Open question for S03:" line lists them in section 15.
+- The PRD gives the words a meaning of its own, so exception 1 does not apply. That exception covers words that are listed and not defined.
+- Line 40 and the gate row at line 620 both say "This PRD does not define a term". Line 157 makes those two sentences untrue.
+- The words are used at lines 162, 317 (RQ-16) and 319 (RQ-18, twice).
+
+P2 is in the BLOCKED list (P1, P2, P3, P4, P9, P13), so one FAIL there blocks the stage.
+
+It matters because stage S08 gives a second model the PRD and the YAML only. A word whose meaning lives only in the PRD is a place where two builders can read it differently.
+
+## How to fix it
+
+**Option A (recommended). Drop the defined word and write the condition in plain words.**
+
+- Line 157: delete the sentence.
+- Line 162: change "on a healthy call" to "on a call that no row of the failure table applies to". Change "The sentence on a healthy call" to "The sentence when no failure row applies".
+- RQ-16 (line 317): change "A healthy call returns..." to "A call with an allow row, to which no row of the failure table applies, returns...".
+- RQ-18 (line 319): make the same change in both places.
+- Leave the planned test name `test_healthy_recommend_is_hold_for_review_with_the_sentence` as it is. It is an identifier, not a PRD term. Nothing in `traceability.md` changes.
+
+**Option B. Keep the words and list them as an open question.**
+
+- Add one "Open question for S03:" line in section 15. It says the words have no YAML id and no glossary row, and that the PRD does not explain them.
+- You must still delete the sentence at line 157. An open-question word has to be listed and not defined.
+- The Open question count then goes from 13 to 14. That means edits in the PRD header (line 12), `traceability.md`, the gate row at line 620, and the S06F count checks.
+
+Option A touches fewer places and needs no count changes.
+
+## Running the fix
+
+The playbook says to run S06F, not to hand-edit.
+
+1. Open a new chat for `playbook/S06F-prd-fixes.md`.
+2. Put "F-1, option A" in its "Decisions for this round" block.
+3. It applies F-1 from `prd-review.md` and raises both `prd.md` and `traceability.md` to v1.6.
+4. Run S06R again in a fresh chat.
+
+If you would rather treat line 157 as a usage note, that is your call. P2 would then be PASS. I scored it FAIL because the sentence starts "In this PRD, a healthy call is...", which is a definition.
+
+I can run the S06F fix in this chat if you want. Tell me which option.
+
+
+## 2026-10-13 09:20
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+make the required updates to  playbook/S06F-prd-fixes.md. to address all the issues we found in this S06R-prd-review based on your recommended options/approach.
+
+### Assistant
+
+I replaced the old Round 3 block in `playbook/S06F-prd-fixes.md` with a Round 5 block. It fixes F-1 and settles X-1 to X-7. It leaves X-8 as it is. I did not run S06F, and I did not edit `prd.md`, `traceability.md` or `prd-fixes.md`.
+
+What the Round 5 block tells S06F to do:
+
+| Finding | Decision |
+|---|---|
+| F-1 ("healthy call") | Option A. Delete the defining sentence at section 7. Replace each "healthy call" in the outcome table, RQ-16 and RQ-18 with the plain condition "a call with an allow row to which no failure row applies". Keep the test name. Add no Open question line. |
+| X-1 (RQ-31 vs the backlog file) | RQ-31 stays. Add a "known stale case" sentence to section 15. The backlog file is changed by you, outside this stage. |
+| X-2 (long correlation id on a write) | RQ-69: the server swaps an id over 128 characters for a new UUID and does not refuse the call. This is the same as a missing header (RQ-49). No new YAML id. The audit route keeps its 400 for a long id in the path. |
+| X-3 (alarm rows with no usable device) | RQ-08 says line 353 (`ALA-BAD1`) is blank except its alarm id, so no storm reply lists it. RQ-62 says a device id with no device row is listed, and uses `STO-00001` / `DEV-00001` as the example. RK-17 names both rows. |
+| X-4 (Outcome of remediation execution) | Section 7 intro says the Outcome column comes from `ai-qualification.md`, except `ai_use.remediation_execution`, which takes `outcome.execute` from the YAML. |
+| X-5 (limit of 10 running calls) | Label every mention PROPOSED, N-05, owner Team-Force. |
+| X-6 (D-18 listed deferred, cache flag planned) | Add one sentence under the deferred table that explains why both are true. RQ-31 says S07 adds the flag under a new ADR. |
+| X-7 (plain speech) | Explain "case id" in RQ-44, "audit action word" in RQ-52. Replace "execute check" in RQ-33 with the real field names. |
+| X-8 | No edit. Round 3 settled steps 5 and 6. |
+
+Other parts of the file I changed:
+- Version moves from 1.5 to 1.6 in `prd.md` and `traceability.md`. All counts stay the same: 73 rows, 29 existing tests, 44 planned tests, 757 ids, 13 Open question lines, layer 1.1.1.
+- The Locked facts table now has rows for rounds 4 and 5, and the review fix list at round 5.
+- The Inputs list now includes `devices.csv` and `optimization-backlog.md`, both read only.
+- The search list at the end of the block now names the new words: "healthy", "execute check", "case id", "10 running calls", "128", and the others.
+
+Two facts I checked in the data before writing X-3. Line 353 of `alarms.csv` is blank except for `ALA-BAD1`. `devices.csv` has no `DEV-00001`, and the row at line 2 names it.
+
+You make two edits by hand. S06F does not touch these files:
+1. `docs/12-finops/optimization-backlog.md` lines 125, 127 and 128. The new text is in the block. It says the key is `prompt_hash` alone, nothing clears the store early, and the cap is PROPOSED with no number.
+2. `playbook/S07-application-and-demo.md` line 36. Change "on a healthy call" to "when no failure row applies".
+
+One judgement for you to confirm. On X-1 I kept the PRD rule and changed the backlog file, not the other way round. The PRD rule is your round 3 decision and ADR 0003 decision 3. With one stub model and one policy version, a key with version numbers adds nothing in this packet.
+
+Next step: paste the updated Decisions block into a fresh chat to run S06F. Then run S06R again in another fresh chat.
+
+
+## 2026-10-13 08:46
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+provide specifics of which words to replace and/or add in docs/12-finops/optimization-backlog.md based on - "You make two edits by hand, because S06F does not touch these files: docs/12-finops/optimization-backlog.md, lines 125, 127 and 128: the new text is in the block. The key is prompt_hash alone, nothing clears the store early, and the cap is PROPOSED with no number."
+
+### Assistant
+
+Only lines 125, 127 and 128 of `docs/12-finops/optimization-backlog.md` need to change. Each edit replaces the whole table row.
+
+Line 125. Old: `| What the key holds | `prompt_hash`, `model_version`, and the policy version. A change in any one gives a new key. |`
+New: `| What the key holds | `prompt_hash` alone (RQ-31 in the PRD). One stub model and one policy version exist in this packet, so no other key part is needed. |`
+
+Line 127. Old: `| Clear at once | The cache is emptied when the policy version or the model version changes. |`
+New: `| Clear at once | No rule empties the store before its 300 seconds are up. A restart empties it. |`
+
+Line 128. Old: `| Size limit | 500 stored answers in memory, oldest removed first. One process only, like the dedupe memory and the audit lock (`recovery-evidence.md`). A restart empties it. |`
+New: `| Size limit | The cap on stored answers is PROPOSED. Owner: Team-Force. No number is set (ADR 0003 decision 3). One process only, like the dedupe memory and the audit lock (`recovery-evidence.md`). A restart empties it. |`
+
+No other line in the file contradicts the new rows. Line 12 stays true, because a changed record gives a different `prompt_hash`. Line 123 and the review trigger on line 131 still read correctly.
+
+
+## 2026-10-13 08:50
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+do i need to take a call on this - "One call to confirm: on X-1 I kept the PRD rule and changed the backlog file. The PRD rule is your round 3 decision and ADR 0003 decision 3. There is one stub model and one policy version, so a key with version numbers adds nothing in this packet."?
+
+### Assistant
+
+No, you do not need to take a call. I worded it as a question, but the owner already made this decision. In round 3 you chose that a stored answer is found by `prompt_hash` alone. ADR 0003 decision 3 records the same rule, and the PRD (RQ-31) follows it. The backlog file was the only one that disagreed. The three-line edit makes it match your earlier decision.
+
+Version numbers in the key would only matter if the model or the policy changed while the app kept running. Here both are fixed. There is one stub model. The policy loads once when the app starts (Inference, based on the existing load-once test). A restart empties the store, because it lives in memory. So an old answer can never be served under a newer model or policy version.
+
+Only one situation would change this: S07 or S08 adds a second model, or makes the policy reloadable while the app runs. Then you would add the model version and the policy version to the key, and clear the store when either changes. That needs a new ADR, because ADR 0003 decision 3 fixes the key today. Nothing in the current plan does this.
+
+Go ahead with the three-line edit to `optimization-backlog.md` and the one-line edit to the S07 playbook, as planned.
+
+
+## 2026-10-13 09:05
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Run stage S06F (PRD fixes) with the prompt in `playbook/S06F-prd-fixes.md` lines 54-206. That is round 5: apply F-1 and X-1 to X-7 from `docs/prd/prd-review.md` v4.0, leave X-8 as it is, and edit only `prd.md`, `traceability.md` and `prd-fixes.md`.
+
+Inputs: `playbook/S06-prd.md`, `playbook/S06R-prd-review.md`, `playbook/README.md`, `docs/prd/prd-review.md`, `docs/prd/prd.md`, `docs/prd/traceability.md`, `docs/prd/prd-fixes.md`, `docs/prd/Risk Management.md`, `docs/02-baseline/ai-qualification.md`, `docs/02-baseline/semantic-layer-revision.md`, `docs/02-baseline/S05R_Decisions_Taken.md`, `docs/ADR/0002-...`, `docs/ADR/0003-...`, `docs/00-contract/operating-contract.md`, `data/synthetic/alarms.csv`, `data/synthetic/devices.csv`, `docs/12-finops/optimization-backlog.md`, `apps/api`, `playbook/S07-application-and-demo.md`, `Project_Intent - Appendix B.md`, and every design file and test file that a fix names.
+
+### Assistant
+
+I applied round 5 to `prd.md` and `traceability.md`, and recorded it in `prd-fixes.md`. Both PRD files are now v1.6. The semantic layer stays at `1.1.1`.
+
+1. **Stage status: CONDITIONAL PASS.** Every fix is applied (F-1 and X-1 to X-7), X-8 is left as decided, all checks match the locked counts, and the done test failed then passed. It is not PASS because S06R must run again in a fresh chat, and because `Project_Acronyms.md` (outside the fix list) still holds old wording.
+
+2. **Key findings.**
+   - F-1 closes the one FAIL row (P2 and P12.8). The defining sentence for "healthy call" is gone. The outcome table, RQ-16 and RQ-18 now say "a call to which no row of the failure table applies". Only the test name in RQ-18 and the two matching rows in `traceability.md` still hold the word "healthy".
+   - X-1: the block said `optimization-backlog.md` lines 125, 127 and 128 still gave a model-and-policy key and a cap of 500. I read them first, as the block asked. They already say `prompt_hash` alone, no clear before 300 seconds, and a PROPOSED cap with no number. The file wins, so the new sentence in section 15 says what the review read, what the lines read now, and that they agree with RQ-31.
+   - The two owner edits outside this stage were already made. `S07` line 36 and the three backlog lines were changed at 08:44 and 08:47. Backlog line 125 lacks the last two words "in this packet". The meaning is the same. I did not edit either file.
+   - X-2: a header id over 128 characters is swapped for a new UUID. The call is not refused. RQ-69 and RK-03 say so.
+   - X-3: I checked the data first. `alarms.csv` line 2 names `DEV-00001`, and `devices.csv` has no such device. Line 353 (`ALA-BAD1`) is blank except for its alarm id, and it is the only row with a blank `dedupe_key`. The text in RQ-08, RQ-62 and RK-17 matches the files.
+   - X-4: only `ai_use.remediation_execution` takes its outcome from the YAML. No other use differs.
+   - X-5, X-6 and X-7 are applied as written.
+   - Checks: 73 rows, 757 ids, 29 existing and 44 planned tests, 13 Open question lines, 41 layer tests passed, 40 passed and 1 skipped for the PRD tests. `logs/audit.log` was 240 lines before and after.
+
+3. **Major risks.**
+   - A planned test is not evidence until it exists. 44 of 73 are planned.
+   - S07 must add the cache flag as a YAML id under a new ADR before it ships RQ-31. That raises the layer version.
+   - The RQ-69 test now has a second case (the 129 character header id).
+   - `Project_Acronyms.md` lines 93, 387 and 394 still say "a healthy call" and "never holds a BLOCK or HOLD answer".
+
+4. **Assumptions and unknowns.**
+   - The Decisions block is the decision for every fix.
+   - Where the block says the file wins, I used what the file says on 2026-10-13. This happened once, for X-1.
+   - `git status` could not show the three PRD files, because `docs/prd/` is an untracked folder. I compared file times and hashes too.
+   - The `opa` test still skips on this machine.
+
+5. **Artifacts created, with paths.** Changed, all under `06-telecom-service-network-incident-ops/docs/prd/`: `prd.md` (v1.6), `traceability.md` (v1.6), and `prd-fixes.md` (v5.0, new section "Round 5, 2026-10-13"). `transcript/chat_transcript.md` has this turn.
+
+6. **Blocking issues.** None.
+
+7. **Recommended next action.** Run S06R again in a fresh chat against v1.6. Optionally, change the three `Project_Acronyms.md` lines first. Then start S07 once S06R reads PASS or CONDITIONAL PASS.
+
+## 2026-10-13 11:30
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Here is how we should proceed - 1. Fix the four Project_Acronyms.md lines now. 2. Defer RQ-31.
+
+### Assistant
+
+Both steps are done.
+
+1. **Summary.** The four `Project_Acronyms.md` lines now match the PRD. RQ-31 (the 300 second answer store) is deferred under the new ADR 0004. `prd.md` and `traceability.md` are v1.7. The tests now count as 29 existing, 43 planned and 1 deferred (29 + 43 + 1 = 73). The status is CONDITIONAL PASS, because S06R has not scored the round 5 and round 6 edits yet.
+
+2. **Decisions applied.**
+   - The RQ-31 row stays. Its YAML ids, test name and design file did not change. Its status is "deferred (ADR 0004)".
+   - S07 does not build the store. The 300 second lifetime (`OB-01`) stays DECIDED.
+   - The cache flag (D-18) is not needed in S07, so no YAML id is added and the layer stays `1.1.1`.
+   - The 13 Open question lines are unchanged.
+
+3. **Checks 8a to 8h.**
+   - 73 rows in both files. 757 YAML ids. No unresolved cited id.
+   - Row-by-row compare: no mismatch.
+   - Tests: 29 existing found, 43 planned absent, 1 deferred absent.
+   - Semantic layer unchanged. 13 Open question lines.
+   - The 29 existing tests: 40 passed, 1 skipped (the `opa` test). The full suite: 331 passed, 2 skipped. `logs/audit.log` was restored to 240 lines with the same hash.
+   - Done test: I broke `metric.repeated_prompt_share`. Check 8b then failed for RQ-31 and RQ-63. After the restore it passed.
+
+4. **Changes by file.**
+   - `docs/prd/prd.md` and `docs/prd/traceability.md`: v1.7. RQ-31 marked deferred, and the planned count 44 became 43. Hashes: `0BA9E789...DA6B1D6F` and `770EBE73...3D121BAA9`.
+   - `docs/prd/prd-fixes.md`: Round 6 section added (v6.0).
+   - `docs/ADR/0004-defer-rq-31-answer-store.md`: new.
+   - Outside files (small edits): ADR 0003, `optimization-backlog.md`, `Risk Management.md`, `playbook/S06R-prd-review.md`, `playbook/S06F-prd-fixes.md`, `playbook/STATUS.md` (rows for round 5, the decision and round 6), and `Project_Acronyms.md`.
+
+5. **Still open (not fixes).**
+   - `docs/12-finops/evidence.md` line 265 still says the store is built in S07. I did not edit it. I listed it for the next S06R.
+   - The deferred test has no stage and no date. ADR 0004 lists the steps for a later stage: run S05R, add the cache flag under a new ADR, raise the layer version, and set the status back to planned.
+   - The audit row still has no key for a reason.
+
+6. **Blocking issues.** None.
+
+7. **Recommended next action.** Run S06R in a fresh chat against v1.7. It should score the round 5 and round 6 edits and read `evidence.md` line 265.
+
+## 2026-10-13 11:38
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+do we need to update the prompt or input list for S06R?
+
+### Assistant
+
+Yes. The S06R prompt and its input list don't mention ADR 0004 or the deferral yet. I updated only the P13 check and the locked facts earlier.
+
+**Needs a change before you run S06R**
+
+| Where in `S06R-prd-review.md` | Problem | Change |
+|---|---|---|
+| Inputs | ADR 0004 is not listed. | Add `docs/ADR/0004-defer-rq-31-answer-store.md`. |
+| Scope (Include line) | It names ADR 0002 and ADR 0003 only. | Add ADR 0004. |
+| Lifecycle linkage | It says "Cite ... ADR 0002, ADR 0003". | Add ADR 0004. |
+| P1 | It says "A planned S07 test name still counts." RQ-31 is now deferred, so a reviewer could mark it FAIL. | Add "A deferred test name still counts." |
+| P13 | It names ADR 0004, but it doesn't check the counts. | Add: "`prd.md` and `traceability.md` agree on 29 existing, 43 planned and 1 deferred test." |
+| Expected output (P13 cell) | It says "the three ADR 0003 decisions". | Add "and the ADR 0004 deferral". |
+
+**Optional additions to the input list**
+
+- `docs/prd/prd-fixes.md` lets the reviewer see what rounds 5 and 6 changed. The reviewer should still judge the PRD on its own, so this is a judgment call.
+- `docs/12-finops/optimization-backlog.md` and `docs/12-finops/evidence.md` are worth adding. Line 265 of `evidence.md` still says the store is built in S07. Without these files in the inputs, the reviewer will not see that conflict.
+- `Project_Acronyms.md` is optional. It was the source of the stale lines in round 5.
+
+**No change needed:** P2 to P12, the completion gate, and the locked facts. The locked facts already hold the RQ-31 deferral and the 29 / 43 / 1 counts.
+
+I haven't edited the file. I can apply the six required changes, with or without the optional inputs. Which do you want?
+
+## 2026-10-13 11:40
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+yes  apply the six required changes, with the optional inputs
+
+### Assistant
+
+All six changes are applied to `playbook/S06R-prd-review.md`, with the optional inputs.
+
+**Inputs** now also list:
+- `docs/ADR/0004-defer-rq-31-answer-store.md`
+- `docs/prd/prd-fixes.md`, marked context only, so the reviewer judges the PRD on its own text
+- `docs/12-finops/optimization-backlog.md`
+- `docs/12-finops/evidence.md`, with a note that line 265 still says the store is built in S07
+- `Project_Acronyms.md`
+
+**Prompt changes**
+1. Scope (Include line) names ADR 0004 and the four new files.
+2. P1 says a deferred test name (RQ-31, ADR 0004) still counts.
+3. P13 checks that `prd.md` and `traceability.md` agree on 29 existing, 43 planned and 1 deferred test. It also tells the reviewer to list any input file that says S07 builds the answer store, with file and line.
+4. The constraint line says ADR 0003 and ADR 0004 added no YAML id.
+5. Lifecycle linkage cites ADR 0004.
+6. Expected output for P13 names the ADR 0004 deferral and the counts.
+
+I also added a "Playbook change" row to `playbook/STATUS.md`. The prompt is ready to run in a fresh chat against PRD v1.7. The reviewer should flag `evidence.md` line 265 as a finding. I left it unedited on purpose.
+
+## 2026-10-13 11:44
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+why did you add Project_Acronyms.md and not @playbook/STATUS.md ?
+
+### Assistant
+
+I added `Project_Acronyms.md` because it was the file that held the stale wording in round 5. Four of its lines still said "a healthy call" and "never holds a BLOCK or HOLD answer". It also repeats facts the PRD states: the test counts, the ADR list and the meaning of RQ-31. A reviewer can check those repeats against the PRD. I didn't consider `playbook/STATUS.md` at all. That was an oversight, not a decision.
+
+Whether `STATUS.md` belongs in the inputs depends on what you want the reviewer to do with it.
+
+**Reasons to add it**
+- It is the one place that lists every stage result, the counts after each round and the owner decisions. For example, it says RQ-31 was deferred on 2026-10-13.
+- A reviewer can check it against the PRD. If a row says "43 planned" and the PRD says something else, that is a finding.
+- The reviewer can see that the playbook change rows (like the one I added for S06R) match the files.
+
+**Reasons to leave it out**
+- It is a log of what an agent claimed after each stage. A reviewer who reads those claims is no longer judging the PRD on its own text. This is why I marked `prd-fixes.md` as context only.
+- Older rows keep old numbers on purpose. Rows for rounds 3 and 4 say "44 planned". A reviewer could report those as stale when they are only history.
+
+My suggestion is to add it as context only, with one sentence: "Older rows hold the counts of their own date. Check only the newest row against the PRD." That keeps the cross-check and avoids false findings from the old rows.
+
+Do you want me to add it that way, or leave it out?
+
+## 2026-10-13 11:44
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Prompt: `@playbook/S06R-prd-review.md` lines 28 to 93 (Stage S06R, PRD review). Inputs: `docs/prd/prd.md`, `docs/prd/traceability.md`, `docs/prd/Risk Management.md`, `semantic-layer/`, `docs/02-baseline/ai-qualification.md`, `semantic-layer-review.md`, `semantic-layer-revision.md`, `S05R_Decisions_Taken.md`, ADR 0002, ADR 0003, ADR 0004, `docs/prd/prd-fixes.md`, `docs/12-finops/optimization-backlog.md`, `docs/12-finops/evidence.md`, `Project_Acronyms.md`, `Project_Intent - Appendix B.md`, `playbook/README.md`.
+
+### Assistant
+
+**1. Stage status: PASS.** No row is FAIL. The one FAIL from the last review (P2, "healthy call") is closed. All three version strings read `1.1.1`, and `prd.md` and `traceability.md` (both v1.7) agree on 29 existing, 43 planned and 1 deferred test.
+
+**2. Key findings**
+
+- **P1:** All 73 requirements (RQ-01 to RQ-73) have a requirement id, a YAML id that resolves (757 ids), and a test name. RQ-31 keeps its test name and is marked deferred (ADR 0004).
+- **P3 and P4:** The pick, agency and approval point of all 11 AI uses equal the S2Q table. No route can return EXECUTE.
+- **P6 and P10:** Both required sentences are in `prd.md` (lines 257 and 258). `GET /ready`, the no-header 403 (RQ-68) and the "login is out of scope" row are all there.
+- **P9:** The five required acceptance checks are present. Only the clinician test exists today. The other four are planned by name.
+- **P13:** The 13 deferred items match. D-07 is not among them. ADR 0003 and ADR 0004 added no YAML id.
+- **Test run:** I ran the 29 existing acceptance tests. 40 cases passed and 1 skipped (RQ-59, `opa` missing). `build.py --check` passes. 41 semantic-layer tests pass. I restored `logs/audit.log` byte for byte.
+- **Stale answer-store lines (X-1, X-2):** Eleven lines in older files still say S07 builds the answer store, or give old counts. The worst is `docs/12-finops/evidence.md` line 265. It says "Built in S07", "Only RECOMMEND_ONLY answers are stored", and "At most 500 answers". It disagrees with ADR 0004 on all three points.
+
+**3. Major risks**
+
+- X-3. RQ-08 does not name the JSON keys for the raw count, deduped count, flagged count and flag word. S07 will stop and log a gap. A second model would pick different names.
+- X-4. RQ-32 gives a "no" decision an approval id. RQ-33 says a "no" never fills the approval id. The audit row of a "no" is not specified.
+- Planned tests are not evidence until they exist and pass. 43 of 73 are planned.
+- `evidence.md` line 265 could lead a builder to build the store with a cap of 500.
+
+**4. Assumptions and unknowns**
+
+- Two judgement calls. In P2, I scored the Open question words PASS although RQ-08, RQ-31, RQ-65 and RQ-71 describe them (X-5). In P5, I scored steps 5 and 6 PASS although they carry no persona. The owner kept that on purpose (X-6).
+- I did not re-read the CSV files. Round 4 checked them and nothing changed.
+- I did not re-run the 67 node ids behind `traceability.md` section 5 ("101 passed"). That figure is **Unknown** today.
+
+**5. Artifacts created**
+
+- `06-telecom-service-network-incident-ops/docs/prd/prd-review.md` (round 5, v5.0). It replaces round 4.
+
+**6. Blocking issues**
+
+None.
+
+**7. Recommended next action**
+
+Start S07. Before you do, edit the stale lines in section 6, X-1 and X-2. They are small, and they change no PRD version. If you also want the open design points closed (X-3, X-4, X-7), run S06F with those fixes. That moves the PRD to v1.8. Then run S06R again in a fresh chat. Record the PASS in `playbook/STATUS.md`.
+
+## 2026-10-13 11:56
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+List steps serially starting with the first step and ending with the last step for "Start S07. First edit the stale lines in section 6 of the review, X-1 and X-2. They are small, and they change no PRD version. To close the open design points (X-3, X-4, X-7), run S06F with those fixes. That moves the PRD to v1.8. Then run S06R again in a fresh chat. Record the PASS in playbook/STATUS.md."
+
+### Assistant
+
+Here is the order to follow. My earlier sentence put "Start S07" first. It belongs last.
+
+1. Edit the stale lines in X-1 and X-2 (section 6 of `docs/prd/prd-review.md`): `docs/12-finops/evidence.md` line 265; `S05R_Decisions_Taken.md` line 94; ADR 0003 lines 12 and 69; `Risk Management.md` line 11; `Project_Acronyms.md` lines 387 and 400; ADR 0002 line 11; optionally `S05R_Decisions.md` lines 354 and 621. These edits change no PRD version.
+2. Decide whether to close X-3, X-4 and X-7 before S07. Optional. If you skip it, go to step 6. If you do it, go to step 3.
+3. Run S06F with these three fixes in a new chat: X-3 (key names in RQ-08), X-4 (one sentence in RQ-33 on `approval_id` for a "no"), X-7 (one row in the section 8 label table for the HTTP status of each reply).
+4. Check the version. `prd.md` and `traceability.md` both move from v1.7 to v1.8, with the same number in both.
+5. Run S06R again in a fresh chat. It must return PASS or CONDITIONAL PASS.
+6. Record the result in `playbook/STATUS.md`: date, stage id, status, short note.
+7. Start S07 (`playbook/S07-application-and-demo.md`).
+
+If you skip step 2, the sequence is 1, 6, 7.
+
+## 2026-10-13 12:00
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+decide whether to close X-3, X-4 and X-7 before S07.
+
+### Assistant
+
+**Decision: close X-3, X-4 and X-7 before S07.**
+
+Why close them now:
+- The version bump happens anyway. If S07 starts first, it stops on RQ-08, RQ-32 and RQ-33 and logs each as a gap in `docs/demo/evidence.md`. You answer the gaps. The PRD then changes. PRD section 15 says the version goes up by one step and S07 re-checks every changed row. S08 starts only after the PRD version stops changing.
+- S08 depends on it. The second model builds from the same PRD. If RQ-08 names no keys, the two models pick different key names, and the comparison measures that choice and not model quality.
+- The edits are small: a list of key names, one sentence, one table row. The cost is one S06F run and one S06R run.
+
+What you decide before S06F runs:
+1. X-3, key names for the storm reply. Proposal: counts `raw_count`, `deduped_count`, `flagged_count`; lists `rows` and `held_aside`; row keys `alarm_id`, `device_id`, `dedupe_key`, `flag`. These match the test name `test_storm_returns_raw_count_deduped_count_and_alarm_ids`.
+2. X-4, approval id on a "no". Recommended: only a yes gets an approval id. A "no" stores `decision` "no", `approver`, `record_id` and `correlation_id`, with `approval_id` null in the reply and the audit row. RQ-33 then holds with no extra rule. The RQ-32 test name already says "yes is stored with ... a server-made id". RQ-32 needs a small change, because it now says the server makes the id on every good call.
+3. X-7, HTTP status numbers. Add one row to the section 8 label table: "HTTP status of each reply: REAL, a live call at the request."
+
+Optional in the same S06F run: the wording fixes X-5, X-8 and X-9 cost no extra version bump. S06F applies only the fixes you list.
+
+Order: (1) edit the stale lines of X-1 and X-2; (2) run S06F with your answers; (3) run S06R in a fresh chat; (4) record the result in `playbook/STATUS.md`; (5) start S07.
+
+Tell me your answers to items 1 and 2, and I will write the exact S06F fix list.
+
+## 2026-10-13 12:01
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Edit the stale lines in X-1 and X-2 (section 6 of `docs/prd/prd-review.md`): `docs/12-finops/evidence.md` line 265; `S05R_Decisions_Taken.md` line 94; ADR 0003 lines 12 and 69; `Risk Management.md` line 11; `Project_Acronyms.md` lines 387 and 400; ADR 0002 line 11; and (optional) `S05R_Decisions.md` lines 354 and 621.
+
+### Assistant
+
+I made all the edits. No PRD, YAML, code or test file changed, so no version moves.
+
+| File and line | Change |
+|---|---|
+| `docs/12-finops/evidence.md` 265 | The row now says the lifetime is 300 seconds, the build is deferred (ADR 0004), the rules for a later build are in RQ-31, and the cap is PROPOSED (owner Team-Force) with no number. I dropped "Only RECOMMEND_ONLY", "emptied when the version changes", "At most 500" and "Built in S07". |
+| `docs/02-baseline/S05R_Decisions_Taken.md` 94 | "built in S07" is now "build deferred, ADR 0004". |
+| `docs/ADR/0003-s06-risk-recommendations.md` 12 and 69 | Each line now ends with an "Update, 2026-10-13" note: ADR 0004 moves RQ-31 out of S07, and RQ-68 to RQ-73 stay planned for S07. |
+| `docs/prd/Risk Management.md` 11 | "Five" is now "Thirteen". |
+| `Project_Acronyms.md` 387 | The range is now `RQ-18` to `RQ-30`, `RQ-70` and `RQ-71` (`RQ-31` is deferred, ADR 0004). |
+| `Project_Acronyms.md` 400 | It now says each word is on an Open question line in `prd.md` section 15, with no YAML id. |
+| `docs/ADR/0002-...md` 11 | Added an update note: ADR 0003 decided D-07, and login is out of scope. |
+| `docs/02-baseline/S05R_Decisions.md` 354 and 621 | Same wording fix as `S05R_Decisions_Taken.md`. Line 354 now says the lifetime is decided, the build is deferred, and it is not built. |
+
+Checks:
+- I searched the edited files for "built in S07", "Only RECOMMEND_ONLY", "500 answers" and the old range. Only two kinds of hits remain. Both match the PRD: the D-18 trigger "If the cache is built in S07, add the cache flag first" (`S05R_Decisions_Taken.md` line 53, `S05R_Decisions.md` line 360), and `Project_Acronyms.md` line 394, which already says "not built in S07".
+- The docs secret scan and the semantic-layer tests pass (43 passed).
+- `logs/audit.log` was restored after the test run.
+
+`docs/prd/prd-review.md` still lists these lines as stale. It records the state on the day of the review, so I did not edit it.
+
+Next: decide whether to run S06F for X-3, X-4 and X-7. Then record the result in `playbook/STATUS.md` and start S07.
+
+## 2026-10-13 12:10
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+can we update S06F -"## Decisions for this round" section with the fix/solution for X-3, X-4 and X-7?
+
+### Assistant
+
+Yes. (Ask mode, no file changed.) I proposed the Round 7 text for the Decisions block. It closes X-3 (reply key names of the storm route), X-4 (no approval id on a "no") and X-7 (a label row for HTTP status numbers). It leaves X-5, X-6, X-8 and X-9 as they are. It raises the PRD from v1.7 to v1.8 and adds no RQ row, no YAML id and no test name. The next turn applied it.
+
+## 2026-10-13 12:25
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+update S06F -"## Decisions for this round" section with the fix/solution for X-3, X-4 and X-7. Update  other sections in @playbook/S06F-prd-fixes.md with required content (inputs, Expected Output etc.) to prepare it for the next run
+
+### Assistant
+
+I updated `playbook/S06F-prd-fixes.md` for round 7. The next S06F run takes the PRD and `traceability.md` from v1.7 to v1.8.
+
+**Decisions block (now Round 7)**
+- X-3. The storm reply gets these keys: `raw_count`, `deduped_count`, `flagged_count`, `rows` and `held_aside`. Each entry has `alarm_id`, `device_id`, `dedupe_key` and `flag`. A row with a blank `dedupe_key` goes in `held_aside`. The names are PROPOSED, owner Team-Force. Edits go to RQ-08, RQ-62 and the section 15 Open question line. The count of Open question lines stays 13.
+- X-4. Only a yes gets an approval id. For a no, `approval_id` is null in the reply, in the stored record and in the audit row. Edits go to RQ-32, RQ-33, section 6 step 4 and the section 8 "Approval record" row. The stage must read `approval-workflow.md` line 76 first. I checked that line. It says "A rejection writes no approval id."
+- X-7. One new row in the section 8 label table: the HTTP status of other replies the page shows, labelled REAL.
+- X-5, X-6, X-8, X-9. No edit. Each is recorded as "left as it is".
+- Version. v1.7 to v1.8, once, with the same number in both files. The counts stay at 73 rows, 29 existing, 43 planned, 1 deferred, 757 ids and 13 Open question lines.
+- I checked that every sentence the block asks the stage to replace exists once in `prd.md` today.
+
+**Other sections of the file**
+- Inputs. Added ADR 0004, `approval-workflow.md`, `docs/12-finops/evidence.md` and `Project_Acronyms.md` (all read only). The review entry now names v5.0 and X-3, X-4 and X-7. The `prd-fixes.md` entry says rounds 1 to 6 exist.
+- Before you paste. Added a round 7 example.
+- Scope. Excludes `Project_Acronyms.md`, the `playbook/` files and `docs/12-finops/`.
+- Required analysis. Round 7 examples in steps 1 and 7. Check 8b says the reply key names are not YAML ids and are not looked up. Check 8f gives the expected test numbers (40 passed, 1 skipped, 240 audit lines). Check 8g lists the files that already differ in git status.
+- Constraints. ADR 0004 added. The RQ-31 deferral is on the keep-as-PASS list.
+- Locked facts. Added the v1.7 to v1.8 row, the round 7 review row, the storm reply keys and the approval id rule.
+- Lifecycle and Expected output. ADR 0004 and `approval-workflow.md` are cited. A new Expected output row lists the round 7 edits.
+
+**Outside the stage, for the owner.** These lines still say the old thing after round 7. The block tells the stage to name them in the Residual risks row and not to edit them:
+- `playbook/S07-application-and-demo.md` line 34 (storm reply keys) and line 37 (approval id on every call).
+- `Project_Acronyms.md` line 388 and line 312 (the server makes the approval id), and line 386 (storm route keys, optional).
+
+**Open choice.** X-3 b) has RQ-62 read `device_id` from `rows` and `held_aside`. If you want `rows` only, change that one line in the block.
+
+Next: paste the S06F prompt in a fresh chat. Then run S06R in another fresh chat. Then record the PASS in `playbook/STATUS.md`.
+
+## 2026-10-13 12:45
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+is there anything else that needs to be addressed before running S06F again?
+
+### Assistant
+
+Nothing blocks the run. I checked the Decisions block against `prd.md`, the semantic layer, `dedupe.py`, `STATUS.md` and the other playbook files. I found five small points. No file was changed in this turn.
+
+1. The three S06F edits fit the PRD. The X-3 rule (a flagged row stays in `rows`, a blank `dedupe_key` row goes in `held_aside`) matches RQ-08, RQ-09 and `dedupe.py`. The X-4 rule agrees with every "approval id" line in `prd.md`. RQ-58, RQ-29 and RQ-38 need no change.
+2. Check 8g can hide changes. `docs/prd/` shows in `git status --short` as one untracked folder, so an edit to `prd.md` does not show as its own line. Use `git status --short -uall`, or compare file hashes before and after.
+3. `STATUS.md` has no row for the S06R PASS on v1.7, the owner edits of X-1 and X-2, or this round 7 preparation.
+4. The owner lines named in the block (S07 playbook lines 34 and 37, `Project_Acronyms.md` lines 312, 386 and 388) are still unedited. S06F does not need them. The next S06R will list them again as stale unless you edit them first.
+5. `entities.yaml` (`field.audit_row.approval_id`) and `status-taxonomy.yaml` (`status.code.cannot_prove.approval_id`) say `approval_id` is null on every row because no route writes it. This is true today. After S07 a yes writes an id, so the sentence needs a YAML change through S05R and an ADR. It is not part of round 7.
+
+## 2026-10-13 13:00
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+for #2 -  change the wording of 8g
+for #3 - ensure S06F updates the playbook/STATUS.md
+
+### Assistant
+
+I changed `playbook/S06F-prd-fixes.md` for both points.
+
+**Check 8g (new wording)**
+- It now runs `git status --short -uall` from the repository root, before and after. The `-uall` flag lists each file inside the untracked `docs/prd/` folder.
+- It also takes a SHA-256 hash of every listed file before and after. I ran the hash command here first. The first version failed, so the file holds the fixed version: `ForEach-Object { Get-FileHash -LiteralPath $_ -Algorithm SHA256 }`.
+- Only four files may differ: `prd.md`, `traceability.md`, `prd-fixes.md` and `playbook/STATUS.md`. For `STATUS.md` the only difference is one new row at the end of the table.
+- Every other listed file must keep its hash. `logs/audit.log` is restored after the test run. Cache files are named as already present. `transcript/chat_transcript.md` is outside the check, because it is appended after the final response.
+
+**STATUS.md**
+- A new step 11 tells the stage to add one row to the end of the table, last, after the checks and the done test. The row has Date, `S06F round N`, the stage status, and a plain-speech note. The note follows the round 6 row: version, fixes closed and left, owner edits still open, check counts, test numbers, done-test result, record path and "Next: S06R in a fresh chat against vX.Y".
+- The stage must not edit, reorder or delete any other row. It must not log S06R runs or owner edits.
+- The same rule is now in the Decisions block intro, Scope (Include and Exclude), Constraints, Required artifacts (item 3), Completion gate and Expected output.
+
+The rows that `STATUS.md` still lacks (the S06R PASS on v1.7 and the owner edits for X-1 and X-2) are not added by S06F. Add them by hand, or ask me to.
+
+## 2026-10-13 12:48
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+provide specific details of what edits need to be incorporated to address  :
+#4 -a. playbook/S07-application-and-demo.md lines 34 and 37.
+b. Project_Acronyms.md lines 312, 386 and 388.
+
+### Assistant
+
+(Ask mode, no file changed.) I gave the exact old and new text for each line.
+- `playbook/S07-application-and-demo.md` line 34: the storm reply gets the five keys `raw_count`, `deduped_count`, `flagged_count`, `rows` and `held_aside`, and four keys per entry (`alarm_id`, `device_id`, `dedupe_key`, `flag`). Line 37: the server makes the approval id for a yes only, and `approval_id` is null for a no. Line 105 (optional): say the demo approves, so it is a yes.
+- `Project_Acronyms.md` line 388: the approval id is made for a yes only. Line 312: "for a yes ... A no gets no id." Line 386: this row had an older error. It said rows with `last_seen_at` before `first_seen_at` are "listed apart". The PRD keeps such a row in `rows` with a flag word. Only a blank `dedupe_key` row is held aside.
+- Do the edits after S06F finishes and before the next S06R run.
+
+## 2026-10-13 13:05
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+update b. Project_Acronyms.md
+Line 388 (POST /approvals/{id} row): replace the description with "The one human decision. `persona.noc_operator` stores yes or no. The server makes the approval id for a yes only. A no has no approval id. Nothing on any device changes." Keep the last column, RQ-32 to RQ-41.
+Line 312 (APR- row): replace "The PRD (RQ-32) says the server makes the approval id when POST /approvals/{id} is built in S07." with "The PRD (RQ-32) says the server makes the approval id for a yes when POST /approvals/{id} is built in S07. A no gets no id."
+Line 386 (storm route row): replace the description with the new text that names the five reply keys, puts a blank `dedupe_key` row in `held_aside`, keeps a flagged row in `rows` with a flag word, and says the key names are PROPOSED. Keep the last column, RQ-08 to RQ-15.
+
+### Assistant
+
+I made the three edits in `Project_Acronyms.md`, with the wording you gave.
+- Line 388 (`POST /approvals/{id}`): the server makes the approval id for a yes only. A no has no approval id.
+- Line 312 (`APR-`): "for a yes ... A no gets no id."
+- Line 386 (storm route): the reply has the keys `raw_count`, `deduped_count`, `flagged_count`, `rows` and `held_aside`. A blank `dedupe_key` row is in `held_aside`. Every other row is in `rows`. A flagged row stays in `rows` with a flag word. The key names are PROPOSED. The old "listed apart" error is gone.
+- I searched the file for "makes the approval id" and "listed apart". The only hits are the new wording.
+- The last column of each row is unchanged. The file keeps its LF line endings.
+
+`playbook/S07-application-and-demo.md` already holds your edits for lines 35 and 38 (the storm keys and the approval rule). I did not touch it. All four owner edits that the S06F block names as open are now done. Round 7 can say so in its Residual risks row.
+
+## 2026-10-13 13:55
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+correct the playbook/S06F-prd-fixes.md and make it reflect the current state
+
+### Assistant
+
+I updated `playbook/S06F-prd-fixes.md`. Before editing, I read the owner-edited lines to confirm that all of them are done: `playbook/S07-application-and-demo.md` lines 35, 38 and 106, and `Project_Acronyms.md` lines 312, 386 and 388.
+
+- **"Owner edits outside this stage"** now says "None open". It lists the edits the owner made on 2026-10-13: the S07 playbook lines and the three `Project_Acronyms.md` lines. The old line numbers (34, 37) are gone.
+- **New check for the stage.** After it edits the PRD, it reads each of those lines once and compares them with the new RQ-08 and RQ-32 text. If a key name or a rule differs, it edits nothing and lists the difference in the Residual risks row. If none differs, it writes "Owner edits agree with the PRD".
+- **Decisions intro:** says the owner also made the matching X-3 and X-4 edits.
+- **Inputs:** the S07 playbook and `Project_Acronyms.md` are read only, to check that they agree with the PRD after round 7.
+- **Locked facts:** the round 7 row now names those files and lines and says no owner edit is open.
+- **Constraints and step 11 (STATUS row):** both say "name any difference", not "name the open edits".
+- **File checks:** line endings are unchanged and no stale phrases are left. Check 8g needs no change. Those two files are already modified and keep the same hash before and after the run.
+
+## 2026-10-13 14:10
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+DO THE INPUTS IN THE @playbook/S06F-prd-fixes.md  NEED TO BE REVISED?
+
+### Assistant
+
+Yes, one input is missing. I checked every path in the Inputs list. All 25 paths exist. I made no edit.
+
+1. **Missing (needed):** `playbook/STATUS.md`. Step 11 makes the stage read the last rows of that file and add one row. The Inputs list does not name it, so the stage may not have it in context. Add: "`playbook/STATUS.md` (read the last rows, then add one row for this round. Step 11)".
+2. **Optional, to make exact:** `apps/api/` could name `apps/api/services/dedupe.py`. X-3 is about the flag and held-aside rule, and that file holds it.
+3. **Optional, to trim:** these inputs do not feed round 7, because X-3, X-4 and X-7 do not touch them: `Risk Management.md`, `semantic-layer-revision.md`, `S05R_Decisions_Taken.md`, `docs/12-finops/evidence.md`, `docs/12-finops/optimization-backlog.md` and `devices.csv`. They are harmless. The cost is extra reading. Earlier rounds needed them.
+4. **Keep as they are:** `prd-review.md` (v5.0), `prd.md`, `traceability.md`, `prd-fixes.md`, the `semantic-layer/` tree (check 8b), ADR 0002, 0003 and 0004, `approval-workflow.md` (X-4 cites line 76), `Project_Acronyms.md` and the S07 playbook (the agreement check), `alarms.csv` (the worked example), `Project_Intent - Appendix B.md` (the labels for X-7) and `operating-contract.md`.
+
+## 2026-10-13 14:08
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT: @playbook/S06F-prd-fixes.md:60-194
+
+INPUTS: `playbook/S06-prd.md`, `playbook/S06R-prd-review.md`, `playbook/README.md`, `docs/prd/prd-review.md`, `docs/prd/prd.md`, `docs/prd/traceability.md`, `docs/prd/prd-fixes.md`, `docs/prd/Risk Management.md`, `semantic-layer/`, `docs/02-baseline/ai-qualification.md`, `docs/02-baseline/semantic-layer-revision.md`, `docs/02-baseline/S05R_Decisions_Taken.md`, ADR 0002, ADR 0003, ADR 0004, `docs/09-ai-guardrails/approval-workflow.md`, `docs/12-finops/evidence.md`, `Project_Acronyms.md`, `docs/00-contract/operating-contract.md`, `data/synthetic/alarms.csv`, `data/synthetic/devices.csv`, `docs/12-finops/optimization-backlog.md`, `apps/api`, `playbook/S07-application-and-demo.md`, `Project_Intent - Appendix B.md`, `playbook/STATUS.md`, and every design file and test file that a fix names.
+
+### Assistant
+
+I ran S06F round 7. I closed X-3, X-4 and X-7 of review v5.0 and left X-5, X-6, X-8 and X-9 as they are.
+
+1. **Stage status: CONDITIONAL PASS.** All three Decisions lines are applied and every check held. The status is not PASS because S06R must run again in a fresh chat, and four other findings stay open by your decision.
+
+2. **Key findings.**
+   - **X-3 (storm reply keys).** RQ-08 now says the reply is a JSON body with five keys: `raw_count`, `deduped_count`, `flagged_count`, `rows` and `held_aside`. Each entry has `alarm_id`, `device_id`, `dedupe_key` and `flag`. A blank `dedupe_key` goes in `held_aside`. Every other row goes in `rows`. RQ-62 reads device ids from both lists. The section 15 line about raw count and flagged count says the key names are PROPOSED, owner Team-Force, and are not YAML ids. Open question lines stay at 13.
+   - **X-4 (approval id on a no).** `approval-workflow.md` line 76 says "A rejection writes no approval id", which equals your decision. RQ-32, RQ-33, section 6 step 4 and the section 8 "Approval record" row now say only a yes gets an id. For a no, `approval_id` is null in the reply, the stored record and the audit row. Every other hit of "approval id" and "approval_id" already agreed, so I changed nothing else.
+   - **X-7 (HTTP status).** One new row in the section 8 label table, after the `/health` row. It is labelled REAL.
+   - **Versions.** `prd.md` and `traceability.md` are both v1.8. The layer stays `1.1.1`.
+   - **Checks 8a to 8h.** 73 rows in both files. 757 YAML ids, and every cited id resolves. Row-by-row compare shows no mismatch. 29 existing, 43 planned and 1 deferred test (29 + 43 + 1 = 73). `build.py --check` passes and 41 semantic-layer tests pass. The 29 existing PRD tests give 40 passed and 1 skipped (the `opa` test, RQ-59). `logs/audit.log` had 240 lines before, 241 after the run, and 240 after the restore, with the same SHA-256. 13 Open question lines.
+   - **Done test.** I broke `metric.alarm_storm_size` in RQ-13. Check 8b printed `unresolved cited ids: [('RQ-13', 'metric.alarm_storm_sizeX')]`. After the restore it printed `none`, and the file hash matched the original.
+   - **Files changed.** The hash comparison shows exactly four files changed: `prd.md`, `traceability.md`, `prd-fixes.md` and `playbook/STATUS.md` (one new row). Both `git status` lists are identical.
+   - **Owner edits.** The lines in `playbook/S07-application-and-demo.md` (35, 38, 106) and `Project_Acronyms.md` (312, 386, 388) agree with the PRD. I edited none of them.
+
+3. **Major risks.**
+   - RQ-08 now has one sentence that clashes with an older one. A held-aside row has a `flag` key that can hold a flag word. The older sentence says a held-aside row is "counted in the raw count only", while the flagged count counts every row with a flag word. No row in `alarms.csv` has both, so nothing breaks today. I kept every other sentence of the cell, as you asked. It is recorded in the Residual risks row.
+   - 43 of 73 tests are planned and 1 is deferred. A planned test is not evidence until S07 writes it.
+   - The key names and the `approval_id` rule are PROPOSED. They are not YAML ids.
+
+4. **Assumptions and unknowns.**
+   - I took the Decisions block as the fix list, because the review says "Fixes required: None".
+   - I wrote the exact words from the block, because the one file it asked me to read agrees with it.
+   - One of my commands passed no test ids by mistake, so pytest ran its default set (290 passed, 2 skipped) and wrote 8 lines to the audit log. I restored the log. The recorded check is the second run.
+   - Unknown: the figure of 101 passed in `traceability.md` section 5 is from 2026-10-12. I did not re-check it.
+
+5. **Artifacts created, with paths.** All are edits to existing files.
+   - `06-telecom-service-network-incident-ops/docs/prd/prd.md` (v1.8)
+   - `06-telecom-service-network-incident-ops/docs/prd/traceability.md` (v1.8)
+   - `06-telecom-service-network-incident-ops/docs/prd/prd-fixes.md` (header updated and a "Round 7, 2026-10-13" section added)
+   - `playbook/STATUS.md` (one new row, "S06F round 7", CONDITIONAL PASS)
+
+6. **Blocking issues.** None.
+
+7. **Recommended next action.** Run S06R in a fresh chat against v1.8. It will score the round 7 edits and replace `prd-review.md`. Then decide whether to close X-5, X-6, X-8 and X-9 or leave them. S07 starts only after that run reads PASS.
+
+## 2026-10-13 14:39
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+do we need to fix or address anything before running S06R?
+
+### Assistant
+
+No. Nothing blocks S06R. I found three things you could settle first, and none of them changes the result.
+
+**1. One unsettled point in RQ-08 (the one worth deciding).**
+- The cell says a row with a blank `dedupe_key` goes in `held_aside`, and each `held_aside` entry has a `flag` key.
+- The older sentence in the same cell says a held-aside row is "counted in the raw count only".
+- The flagged count is "the number of rows that carry the flag word".
+- So a blank-key row that also carries a flag word is counted by one sentence and not by the other.
+- No such row exists in `alarms.csv`, so no test or demo hits it today.
+- S06R will probably list it as an "other finding". It will not fail the review.
+- If you want it gone first, pick one rule. The rule would be either "a held-aside row with a flag word counts in `flagged_count`" or "a held-aside row never counts in `flagged_count`". I would write it as one more S06F round.
+
+**2. Four open findings will show up again.**
+- X-5, X-6, X-8 and X-9 stay open by your choice, so S06R will list them again.
+- X-8 and the missing full stop in RQ-30 (part of X-9) are one-line fixes.
+- X-5 is a wording change on four Open question lines.
+- X-6 is the persona wording on workflow steps 5 and 6.
+- If you want a shorter findings list this time, close them in a round 8 before S06R. If you do not mind seeing them again, run S06R now.
+
+**3. `playbook/S06R-prd-review.md` is slightly behind.**
+- Line 72 is labelled "Test counts (from PRD v1.7)". The counts are still right, so it is only the label.
+- The playbook has no check for the new storm reply keys or the "only a yes gets an approval id" rule. S06R will find them while reading the PRD. It will not test them on purpose.
+- You could add both rules to its locked facts, and change the label to v1.8.
+
+I checked these and found nothing to fix:
+- The versions are v1.8 in both PRD files, and the layer is `1.1.1`.
+- The counts are 73 rows, 29 existing, 43 planned and 1 deferred test, and 13 Open question lines.
+- The owner-edited lines in the S07 playbook and `Project_Acronyms.md` agree with the PRD.
+- `docs/12-finops/evidence.md` line 265 now says the store build is deferred.
+- The review file still says "PRD v1.7". That is expected, because S06R replaces it.
+
+I recommend running S06R now, unless you want to settle point 1 first. I made no edits in this turn.
+## 2026-10-13 14:40
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Address #3 above - playbook/S06R-prd-review.md is slightly behind
+
+### Assistant
+
+I updated `playbook/S06R-prd-review.md` in four places and logged the change in `playbook/STATUS.md`. I did not run S06R.
+
+- **Inputs.** I added `docs/09-ai-guardrails/approval-workflow.md`, with a note that line 76 says "A rejection writes no approval id". I removed the old note that `evidence.md` line 265 is stale, because you fixed that line. The Scope "Include" list now names `approval-workflow.md`.
+- **P13.** It now also checks that the storm reply key names are the same in every place that names them (RQ-08, RQ-62, section 15). It also checks that the approval id rule for a yes and a no is the same in every place that states it (RQ-32, RQ-33, section 6 step 4, section 8). A difference between two places makes P13 FAIL, and each one is listed with file and line.
+- **Locked facts.** The label "Test counts (from PRD v1.7)" now says v1.8. Two new rows give the five storm reply keys with the four entry keys and the blank `dedupe_key` rule, and the "only a yes gets an approval id" rule. Both are marked PROPOSED, owner Team-Force, where that applies.
+- **Expected output.** The `prd-review.md` row now says P13 cites the storm reply key names and the approval id rule.
+
+I changed no check count. There are still thirteen check rows and eight failure-list rows, and the gate rule is the same. I did not add a P14, so no count in the playbook needed to change.
+
+One effect to know about: P13 blocks the stage when it fails. So a key name or an approval id rule that differs between two places of the PRD would now make the stage BLOCKED. I judged that right, because a builder could not tell which place to follow. If you would rather it only be a finding, say so and I will move the sentence out of P13.
+
+The held-aside and flag clash in RQ-08 is still open. I did not touch it.
+
+## 2026-10-13 14:58
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+Ran stage S06R (PRD review, `playbook/S06R-prd-review.md` lines 29 to 96) with these inputs: `prd.md`, `traceability.md`, `Risk Management.md`, the `semantic-layer` tree, `ai-qualification.md`, `semantic-layer-review.md`, `semantic-layer-revision.md`, `S05R_Decisions_Taken.md`, ADR 0002, ADR 0003, ADR 0004, `prd-fixes.md`, `optimization-backlog.md`, `evidence.md`, `approval-workflow.md`, `Project_Acronyms.md`, `Project_Intent.md` and `playbook/README.md`.
+
+### Assistant
+
+**1. Stage status: PASS.** No row is FAIL. All version strings read `1.1.1`. `prd.md` and `traceability.md` are both v1.8 and agree on 29 existing, 43 planned and 1 deferred test.
+
+**2. Key findings**
+- All 73 requirements have a YAML id that resolves. All 757 ids resolve, and ADR 0003 and ADR 0004 added none. The 29 existing test names are real functions. I ran the suites: 290 passed and 2 skipped in `tests` and `policy/tests`, plus 41 passed in `semantic-layer/tests`. Both skips need the `opa` program, which is not installed here.
+- The 11 AI-limit rows (section 7) match the S2Q table in `ai-qualification.md` on pick, agency and approval point.
+- The storm reply key names are the same in RQ-08, RQ-62, section 15, `Project_Acronyms.md` and the S07 playbook. The approval id rule (a yes gets an id, a no gets none) is the same in RQ-32, RQ-33, section 6 step 4, section 8 and `approval-workflow.md` line 76.
+- The stale "S07 builds the answer store" lines from review v5.0 are fixed. A few older recommendation lines remain, each next to an update note (Z-9).
+- I re-read the CSV data facts, and they hold.
+- P11 picks were RQ-15, RQ-42 and RQ-62. A reader new to telecom can picture all three.
+
+**3. Major risks**
+- **Z-5.** The PRD says the storm step "uses `dedupe.py`", but its counts cannot come from `alarm_intake` as written. I ran it on `STO-00019`. It gives 0 candidates and 2 flagged. RQ-09 says deduped 1.
+- **Z-7.** The PRD does not say whether a bad body (422) or a missing recommendation (404) comes first on `POST /approvals/{id}`.
+- **Z-12.** The demo case is not named. `STO-00002` reaches a sentence, but `STO-00001` and `STO-00005` end at 404 or BLOCK, so no approval could be stored. 158 of 350 storms reach a device with stale flag `false`.
+- **Z-11.** The PRD, traceability file, both ADRs and `Risk Management.md` are not committed to git.
+- A planned test is not evidence until it exists and passes. 43 of 73 are planned.
+
+**4. Assumptions and unknowns**
+- I read "no AI use has execute agency" (P4) as "no use where a model acts".
+- Four judgement calls are marked in the review: P2, P4, P5 and P8. They are the Open question wording (Z-1), the missing persona on steps 5 and 6 (Z-2), and "10 running calls" with no PROPOSED word at two lines (Z-3).
+- The test-run figures are from 2026-10-13. I restored `logs/audit.log` to its 240 lines, and the hash matches.
+
+**5. Artifacts created**
+- `06-telecom-service-network-incident-ops/docs/prd/prd-review.md` (v6.0). It replaces v5.0. I edited no PRD, ADR, `Risk Management.md` or semantic-layer file.
+
+**6. Blocking issues**
+None. "Fixes required" is empty. Section 9 of the review lists four optional fix groups.
+
+**7. Recommended next action**
+Start S07 now. If you want Z-5 to Z-8 closed first, run S06F once for the optional wording edits, then run S06R again in a fresh chat. Either way, commit the PRD set before S07. Name `STO-00002` as the demo storm in the S07 demo script. I did not touch `playbook/STATUS.md`, so you can record the PASS row there.

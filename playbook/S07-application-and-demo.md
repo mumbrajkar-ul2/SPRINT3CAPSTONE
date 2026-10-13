@@ -31,10 +31,11 @@ Exclude: any route the PRD does not name; any EXECUTE path before the four gates
 1. Routes, each with tests under tests/app/:
    - GET /health.
    - GET /records/{id}: 404 on a missing id (this replaces the characterization test that locked the first-row fallback; note the swap). Role check via the S04-03 matrix and S04-06 policy.
-   - GET /alarms/storms/{storm_batch_id}: groups alarms by dedupe_key using apps/api/services/dedupe.py; returns raw count, deduped count, and the alarm ids. Numbers labelled REAL.
+   - GET /alarms/storms/{storm_batch_id}: groups alarms by dedupe_key using apps/api/services/dedupe.py; 
+returns a JSON body with five keys: raw_count, deduped_count and flagged_count (each a whole number), and rows and held_aside (each a list). Each entry has four keys: alarm_id, device_id, dedupe_key and flag. flag holds the flag word, or an empty string when the row has none. A row with a blank dedupe_key goes in held_aside. Every other row goes in rows, flagged or not. These key names are PROPOSED (owner: Team-Force, RQ-08). Numbers labelled REAL.
    - POST /ai/summarize/{id}: keep this route. S04-09 hardens it. Do not remove it.
-   - POST /ai/recommend/{id}: new route on the same gateway. Runs policy, prompt allow-list, schema, timeout; returns one of RECOMMEND_ONLY, HOLD_FOR_REVIEW, BLOCK; never EXECUTE from this route; writes the audit row with provenance before returning. The demo page calls this route.
-   - POST /approvals/{id}: a named human persona records approve or reject with a reason; writes an audit row with approval_id; returns the decision. It does not execute anything.
+   - POST /ai/recommend/{id}: new route on the same gateway. Runs policy, prompt allow-list, schema, timeout; returns HOLD_FOR_REVIEW with the sentence when no failure row applies, and HOLD_FOR_REVIEW with no text or BLOCK on a stop; never RECOMMEND_ONLY or EXECUTE from this route; writes the audit row with provenance before returning. The demo page calls this route.
+   - POST /approvals/{id}: a named human persona sends decision (yes or no) in a JSON body; the server sets approver; for a yes it makes the approval id, and for a no it makes none; it writes the audit row first (for a yes the row holds the id, for a no approval_id is null); it returns approval_id (null for a no), decision, approver, record_id and correlation_id. There is no reason field. It does not execute anything.
    - GET /audit/{correlation_id}: from S05-14.
    - No EXECUTE route unless the PRD lists it and all four gates exist. If built, it is reversible and validated, and a test proves it refuses without approval_id.
 2. Every route reads or creates X-Correlation-Id and passes it through. Every state-changing route writes its audit row first, then changes state. A test proves the order (make the state change fail and assert the audit row exists).
@@ -50,7 +51,7 @@ Exclude: any route the PRD does not name; any EXECUTE path before the four gates
 
 ## Constraints and guardrails
 - Plain speech in docs and in page text.
-- Build only what the PRD names. If a route needs something the PRD lacks, stop and write it as an open question for S06.
+- Build only what the PRD names. If a route needs something the PRD lacks, stop work on that requirement and write it in the 'PRD gaps' section of docs/demo/evidence.md (see prd.md, section 15, 'How S07 reports a gap').
 - No fake safe summary on any failure path.
 - No invented cutoff. PROPOSED with owner only.
 - Redact secrets.
@@ -98,8 +99,8 @@ Cite prd.md requirement ids, semantic-layer ids, and the Phase 4 Half B tests. S
 | `openapi-fragment.yaml` | All routes with schemas. |
 | `demo-script.md` | Header. One case, six steps, labels. Timeout variant. |
 | `demo-recording-notes.md` | Header. Per-step screen, proof file, do-not-claim. |
-| `evidence.md` | Header. pytest output. Audit rows from the run. |
+| `evidence.md` | Header. pytest output. Audit rows from the run. A 'PRD gaps' section.|
 
 ## Done test
 
-Run the demo. Approve the recommendation. `GET /audit/<id>` shows: record read, recommendation with model_version and prompt_hash, approval with approval_id, and the audit query itself. Nothing executed.
+Run the demo. Approve the recommendation. `GET /audit/<id>` shows: record read, recommendation with model_version and prompt_hash, approval with approval_id (the demo approves, so it is a yes), and the audit query itself. Nothing executed.

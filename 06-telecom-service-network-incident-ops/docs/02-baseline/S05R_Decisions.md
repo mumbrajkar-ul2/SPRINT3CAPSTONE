@@ -351,7 +351,7 @@ Your decision: Keep deferred. Waits for the batch summary design. (ADR 0002, 202
 
 **What it is.** FinOps wants to group cost by capability, incident id, flow name, and whether a stored answer was used (a cache hit). The audit row has none of these.
 
-**Why it waits.** The row has no such keys. The cache is a decided item for S07 (`OB-01`, 300 seconds), and it is not built.
+**Why it waits.** The row has no such keys. The cache lifetime is decided (`OB-01`, 300 seconds). The build is deferred (ADR 0004), and it is not built.
 
 **Options.**
 - A. Add all four now.
@@ -618,7 +618,7 @@ These numbers sit in code, settings, or design files. Each is PROPOSED with owne
 | N-05 | The breaker: open after 5 failures, stay open 30 seconds, allow 10 calls at once | `apps/api/services/breaker.py`, `docs/11-reliability/retry-and-circuit-breaker-strategy.md` | Proposed in S04-11. The repo has no measured failure rate to base them on. | Accept for the lab. Revisit with a real model. |
 | N-06 | Three service levels: 99 of 100 `GET /health` calls return 200 each day; 95 of 100 summaries finish in 2000 ms; audit completeness 1.0 | `docs/08-observability/slo-proposal.md` | Proposed in S04-08. No `metrics.yaml` target holds them. | Accept the first and third. Accept the second only for a real model, because the stub waits 10 ms and passes with no real test. |
 
-**Already decided. No action.** The cache lifetime of 300 seconds (`OB-01`, built in S07). The cost rate of 1.0 unit per 1000 tokens (decided 2026-10-11, EDUCATIONAL).
+**Already decided. No action.** The cache lifetime of 300 seconds (`OB-01`, build deferred, ADR 0004). The cost rate of 1.0 unit per 1000 tokens (decided 2026-10-11, EDUCATIONAL).
 
 **Why accepting a number needs care.** A number in a document can be copied into a report as if it were measured. After you accept one, keep the word PROPOSED in the metric text until a real run backs it.
 
@@ -646,4 +646,4 @@ All decisions were made on 2026-10-12 and recorded in `docs/ADR/0002-s05r-deferr
 - D-16 changed one sentence in the YAML, so the layer is now `1.1.1`. `build.py --check` and 41 semantic-layer tests pass.
 - D-12 created `docs/04-secrets/rotation-log.md`, with no entries.
 - D-03, D-06, and D-08 are decided and need code. Stage S07 is the first stage that edits code. S07 adds each new YAML id under a new ADR.
-- The 14 items that stay deferred each wait for the trigger in the summary table.
+- The 14 items that stay deferred each wait for the trigger in the summary table. Update 2026-10-13: ADR 0003 later decided D-07 (login is out of scope for this packet), so 13 items stay deferred.

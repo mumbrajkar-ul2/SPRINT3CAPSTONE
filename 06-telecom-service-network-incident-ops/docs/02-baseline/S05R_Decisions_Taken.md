@@ -8,7 +8,7 @@
 | Status | Decided on 2026-10-12. Mangesh (FDE) decided for Team-Force by taking every recommendation in `S05R_Decisions.md`. The formal record is `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`. |
 | Evidence sources | `docs/02-baseline/S05R_Decisions.md` (the options, the reasons, and the filled decision lines); `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`; `docs/02-baseline/semantic-layer-revision.md` |
 | Assumptions | (1) Mangesh (FDE) speaks for Team-Force on these choices (`docs/00-contract/operating-contract.md` row 10). (2) "Decided" means the choice is made and written down. It does not mean the code or the test exists. |
-| Unresolved issues | The letters of MAESTRO (D-20) are Unknown. Whether a login system is in scope (D-07) is Unknown. A real model is not in use, so every time and cost number comes from a stub. |
+| Unresolved issues | The letters of MAESTRO (D-20) are Unknown. D-07 login scope is decided in ADR 0003 (out of scope for this packet). A real model is not in use, so every time and cost number comes from a stub. |
 | Residual risks | D-03, D-06, and D-08 are decided here and built in stage S07. Until S07 the code does not match them. |
 
 Claim labels: **Verified Fact**, **Inference**, **Assumption**, **Unknown**.
@@ -23,7 +23,8 @@ This file has the decision and the reason for each item in one table row. `S05R_
 |---|---|---|
 | Decided now | 5 | D-03, D-06, D-08, D-12, D-16 |
 | Closed | 1 | D-13 |
-| Kept deferred, each with a named trigger | 14 | D-01, D-02, D-04, D-05, D-07, D-09, D-10, D-11, D-14, D-15, D-17, D-18, D-19, D-20 |
+| Kept deferred, each with a named trigger | 13 | D-01, D-02, D-04, D-05, D-09, D-10, D-11, D-14, D-15, D-17, D-18, D-19, D-20 |
+| Decided later in ADR 0003 | 1 | D-07 |
 | PROPOSED items accepted | 120 | Bundles P-01 to P-11 |
 | Access matrix rows accepted | 35 | TA-01 to TA-35, with TA-15 as written |
 | PROPOSED numbers accepted | 6 | N-01 to N-06 |
@@ -90,7 +91,7 @@ The items in P-01 to P-11 add up to 120: 7 + 12 + 4 + 5 + 2 + 6 + 15 + 8 + 47 + 
 
 **Why a number needs care.** A number in a document can be copied into a report as if it were measured. Each number above came from a design or a stub. None was measured with a real model.
 
-**Already decided before this file.** The cache lifetime of 300 seconds (`OB-01`, built in S07). The cost rate of 1.0 unit per 1000 tokens (decided 2026-10-11, EDUCATIONAL).
+**Already decided before this file.** The cache lifetime of 300 seconds (`OB-01`, build deferred, ADR 0004). The cost rate of 1.0 unit per 1000 tokens (decided 2026-10-11, EDUCATIONAL).
 
 ## Part 4. What changed because of these decisions
 

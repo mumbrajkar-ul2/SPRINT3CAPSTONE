@@ -11,7 +11,7 @@ Plain speak applies to every file you write.
 3. Paste the prompt in the fenced block. Do not trim any part of it.
 4. Check the output against **Expected output** and the **Done test**.
 5. Read the seven-item final response the model returns. Record the stage status (PASS, CONDITIONAL PASS, or BLOCKED) in `playbook/STATUS.md`.
-6. If the status is BLOCKED, clear the block before the next stage. Do not skip ahead. When S03R has a FAIL row, or the S03R rows that S05R reruns have one, you clear it by running `S03F-semantic-layer-fixes.md` and then S03R again in a fresh chat.
+6. If the status is BLOCKED, clear the block before the next stage. Do not skip ahead. When S03R has a FAIL row, or the S03R rows that S05R reruns have one, you clear it by running `S03F-semantic-layer-fixes.md` and then S03R again in a fresh chat. When S06R has a FAIL row, you clear it by running `S06F-prd-fixes.md` and then S06R again in a fresh chat.
 7. Append the turn to `transcript/chat_transcript.md`.
 
 Each prompt is built from the eight parts in `Assignment Material/Prompt_Anatomy.pdf`: Action, Scope, Constraints, Analysis Dimensions, Evidence Rules, Artifact Generation, Completion Gate, Lifecycle Linkage. Each prompt uses the shell in `Assignment Material/Prompt Template.pdf`.
@@ -42,8 +42,9 @@ Each prompt is built from the eight parts in `Assignment Material/Prompt_Anatomy
 | `S05-14-audit-chain.md` | Phase 5, Challenge 14 | `docs/14-audit/` | S04-03, S04-06, S04-08, S04-09, S04-11, S04-12, S05-13 |
 | `S05R-semantic-layer-revision.md` | Phase 5R | `semantic-layer/` (revised, version raised), `docs/02-baseline/semantic-layer-revision.md` | S05-13, S05-14 |
 | `S06-prd.md` | Phase 6 | `docs/prd/` | S05R PASS, or S03R PASS after an S03F round that fixed S05R rows |
-| `S06R-prd-review.md` | Phase 6 review | `docs/prd/prd-review.md` | S06 |
-| `S07-application-and-demo.md` | Phase 7 | `apps/api/`, `docs/demo/` | S06R PASS |
+| `S06R-prd-review.md` | Phase 6 review | `docs/prd/prd-review.md` | S06, or S06F |
+| `S06F-prd-fixes.md` | Phase 6 fix pass. Runs when S06R has a FAIL row, or when the owner chooses to fix Other findings before S07. | `docs/prd/prd.md` and `traceability.md` (fixed, same semantic-layer version), `docs/prd/prd-fixes.md` | S06R with a FAIL row. Then S06R runs again. |
+| `S07-application-and-demo.md` | Phase 7 | `apps/api/`, `docs/demo/` | S06R PASS, or CONDITIONAL PASS with fixes applied |
 | `S08-second-model.md` | Phase 8 | `apps/api_model_b/`, `docs/model-comparison/` | S07 |
 | `S09-readiness-and-evidence-pack.md` | Phase 9 | `docs/15-readiness/`, `PRODUCTION_EVIDENCE_PACK.md` | S08 |
 | `S10-defence.md` | Phase 10 | `docs/defence/` | S09 |
