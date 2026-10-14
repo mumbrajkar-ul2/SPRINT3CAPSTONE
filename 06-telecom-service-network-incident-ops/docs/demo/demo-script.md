@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S07. Application and demo. This file is the step-by-step script for one case. |
-| Date / version | 2026-10-13, v1.0. Semantic layer 1.2.0. PRD v1.8. |
+| Date / version | 2026-10-13, v1.1. Semantic layer 1.2.1. PRD v1.9. |
 | Author | Cursor agent (Claude Sonnet 5.5) for Mangesh (FDE) |
 | Status | Written from a real run on 2026-10-13. Every value in the "You will see" column came from that run (see `docs/demo/evidence.md`, section 4). |
 | Evidence sources | `docs/prd/prd.md` (RQ-08 to RQ-30, RQ-32 to RQ-34, RQ-42, RQ-48, RQ-62 to RQ-65). `apps/api/main.py`. `apps/api/static/index.html`. `data/synthetic/alarms.csv` and `devices.csv`. `docs/demo/evidence.md`. |

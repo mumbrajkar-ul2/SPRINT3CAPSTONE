@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S07. Application and demo. These notes tell the person who records the demo what to show, which file proves each point, and what not to claim. |
-| Date / version | 2026-10-13, v1.0. Semantic layer 1.2.0. PRD v1.8. |
+| Date / version | 2026-10-13, v1.1. Semantic layer 1.2.1. PRD v1.9. |
 | Author | Cursor agent (Claude Sonnet 5.5) for Mangesh (FDE) |
 | Status | Ready to record. The agent ran the page in a browser on 2026-10-13 and read each result. The agent made no video. |
 | Evidence sources | `docs/demo/demo-script.md`. `docs/demo/evidence.md`. `apps/api/static/index.html`. `apps/api/main.py`. `tests/app/`. `docs/prd/prd.md` sections 7, 8 and 12. |
@@ -21,7 +21,7 @@ Paths are relative to `06-telecom-service-network-incident-ops/`.
 |---|---|
 | The app runs on the Python copy of the policy. | `$env:POLICY_ENGINE = "python"` before `uvicorn`. |
 | The files of an earlier run are out of the way. | Move `logs/audit.log` and `logs/approvals.jsonl` to a folder named for the earlier run. The audit read then shows only this recording. |
-| The test suite passes. | `.\.venv\Scripts\python.exe -m pytest tests policy/tests semantic-layer/tests -q`. On 2026-10-13: 467 passed, 2 skipped (REAL). The 2 skipped tests need the `opa` program. |
+| The test suite passes. | `.\.venv\Scripts\python.exe -m pytest tests policy/tests semantic-layer/tests -q`. On 2026-10-13: 469 passed, 0 skipped (REAL), with `opa` 1.21.2 on the path. Without `opa`, the result is 467 passed and 2 skipped. |
 | The browser window is wide enough to show the audit table. | The table has 11 columns. |
 
 ## 2. What to show at each step

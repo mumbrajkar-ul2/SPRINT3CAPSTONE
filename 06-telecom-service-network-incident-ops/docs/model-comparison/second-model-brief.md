@@ -13,7 +13,7 @@
 
 ## 1. Model to use
 
-Model name: **FILL IN BEFORE USE**
+Model name: **GPT-5.6 Sol**
 
 The model must be a different model from the one that wrote the PRD. That model is Claude Sonnet 5.5.
 

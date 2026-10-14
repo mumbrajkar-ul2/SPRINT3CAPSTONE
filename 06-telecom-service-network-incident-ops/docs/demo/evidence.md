@@ -3,13 +3,13 @@
 | Field | Value |
 |---|---|
 | Stage | S07. Application and demo. This file holds the test output, the audit rows of the demo run, the list of changed tests and the PRD gaps. |
-| Date / version | 2026-10-13, v1.0. Semantic layer 1.2.0. PRD v1.8. |
+| Date / version | 2026-10-13, v1.1. Semantic layer 1.2.1. PRD v1.9. `traceability.md` v1.10. ADR 0006 closed G-5 and G-7. |
 | Author | Cursor agent (Claude Sonnet 5.5) for Mangesh (FDE) |
-| Status | **CONDITIONAL PASS.** All four gate conditions hold (section 2). The "PRD gaps" table (section 7) has rows with no owner answer, and the PRD says S07 reports PASS only when every row has an owner answer. |
-| Evidence sources | The full test run in section 9 (`pytest tests policy/tests semantic-layer/tests`, 2026-10-13). A browser run of the page against the live app on 2026-10-13 (section 4). `docs/prd/prd.md`, `docs/prd/traceability.md`. `apps/api/`, `tests/app/`, `data/contracts/openapi-fragment.yaml`, `docs/ADR/0005-s07-yaml-additions.md`. |
-| Assumptions | (1) The model is the stub `local-sim-v1`. (2) The demo run used a temporary audit log and approvals file, so the repo files `logs/audit.log` and `logs/approvals.jsonl` hold nothing from it. (3) The test run used the Python copy of the policy (`POLICY_ENGINE=python`, set by `tests/conftest.py`). (4) A number that is an id or a time stamp, such as `STO-00002` or `22:35:05`, is a name and not a measure. It carries no label. |
-| Unresolved issues | Nine PRD gaps with no owner answer (section 7). The near-miss phrase list is a draft that needs Team-Force review (ADR 0005). |
-| Residual risks | Section 8 lists eight limits found while building. The largest: the policy checks only that an approval id is not blank, and the page tests read the page source and do not run its script. |
+| Status | **CONDITIONAL PASS.** All four gate conditions hold (section 2). Seven of nine PRD gaps still have no owner answer (section 7). G-5 and G-7 are closed in ADR 0006. The PRD says S07 reports PASS only when every row has an owner answer. |
+| Evidence sources | The full test run in section 9 (`pytest tests policy/tests semantic-layer/tests`, 2026-10-13). A browser run of the page against the live app on 2026-10-13 (section 4). `docs/prd/prd.md`, `docs/prd/traceability.md`. `apps/api/`, `tests/app/`, `data/contracts/openapi-fragment.yaml`, `docs/ADR/0005-s07-yaml-additions.md`, `docs/ADR/0006-s07-gaps-g5-g7.md`. |
+| Assumptions | (1) The model is the stub `local-sim-v1`. (2) The demo run used a temporary audit log and approvals file, so the repo files `logs/audit.log` and `logs/approvals.jsonl` hold nothing from it. (3) The test run used the Python copy of the policy (`POLICY_ENGINE=python`, set by `tests/conftest.py`). The two tests that compare the Python copy with the Rego files ran against OPA 1.21.2. (4) A number that is an id or a time stamp, such as `STO-00002` or `22:35:05`, is a name and not a measure. It carries no label. |
+| Unresolved issues | Seven PRD gaps with no owner answer (G-1 to G-4, G-6, G-8, G-9). The near-miss phrase list is a draft that needs Team-Force review (ADR 0005). PRD v1.9 had the consistency checks 8a to 8h and no full S06R review. The last full S06R ran against v1.8. |
+| Residual risks | Section 8 lists eight limits found while building. The largest: the policy checks only that an approval id is not blank, and the page tests read the page source and do not run its script. S08 will receive PRD v1.9, which S06R has not reviewed. |
 
 Claim labels: **Verified Fact**, **Inference**, **Assumption**, **Unknown**. Test output and counts are REAL.
 
@@ -45,7 +45,7 @@ Other changes: the audit row has 17 keys (`record_id` is the 16th, `final_action
 
 ## 3. Tests
 
-Full run: **467 passed, 2 skipped** (REAL). The two skips are `test_opa_and_python_agree_on_access` and `test_opa_and_python_agree_on_every_ai_action_combination`. Both need the `opa` program, which is not on this machine. A skipped test counts as not run (PRD section 10, RQ-59). The full output is in section 9.
+Full run: **469 passed, 0 skipped** (REAL). The first run of this stage gave 467 passed and 2 skipped, because the `opa` program was not installed. The two skipped tests are `test_opa_and_python_agree_on_access` and `test_opa_and_python_agree_on_every_ai_action_combination`. After OPA 1.21.2 was installed (SHA-256 checked against the published value), both ran and passed. A skipped test counts as not run (PRD section 10, RQ-59). The full output is in section 9.
 
 New tests under `tests/app/`: 136 (REAL). Count of each file:
 
@@ -112,7 +112,7 @@ The tests the PRD names for S07, and their result in the full run (43 of 43 plan
 | RQ-08 | `tests/app/test_storm_route.py::test_storm_returns_raw_count_deduped_count_and_alarm_ids` | PASSED |
 | RQ-10 | `tests/app/test_storm_route.py::test_unknown_storm_returns_404` | PASSED |
 
-Tests in `tests/app/` write to a temporary audit log and a temporary approvals file (RQ-72, `tests/app/conftest.py`). **Verified Fact.** `logs/approvals.jsonl` does not exist after the full run. `logs/audit.log` grew from 80126 to 82826 bytes during the full run. The growth comes from older tests outside `tests/app/` that write to the real log. RQ-72 covers only `tests/app/`.
+Tests in `tests/app/` write to a temporary audit log and a temporary approvals file (RQ-72, `tests/app/conftest.py`). **Verified Fact.** `logs/approvals.jsonl` does not exist after the full run. `logs/audit.log` grew from 91699 to 94399 bytes during the full run. The growth comes from older tests outside `tests/app/` that write to the real log. RQ-72 covers only `tests/app/`.
 
 ## 4. The demo run
 
@@ -164,7 +164,7 @@ Case-4 has no `record.storm_read` row, because the storm was unknown and the rou
 
 ## 5. Tests that S07 changed
 
-The PRD (O-4) names four tests. S07 changed those four and five more that also locked behaviour that RQ-03, RQ-40 and RQ-41 remove. Each change keeps the test name close to the old one and says what it replaced.
+The PRD (O-4) now names eight tests (ADR 0006, gap G-5). S07 changed those eight. Each change keeps the test name close to the old one and says what it replaced.
 
 | Test | Old behaviour locked | New behaviour locked | In PRD O-4 |
 |---|---|---|---|
@@ -172,27 +172,27 @@ The PRD (O-4) names four tests. S07 changed those four and five more that also l
 | `tests/performance/test_load_once.py::test_missing_id_still_returns_the_first_row` | Loader gives the first row for a missing id. | Replaced by `test_missing_id_returns_nothing`. Loader gives `None`. | Yes |
 | `tests/access/test_negative_access.py::test_missing_role_header_keeps_operator_default` | HTTP 200 for a call with no role header. | Replaced by `test_missing_role_header_is_refused`. HTTP 403, a `policy.deny` row, role null. | Yes |
 | `policy/tests/test_policy_python.py::test_record_route_keeps_missing_header_default_operator` | HTTP 200 for a call with no role header. | Replaced by `test_record_route_refuses_a_missing_header`. HTTP 403 and a `policy.deny` row. | Yes |
-| `tests/test_characterization.py::test_legacy_missing_record_behavior_is_characterized` | The loader returns a non-empty dict for a missing id. | Replaced by `test_missing_record_returns_nothing`. | No (gap G-5) |
-| `tests/performance/test_load_once.py::test_empty_file_gives_the_error_body` | Loader returns `{"error": "missing"}` on an empty file. | Replaced by `test_empty_file_returns_nothing`. Loader returns `None`. | No (gap G-5) |
-| `tests/performance/test_load_once.py::test_only_device_id_is_matched` | A site id or a hostname gives the first row. | Same name. A site id or a hostname gives `None`. A device id still gives its row. | No (gap G-5) |
-| `tests/observability/test_audit_schema.py::test_every_audit_row_has_every_required_field` | Rows have 15 keys. | Same name. Rows have 17 keys, and `final_action` is `none`. The PRD (RQ-50) calls this test "existing" and expects it to pass unchanged. | No (gap G-5) |
+| `tests/test_characterization.py::test_legacy_missing_record_behavior_is_characterized` | The loader returns a non-empty dict for a missing id. | Replaced by `test_missing_record_returns_nothing`. | Yes (ADR 0006) |
+| `tests/performance/test_load_once.py::test_empty_file_gives_the_error_body` | Loader returns `{"error": "missing"}` on an empty file. | Replaced by `test_empty_file_returns_nothing`. Loader returns `None`. | Yes (ADR 0006) |
+| `tests/performance/test_load_once.py::test_only_device_id_is_matched` | A site id or a hostname gives the first row. | Same name. A site id or a hostname gives `None`. A device id still gives its row. | Yes (ADR 0006) |
+| `tests/observability/test_audit_schema.py::test_every_audit_row_has_every_required_field` | Rows have 15 keys. | Same name. Rows have 17 keys, and `final_action` is `none`. RQ-50 now expects 17 keys (ADR 0006). | Yes (ADR 0006) |
 
-The four tests that the PRD names for the 404 and the no-header change now have a second test in `tests/app/` (`test_missing_id_returns_404_and_no_row`, `test_missing_header_returns_403_and_a_deny_row`).
+The four tests for the 404 and the no-header change now have a second test in `tests/app/` (`test_missing_id_returns_404_and_no_row`, `test_missing_header_returns_403_and_a_deny_row`).
 
 ## 6. Semantic layer
 
 | Item | Value |
 |---|---|
-| Version | 1.2.0 (raised from 1.1.1). `build.py --check` passes. |
+| Version | 1.2.1 (raised from 1.1.1 under ADR 0005, then ADR 0006). `build.py --check` passes. |
 | Defined ids | 765 (757 before). |
 | Glossary rows | 281 (273 before). |
 | Semantic-layer tests | 41 passed. |
-| Decision record | `docs/ADR/0005-s07-yaml-additions.md`. |
+| Decision record | `docs/ADR/0005-s07-yaml-additions.md`, `docs/ADR/0006-s07-gaps-g5-g7.md`. |
 | Rules turned on (`enforced_today: true`) | `rule.missing_id_not_other_device`, `rule.alarm_last_seen_not_before_first_seen`, `rule.duplicate_dedupe_key_in_storm_is_one_alarm`, `rule.ai_recommendation_needs_policy_approval_audit_before_state_change`, `rule.no_default_role`. Six rules stay `false`. |
 
 ## 7. PRD gaps
 
-The PRD (section 15, "How S07 reports a gap") says S07 stops work on a requirement when the PRD, the YAML and the ADRs do not fix a choice. In the rows marked "built" below, S07 built the smallest choice so that the flow runs. Each one is a few lines of code. The owner answer column is empty until the owner fills it.
+The PRD (section 15, "How S07 reports a gap") says S07 stops work on a requirement when the PRD, the YAML and the ADRs do not fix a choice. In the rows marked "built" below, S07 built the smallest choice so that the flow runs. Each one is a few lines of code. G-5 and G-7 have owner answers (ADR 0006). The other seven rows stay empty.
 
 | Gap | Requirement id | What the PRD lacks | Sources that disagree | What S07 did | Owner answer |
 |---|---|---|---|---|---|
@@ -200,9 +200,9 @@ The PRD (section 15, "How S07 reports a gap") says S07 stops work on a requireme
 | G-2 | RQ-03, RQ-10, RQ-32, RQ-34, RQ-73 | Whether a 404 (missing device, unknown storm, no shown recommendation), a 422, a call of `GET /` or a call of `GET /ready` writes an audit row. RQ-45 says it only for the audit route. `rule.denied_access_is_audited` covers denies only. | None disagree. `docs/prd/prd.md` lines 285, 301, 341, 343 and 416 are silent. | **Built:** these calls write no row. A refused role still writes `policy.deny`. | |
 | G-3 | RQ-15, RQ-41 | The value of `record_id` on a storm read and on an audit read, and where the storm id is recorded. RQ-41 says only that a read of one device writes the device id. | None disagree. `docs/prd/prd.md` lines 306 and 350 are silent. | **Built:** `record_id` is null on a storm read and an audit read. The audit chain does not say which storm was read. | |
 | G-4 | RQ-73 | The status words of the `/ready` body. The PRD calls it an Open question for S03. | None disagree. `docs/prd/prd.md` line 416 and line 591. | **Built:** body `status` is `ok` or `Degraded` (the ids `status.code.health.ok` and `status.code.runbook_level.degraded` already exist), and `checks` holds four true or false values. | |
-| G-5 | O-4 (and RQ-50) | The list of tests to change is incomplete. Four tests are named. Four more existing tests lock behaviour that RQ-03 and RQ-40 and RQ-41 remove (section 5). RQ-50 calls `test_every_audit_row_has_every_required_field` "existing" and expects it to pass. | `docs/prd/prd.md` line 421 (four tests) against lines 368 (RQ-50) and 285 (RQ-03). | **Changed** the four named tests and the four others (section 5). | |
+| G-5 | O-4 (and RQ-50) | The list of tests to change is incomplete. Four tests are named. Four more existing tests lock behaviour that RQ-03 and RQ-40 and RQ-41 remove (section 5). RQ-50 calls `test_every_audit_row_has_every_required_field` "existing" and expects it to pass. | `docs/prd/prd.md` O-4 against RQ-50 and RQ-03. Closed by ADR 0006. | **Changed** the four named tests and the four others (section 5). | Accepted 2026-10-13 (ADR 0006, Mangesh). The PRD now names eight tests. RQ-50 expects 17 keys. |
 | G-6 | RQ-32, RQ-37 | The body of the 422 reply, the body of a 500 when the approval cannot be stored, and what to do with extra keys in the approvals body. RQ-32 says the body has one key. | None disagree. `docs/prd/prd.md` lines 341 and 346 are silent. | **Built:** 422 body `{"detail": "decision must be the word yes or the word no"}`. 500 body `{"error": "approval not stored"}` (PROPOSED wording; owner Team-Force). An extra key is ignored. The server never reads an approver or an approval id from the body. | |
-| G-7 | RQ-63 (section 8) | Section 8 says the page shows the share of audit rows with every key filled and the share of rows whose `prompt_hash` was seen before. No route in section 9 returns them. The script `docs/12-finops/metrics_from_audit.py` computes the second one over the whole log. The formula of `metric.audit_completeness` names `policy_result`, which no audit row stores. Section 8 also says the outcome counts come from the whole log, and the audit route returns one case. | `docs/prd/prd.md` lines 224 and 225 against section 9 (lines 240 to 250) and `semantic-layer/metrics.yaml` lines 86 to 109. | **Stopped on these two numbers.** The page shows neither. The row count and the calls per outcome cover the rows of the case id the page sent, and the page says so. A new route is outside the PRD (playbook "Exclude"). | |
+| G-7 | RQ-63 (section 8) | Section 8 says the page shows the share of audit rows with every key filled and the share of rows whose `prompt_hash` was seen before. No route in section 9 returns them. The script `docs/12-finops/metrics_from_audit.py` computes the second one over the whole log. The formula of `metric.audit_completeness` names `policy_result`, which no audit row stores. Section 8 also says the outcome counts come from the whole log, and the audit route returns one case. | `docs/prd/prd.md` section 8 against section 9 and `semantic-layer/metrics.yaml`. Closed by ADR 0006. | **Stopped on these two numbers.** The page shows neither. The row count and the calls per outcome cover the rows of the case id the page sent, and the page says so. A new route is outside the PRD (playbook "Exclude"). | Accepted 2026-10-13 (ADR 0006, Mangesh). The page does not show the two shares. `metrics_from_audit.py` computes both over the whole log (PRECOMPUTED). The formula of `metric.audit_completeness` now names `outcome`. |
 | G-8 | RQ-30, RQ-70, RQ-71 | How a phrase or a forbidden value is matched in the model text: whole words or any part, with or without capitals. The device values of `mgmt_ip` and `credential_profile` are plain words such as `alpha`. | None disagree. `docs/prd/prd.md` lines 330, 413 and 414 are silent. | **Built:** whole words, any capitals, any white space between words. A harmless sentence that holds such a plain word is held for review. This is the safe side. The near-miss list is a draft (ADR 0005). | |
 | G-9 | RQ-62 | The PRD says nothing about `apps/web/src/app/api.service.ts`. It sends no `X-User-Role` header, so after RQ-68 every call of it gets 403. | None disagree. `docs/prd/prd.md` has no mention of `apps/web`. | **Left unchanged.** The playbook excludes wiring the Angular scaffold. The served page is the demo. | |
 
@@ -224,7 +224,11 @@ The PRD (section 15, "How S07 reports a gap") says S07 stops work on a requireme
 Command, from the project folder: `.\.venv\Scripts\python.exe -m pytest tests policy/tests semantic-layer/tests -v -p no:cacheprovider -W ignore::DeprecationWarning --no-header`.
 
 ```text
-﻿========================================================================================= test session starts =========================================================================================
+========================================================================================= test session starts =========================================================================================
+platform win32 -- Python 3.13.5, pytest-8.3.2, pluggy-1.6.0 -- C:\MangeshStudy\FDE\Labs\SPRINT3CAPSTONE\06-telecom-service-network-incident-ops\.venv\Scripts\python.exe
+rootdir: C:\MangeshStudy\FDE\Labs\SPRINT3CAPSTONE\06-telecom-service-network-incident-ops
+configfile: pyproject.toml
+plugins: anyio-4.15.1, platformdirs-4.13.0
 collecting ... collected 469 items
 
 tests/access/test_negative_access.py::test_noc_operator_mapped_role_may_read_record PASSED                                                                                                       [  0%]
@@ -653,8 +657,8 @@ policy/tests/test_policy_python.py::test_summarize_route_blocks_a_device_with_a_
 policy/tests/test_policy_python.py::test_summarize_route_blocks_an_id_that_does_not_exist PASSED                                                                                                 [ 90%]
 policy/tests/test_policy_python.py::test_summarize_route_holds_a_device_with_a_blank_stale_flag PASSED                                                                                           [ 90%]
 policy/tests/test_policy_python.py::test_no_route_can_execute PASSED                                                                                                                             [ 90%]
-policy/tests/test_policy_python.py::test_opa_and_python_agree_on_access SKIPPED (opa binary not on PATH)                                                                                         [ 91%]
-policy/tests/test_policy_python.py::test_opa_and_python_agree_on_every_ai_action_combination SKIPPED (opa binary not on PATH)                                                                    [ 91%]
+policy/tests/test_policy_python.py::test_opa_and_python_agree_on_access PASSED                                                                                                                   [ 91%]
+policy/tests/test_policy_python.py::test_opa_and_python_agree_on_every_ai_action_combination PASSED                                                                                              [ 91%]
 semantic-layer/tests/test_semantic_layer.py::test_tree_is_exactly_the_capture_layout_plus_generated_and_build PASSED                                                                             [ 91%]
 semantic-layer/tests/test_semantic_layer.py::test_every_yaml_carries_version_and_readme_repeats_it PASSED                                                                                        [ 91%]
 semantic-layer/tests/test_semantic_layer.py::test_schema_validates_every_yaml_file PASSED                                                                                                        [ 91%]
@@ -697,5 +701,43 @@ semantic-layer/tests/test_semantic_layer.py::test_cannot_prove_ids_match_the_ite
 semantic-layer/tests/test_semantic_layer.py::test_audit_action_words_in_main_py_all_have_an_id PASSED                                                                                            [ 99%]
 semantic-layer/tests/test_semantic_layer.py::test_every_id_the_code_policy_and_tests_name_is_still_defined PASSED                                                                                [100%]
 
-=================================================================================== 467 passed, 2 skipped in 31.75s ===================================================================================
+========================================================================================== warnings summary ===========================================================================================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  C:\MangeshStudy\FDE\Labs\SPRINT3CAPSTONE\06-telecom-service-network-incident-ops\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+tests/access/test_negative_access.py: 5 warnings
+tests/ai/test_guardrails.py: 46 warnings
+tests/app/test_approvals_route.py: 34 warnings
+tests/app/test_audit_before_state_change.py: 6 warnings
+tests/app/test_audit_row_keys.py: 31 warnings
+tests/app/test_command_phrases.py: 37 warnings
+tests/app/test_demo_flow.py: 21 warnings
+tests/app/test_readiness_route.py: 5 warnings
+tests/app/test_recommend_route.py: 35 warnings
+tests/app/test_records_route.py: 5 warnings
+tests/app/test_storm_route.py: 15 warnings
+tests/audit/test_audit_rebuild.py: 105 warnings
+tests/characterization/test_current_behaviour.py: 2 warnings
+tests/finops/test_metrics_from_audit.py: 3 warnings
+tests/observability/test_audit_schema.py: 7 warnings
+tests/performance/test_load_once.py: 21 warnings
+tests/reliability/test_breaker.py: 6061 warnings
+tests/reliability/test_drills.py: 14 warnings
+tests/security/test_audit_log_security.py: 1 warning
+tests/security/test_client_flags_ignored.py: 3 warnings
+tests/test_api_contract.py: 1 warning
+policy/tests/test_policy_python.py: 15 warnings
+  C:\MangeshStudy\FDE\Labs\SPRINT3CAPSTONE\06-telecom-service-network-incident-ops\apps\api\services\audit.py:108: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "ts": datetime.utcnow().isoformat(),
+
+tests/app/test_approvals_route.py: 8 warnings
+tests/app/test_audit_before_state_change.py: 1 warning
+tests/app/test_audit_row_keys.py: 3 warnings
+tests/app/test_demo_flow.py: 2 warnings
+  C:\MangeshStudy\FDE\Labs\SPRINT3CAPSTONE\06-telecom-service-network-incident-ops\apps\api\services\approvals.py:49: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    line = json.dumps({"ts": datetime.utcnow().isoformat(), **record}) + "\n"
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================================================================ 469 passed, 6488 warnings in 62.03s (0:01:02) ============================================================================
 ```
