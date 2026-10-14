@@ -8748,3 +8748,189 @@ The recommended next step is to commit and push the S09 work, then run S10.
 4. **Run S10 (defence).** It presents from `PRODUCTION_EVIDENCE_PACK.md` and writes the answers to the section 3.3 questions. That closes item 11 of the 6.3 checklist.
 
 Steps 2 and 3 can happen in parallel with S10. Step 1 comes first, because the pack points at the evidence files.
+
+## 2026-10-14
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+does the @playbook/S10-defence.md need to be updated after the recent run of S09?
+
+### Assistant
+
+Yes. `playbook/S10-defence.md` needs a small update. The S09 run created files that S10 should read, and it changed three facts that questions 6, 9 and 10 state. Nothing in it is wrong enough to block S10, so the update can wait until you say go.
+
+**1. Inputs: add the S09 files.** Question 10 and question 6 already cite files that the Inputs list does not name, and S09 added others.
+- `docs/15-readiness/risk-owner-table.md` and `residual-risk-register.md` (question 10 cites the first one)
+- `docs/15-readiness/readiness-checklist.md`, `operating-contract-check.md` and `deferred-work-list.md` (question 6 cites the third)
+- `docs/16-evidence-pack/hash-recheck.md` and `audit-log-record.md`
+- `docs/00-contract/operating-contract.md` (question 3 cites it)
+- `docs/model-comparison/yaml-hashes-before.md` (question 9 cites it)
+
+**2. Question 6: the gap list is out of date.** It says "G-1 to G-9". ADR 0006 closed G-5 and G-7, so seven gaps are open: G-1 to G-4, G-6, G-8 and G-9. The path `deferred-work-list.md` should read `docs/15-readiness/deferred-work-list.md`. The answer can also point at the 39 deferred items.
+
+**3. Question 9: add the S09 hash re-check and the test counts.** The answer already states the 16 differences, the 78 tests that first failed to load and the 24 dedupe tests. It should also state the 36 of 36 hash re-check from `docs/16-evidence-pack/hash-recheck.md`. It should state that the second app passes 378 and fails 89 (35 differences, 54 internal names), and that the first app passes 469 with `opa` installed.
+
+**4. Question 10: state what S09 decided.** The answer should say: no-go for production, go for the lab demo under seven conditions, 63 open risks, 22 with a named acceptor and 41 with a PROPOSED owner, and the gate is CONDITIONAL PASS. It should cite `go-no-go-decision.md` section 2 and `risk-owner-table.md` section 3.
+
+**5. Rules for S10 that S09 found.**
+- The old shared password text sits in `transcript/chat_transcript.md`. S10 must not copy it into any answer (risk `S09-5`).
+- `playbook/STATUS.md` has no row for S05-14, S06 or S06R. Question 5 should cite `docs/14-audit/evidence.md` for S05-14 and not a STATUS row.
+- Item 11 of the 6.3 checklist ("you can answer the section 3.3 questions") is marked not ready in S09. A PASS in S10 is what closes it, so the S10 completion gate should say so.
+
+Say "go ahead" and I will make these edits and add a "Playbook update" row to `playbook/STATUS.md`.
+
+## 2026-10-14
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+go ahead
+
+### Assistant
+
+I edited `playbook/S10-defence.md` and added a "Playbook update" row to `playbook/STATUS.md`.
+
+- **Inputs:** added the five other `docs/15-readiness/` files, `hash-recheck.md`, `audit-log-record.md`, `operating-contract.md` and `yaml-hashes-before.md`. All of them exist.
+- **Question 5:** cite `docs/14-audit/evidence.md` for S05-14, because STATUS has no row for it. State that `logs/audit.log` holds 308 lines after the S09 restore.
+- **Question 6:** seven PRD gaps are open (G-5 and G-7 are closed). The deferred-work list holds 39 items. Its path now reads `docs/15-readiness/deferred-work-list.md`.
+- **Question 9:** the answer now states the S09 hash re-check (36 of 36) and the test counts of both apps.
+- **Question 10:** the answer now states the S09 decision: 63 open risks, 22 with a named acceptor, 41 PROPOSED, and CONDITIONAL PASS.
+- **Guardrail:** do not copy the old password text from the transcript into any answer or slide.
+- **Gate:** a PASS closes item 11 of the 6.3 checklist, and the final response must report that.
+
+## 2026-10-14
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+update @playbook/STATUS.md and @Project_Acronyms.md based on latest playbook runs
+
+### Assistant
+
+I updated `playbook/STATUS.md` and `Project_Acronyms.md` (now v1.5).
+
+**`playbook/STATUS.md`**
+- Backfilled five missing stage rows from their evidence files and marked each as backfilled on 2026-10-14: S05-14 Half A and Half B (both CONDITIONAL PASS), S06 (CONDITIONAL PASS), S06R round 1 (BLOCKED), S06F rounds 1 and 2 (DONE), and the latest S06R (PASS against PRD v1.8).
+- Added a "Reader guide update" row for `Project_Acronyms.md` v1.5.
+- The S09 row and the S10 "Playbook update" row were already there.
+- Earlier S06R review rounds (v2.0 to v5.0) are still not in the log. I did not invent results for them.
+
+**`Project_Acronyms.md`**
+- **New labels:**
+  - S07: `G-1` to `G-9`.
+  - S08: `D-01` to `D-16`, `Q-1` to `Q-13`, `F-1` to `F-10`, and the failure types `D` and `H`.
+  - S09: `DW-xx`, `S09-1` to `S09-5`, `C1` to `C7`, `CR-7`, `CR-10`, and the register ids.
+  - The shared-label warning now covers the new clashes (`D-xx`, `F-x`, `C`, `CR`).
+- **Stage and hand-back rows:** rewrote `S06`, `S06R`, `S07`, `S08`, `S09`, `S10` and `D5` to `D8`. Added `S06F`.
+- **"Planned for S07" is now "Built in S07".**
+- **Corrected rows that S07 and ADR 0005 changed:**
+  - `record_id` (16th key) and the final-action key (17th key, `final_action`).
+  - `decision`, the command-phrase list (29 phrases) and the near-miss list.
+  - `RQ-nn`, `SB-01` and `APR-`: the approval store now exists.
+- **New code names:** `apps/api_model_b/`, `APP_UNDER_TEST`, `approvals.jsonl`, `approval_id`, `approval_required`, `policy_version` and the `evidence/` run files.
+
+**One related edit.** Risk `S09-3` (STATUS had no rows for S05-14, S06 and S06R) now says the rows were backfilled. It stays open until Mangesh confirms them, so the counts (63 open, 22 named, 41 PROPOSED) do not change.
+
+**Check.** No file has a byte order mark. Every table row in the acronyms file is closed.
+
+
+## 2026-10-14 00:30
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+do we need to re-generate yaml-hashes-after.md having fixing the "not loaded" cases for model #2?
+
+### Assistant
+
+No new hash tables are needed. I re-ran the checks and added a short section 7 to `docs/model-comparison/yaml-hashes-after.md`.
+
+The file was written at 22:21. The load fix came after it. The fix changed `apps/api_model_b/` and the alias plugin. None of those files is among the 36 hashed files, so the tables stay valid.
+
+Re-check results (2026-10-14 00:30):
+- 36 of 36 hashes match, no mismatches.
+- `git status` on the gate paths prints nothing.
+- `build.py --check` passes, and `pytest semantic-layer/tests` gives 41 passed.
+- `logs/audit.log` is back to 308 lines with the same SHA-256 as before.
+
+Section 7 also lists the six files the fix changed, and notes two commits made after the one named in section 2 (`ec56a34` and `e956891`). The header Status line now points to section 7.
+
+## 2026-10-14 00:40
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+do any of the S09 outputs need to be corrected based on above changes?
+
+### Assistant
+
+No. S09 was written after the load fix, so it already uses the new numbers. I changed nothing.
+
+What I checked:
+- `PRODUCTION_EVIDENCE_PACK.md` cites `app-comparison.md` version 2 and `second-model-load-fix.md`. It gives the second app as 378 pass, 89 fail, 2 skip, 0 not loaded (35 D plus 54 H). It says 24 drill tests use a copy of `dedupe.py`. It gives the first app as 467 pass and 2 skip in S08, and 469 pass and 0 skip in the final run.
+- `docs/16-evidence-pack/hash-recheck.md` says 36 of 36 match. My re-check at 00:30 gave the same result.
+- The audit log record says the file went back to 308 lines with the same SHA-256. My re-check found the same.
+- `docs/15-readiness/residual-risk-register.md` row BL-12 says bandit finds 40 low items: 2 in `apps/api/services/policy.py`, 37 in `apps/api_model_b/tests/test_model_b.py` and 1 in `apps/api_model_b/main.py`. `evidence/bandit.json` shows the same counts.
+- The 7 open PRD gaps and the S08 differences D-01 to D-16 are in the risk registers and owner table.
+
+Two optional points:
+1. The pack says the second app kept "1927 of 2000" audit rows. That number came from the probe. The test run kept 1939. The count changes from run to run, so the pack could say "about 1,930 of 2,000 (1927 in the probe, 1939 in the test run)".
+2. `hash-recheck.md` explains how to repeat the check by reading table rows of `yaml-hashes-after.md`. I added section 7 with a small table to that file. A script that reads every row starting with a backtick could pick up those rows. Add "sections 3 to 5 only" to the repeat steps.
+
+## 2026-10-14 00:51
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+PROMPT:
+S10-defence.md (35-86)
+
+INPUTS:
+Project_Intent.md, AI-FDE_Brownfield_Repo_Transformation_Challenge_Guide.pdf, PRODUCTION_EVIDENCE_PACK.md, and the 21 files named in the S10 playbook: `docs/15-readiness/` (go-no-go-decision, risk-owner-table, readiness-checklist, operating-contract-check, deferred-work-list), `docs/16-evidence-pack/` (hash-recheck, audit-log-record), `docs/00-contract/operating-contract.md`, `docs/demo/` (demo-script, evidence), `docs/14-audit/evidence.md`, `docs/11-reliability/` (idempotency-plan, degraded-mode-design), `docs/09-ai-guardrails/approval-workflow.md`, `docs/model-comparison/` (app-comparison, second-model-run-log, second-model-load-fix, yaml-hashes-before, yaml-hashes-after), `docs/02-baseline/defect-list.md`, `docs/prd/prd.md`.
+
+### Assistant
+
+**1. Stage status: PASS.** All ten answers cite a file or a test and name what is still unproven. The slide outline covers D1 to D8.
+
+**2. Key findings**
+- Q1 and Q2: the demo routed storm `STO-00002` for device `DEV-00002`. It ran flow 3 (lookup, recommendation, human decision), with the storm dedupe from flow 2 as step 1. Flows 1 and 4 have no route. The "Not built" table in the PRD has 12 rows.
+- Q3 and Q7: the app has a human decision (`POST /approvals/{id}`, yes or no). That route changes no device. The `network_engineer` approval for a live change has no route. A no stores no approval id and no reason.
+- Q4: 354 alarm rows give 350 new, 3 repeats and 1 held aside. A repeated yes on the approvals route stores a second record, because RQ-32 says so. The risk register has no row for this.
+- Q5: the case rebuilds from the S07 evidence file and from `test_one_case_rebuilds_from_one_correlation_id`. `logs/audit.log` holds 308 lines with the same SHA-256 as after the S09 restore (I rechecked). The tracked log holds no row of this case, because the demo used a temporary log.
+- Q6: F01 (missing id returned the first device row) and F15 (no role header got `operator`) were left visible and closed by the spec. Seven PRD gaps stay open. The deferred list has 39 items (26 + 13).
+- Q8: a timeout returns HOLD_FOR_REVIEW with no summary. `/health`, `/ready`, the record lookup, the storm read and the audit read keep running.
+- Q9: 36 of 36 hashes match. 16 differences (3 listed, 13 unlisted). The second app passes 378, fails 89 and skips 2. The S08 Part 3 verdict is CONDITIONAL PASS.
+- Q10: no-go for production, go for the lab demo under C1 to C7. 63 risks are open: 22 accepted and 41 PROPOSED (rechecked: 22 and 41 rows). 12 of the 22 accepted rows rest on one instruction in ADR 0003, which the owner table reads as an Inference.
+
+**3. Major risks**
+- The role is a word the caller types, so every actor and approver is a claim.
+- The model is the stand-in `local-sim-v1`. No test ran against a real model.
+- The audit log is a plain file. Anyone with file access can edit it.
+- The GitHub run on `ec56a34` ended red on lint, the dependency scan and the static scan.
+- Team-Force proposes, owns and accepts its own risks, with no outside check.
+
+**4. Assumptions and unknowns**
+- I added no new claim. Four counts were redone in S10 and are marked as such.
+- The 30-minute talk length on the outline is an Assumption.
+- Unknown: whether the repeated-yes behaviour is an accepted risk, whether the second app's 2 skipped tests pass with `opa`, and the present state of the other inherited defects.
+- I did not copy the old shared password text into either file.
+
+**5. Artifacts created**
+- `06-telecom-service-network-incident-ops/docs/defence/defence-answers.md`
+- `06-telecom-service-network-incident-ops/docs/defence/slide-outline.md` (10 slides: opening, D1 to D8, closing)
+
+**6. Blocking issues**
+None. Item 11 of the `Project_Intent.md` 6.3 checklist ("you can answer the section 3.3 questions") changes from Not ready to ready, so all 11 items are ready. Three S09 files still say Not ready or not started: `docs/15-readiness/readiness-checklist.md` section 3 row 11, the table of 11 items in `PRODUCTION_EVIDENCE_PACK.md`, and DW-24 in `docs/15-readiness/deferred-work-list.md`. I left them as they are. The S09 result stays CONDITIONAL PASS and the production decision stays no-go.
+
+**7. Recommended next action**
+1. Update the three S09 lines above if the pack must show 11 of 11.
+2. Commit and push the refreshed `evidence/` folder (C5, `S09-1`) so the next CI run proves the final tree.
+3. Ask Team-Force to accept or reassign the 41 PROPOSED owners (C6).
+4. Decide whether to redact the old password text in the transcript (C7, `S09-5`).

@@ -5,7 +5,7 @@
 | Stage | S08 Part 3. This file records the same hashes again after the second app was built and after both apps ran the shared suites. |
 | Date / version | 2026-10-13. Semantic layer `1.2.1`. PRD `v1.9`. Compared with `docs/model-comparison/yaml-hashes-before.md`. |
 | Author | Cursor agent (Claude Sonnet 5.5) for Mangesh (FDE) |
-| Status | **PASS for the hash gate.** All 21 gate files match (20 under `semantic-layer/` and `docs/prd/prd.md`). The 15 other files match too. |
+| Status | **PASS for the hash gate.** All 21 gate files match (20 under `semantic-layer/` and `docs/prd/prd.md`). The 15 other files match too. Checked again after the load fix of the second app: still 36 of 36 (section 7). |
 | Evidence sources | `docs/model-comparison/yaml-hashes-before.md` (the 36 before hashes); the hash command in section 1, run on 2026-10-13 after the last test run; `git status` and `git log` output in section 2; `python semantic-layer\build.py --check`; `pytest semantic-layer/tests` |
 | Assumptions | (1) Each hash covers the file as it sits on this Windows copy, the same copy that `yaml-hashes-before.md` hashed. (2) `__pycache__` folders are left out, as in the before file. |
 | Unresolved issues | None for the hashes. |
@@ -87,3 +87,27 @@ These files are not part of the gate. They show that the test run did not change
 **Verified Fact.** The test runs append rows to `logs/audit.log`. The file had 308 lines and SHA-256 `A51E98494A5286781BAABCD051D92F5B4F47D6135C5B44982529CEEC269C1951` before this stage. The runs raised it to 322 lines. The file was restored from a copy taken before the first run. After the restore it has 308 lines and the same SHA-256 again. The file was already marked modified in `git status` before this stage, and that state is kept.
 
 **Verified Fact.** This stage added four harness files under `docs/model-comparison/harness/`: `alias_model_b.py`, `probe_battery.py`, `probe_battery2.py` and `probe_phrases.py`. They change no gate file.
+
+## 7. Re-check after the load fix of the second app
+
+**Why this section exists.** Sections 1 to 6 were written on 2026-10-13 at 22:21. The load fix of the second app came after that. It changed files under `apps/api_model_b/` and the alias plugin. The hash tables above do not need new numbers, because none of the 36 files is among the files the fix changed. This section records that the same checks were run again on 2026-10-14 at 00:30.
+
+| Check | Result after the load fix |
+|---|---|
+| Hash of the 36 rows in `yaml-hashes-before.md` (same script as section 1) | `rows hashed: 36`, `mismatches: []` |
+| `git status --short -- semantic-layer docs/prd data tests policy apps/api docs/ADR` | Printed nothing |
+| `python semantic-layer\build.py --check` | `generated/ matches the YAML. 7 files validated. Version 1.2.1.` |
+| `pytest semantic-layer/tests -q -p no:cacheprovider` | `41 passed in 2.50s` |
+| `logs/audit.log` | 308 lines, SHA-256 `A51E98494A5286781BAABCD051D92F5B4F47D6135C5B44982529CEEC269C1951`. Same as in section 6. |
+
+**Verified Fact.** The load fix changed these files, and none of them is in the 36:
+- `apps/api_model_b/services/ai_gateway.py` (edited)
+- `apps/api_model_b/main.py` (edited)
+- `apps/api_model_b/services/audit.py` (edited)
+- `apps/api_model_b/settings.py` (new)
+- `apps/api_model_b/services/dedupe.py` (new; a copy of the first app's file)
+- `docs/model-comparison/harness/alias_model_b.py` (edited)
+
+**Verified Fact.** Two commits came after the commit named in section 2: `ec56a34` (2026-10-13 23:19, "After completing S08 - Second Model") and `e956891` (2026-10-14 00:14, "After completing S09-readiness-and-evidence-pack"). The commit `51aa787` named in section 2 was the latest at the time of that check. The 36 hashes match the files as they sit now, so the later commits did not change the layer or the PRD.
+
+Detail of the fix: `docs/model-comparison/second-model-load-fix.md`.

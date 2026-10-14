@@ -98,7 +98,7 @@ Nobody in the packet accepted these risks. The owner is Unknown. The table PROPO
 | S08 D-16 (Q-13) | Team-Force | The two apps build the prompt text in a different layout. |
 | S09-4 | Team-Force | `make` is not installed on this machine, so `make evidence` did not run. |
 | S09-1 | Mangesh (FDE) | The refreshed `evidence/` folder is not committed. |
-| S09-3 | Mangesh (FDE) | `../playbook/STATUS.md` has no row for S05-14, S06 or S06R. |
+| S09-3 | Mangesh (FDE) | `../playbook/STATUS.md` had no row for S05-14, S06 or S06R. The rows were backfilled on 2026-10-14. Mangesh confirms them. |
 | S09-5 | Mangesh (FDE) for Team-Force | Three live routes are outside the list that contract row 2 allows. Four files have no stage as author. The old shared password sits in the chat transcript. |
 
 ## 4. Count check
