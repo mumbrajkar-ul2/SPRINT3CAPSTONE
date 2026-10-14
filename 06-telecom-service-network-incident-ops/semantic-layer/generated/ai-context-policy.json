@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "file": "ai-context-policy",
   "description": "The rules around every model call. Fields that may enter a prompt. Fields that never may. The shape every answer must have. The provenance fields that say where the answer came from. The four outcomes. What happens on a timeout or a bad answer. And, for each of the eleven capabilities from ai-qualification.md, the pick, the agency, and the human approval point. The allow list and the output shape are PROPOSED. Stage S04-09 confirms them.",
   "source": [

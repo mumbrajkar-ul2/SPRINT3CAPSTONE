@@ -8,7 +8,7 @@
 | Status | Accepted by earlier decisions, except one item. D-03, D-05, D-06 and D-08 are DECIDED in `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md`. The three audit action words are required by RQ-52. The near-miss list (RQ-71) is a first draft that S07 wrote. It stays PROPOSED until Team-Force reviews it. |
 | Evidence sources | `docs/prd/prd.md` (RQ-30, RQ-32, RQ-40, RQ-41, RQ-52, RQ-71, section 12, section 15); `docs/ADR/0002-s05r-deferred-and-proposed-decisions.md` (D-03, D-05, D-06, D-08); `docs/ADR/0004-defer-rq-31-answer-store.md`; `semantic-layer/tests/test_semantic_layer.py::test_audit_action_words_in_main_py_all_have_an_id`; `semantic-layer/tests/test_semantic_layer.py::test_audit_row_fields_are_the_keys_the_code_writes` |
 | Assumptions | (1) Mangesh (FDE) speaks for Team-Force on open choices (`operating-contract.md` row 10). (2) A key name that the PRD already fixes is not a new choice. (3) The words in the near-miss list are forms of the seven command phrases, so the list adds no new verb. |
-| Unresolved issues | The near-miss list needs a Team-Force review. The cache flag (D-18) is not added, because RQ-31 is deferred (ADR 0004). The failmode id for a forbidden value in a model answer (RQ-70) is not added. The reasons list keeps `failmode.forbidden_field_in_prompt` until Team-Force decides. The word to store for an unknown role (RQ-69) is not added (see the PRD gaps in `docs/demo/evidence.md`). |
+| Unresolved issues | The near-miss list needs a Team-Force review. The cache flag (D-18) is not added, because RQ-31 is deferred (ADR 0004). The failmode id for a forbidden value in a model answer (RQ-70) is not added. The reasons list keeps `failmode.forbidden_field_in_prompt` until Team-Force decides. The word to store for an unknown role (RQ-69) is not added (see the PRD gaps in `docs/demo/evidence.md`). Gaps G-5 and G-7 are closed in ADR 0006. |
 | Residual risks | The two phrase lists are short. A phrase that means "reboot" in other words passes (D-08). The device values (`mgmt_ip`, `credential_profile`) are plain words such as `alpha`, so a harmless answer that holds one of them is held too. |
 
 Claim labels: **Verified Fact**, **Inference**, **Assumption**, **Unknown**.
@@ -72,3 +72,5 @@ A phrase matches when it appears as whole words, in any letter case. The word `r
 ## Text-only update to metrics.yaml
 
 After the routes ran, `semantic-layer/metrics.yaml` still said that the audit row has no `record_id` key. The text of `metric.audit_completeness` (`live_source` and `today`) now says that `record_id` is the 16th key and `final_action` is the 17th. No id, formula, unit or target changed. `build.py` was run again and `--check` passes at version 1.2.0.
+
+ADR 0006 later changed the formula of `metric.audit_completeness` (`policy_result` to `outcome`) and raised the layer to `1.2.1`. See `docs/ADR/0006-s07-gaps-g5-g7.md`.

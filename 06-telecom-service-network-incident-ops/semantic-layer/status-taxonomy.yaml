@@ -1,8 +1,8 @@
-# status-taxonomy.yaml -- semantic layer 1.2.0
+# status-taxonomy.yaml -- semantic layer 1.2.1
 # Every status word in code, docs, and data, by column, with observed row counts.
 # Counts come from one read-only pass over data/synthetic on 2026-10-10.
 # This file sets no allowed list and no severity cutoff. The repo defines none.
-version: 1.2.0
+version: 1.2.1
 file: status-taxonomy
 description: >-
   Every status word used in code, docs, and the CSV files, with the column it sits in and how many rows hold it. Counts are from one read of data/synthetic on 2026-10-10. The repo defines no allowed list for any column. Each field below says so with allowed_list_defined_by_repo false.

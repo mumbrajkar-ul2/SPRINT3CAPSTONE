@@ -1,8 +1,8 @@
-# entities.yaml -- semantic layer 1.2.0
+# entities.yaml -- semantic layer 1.2.1
 # The seven entities, their fields, and whether the API reads each field today.
 # Field types are what the cells hold, not what the column name promises.
 # Stage S05R (1.1.0) added the 15 audit row fields under concept.audit_row, two concepts, and corrected sentences about the audit row, the prompt, and the policy.
-version: "1.2.0"
+version: "1.2.1"
 file: entities
 description: >-
   The seven entities of this system. Six are CSV tables named in docs/domain-specific-spec.md.

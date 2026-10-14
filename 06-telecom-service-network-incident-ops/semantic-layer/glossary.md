@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Stage | S03 — Semantic layer (Execution Plan Phase 3; product path step 1, D3) |
-| Date / version | 2026-10-13, semantic layer `1.2.0`. Written in S03 on 2026-10-10 and revised in S05R. One sentence changed in ADR 0002. Eight rows added in S07 (ADR 0005). |
+| Date / version | 2026-10-13, semantic layer `1.2.1`. Written in S03 on 2026-10-10 and revised in S05R. One sentence changed in ADR 0002. Eight rows added in S07 (ADR 0005). One formula word changed in ADR 0006 (`policy_result` to `outcome`). |
 | Author | Mangesh (FDE), drafted with Cursor |
 | Status | PASS. Every id with a glossary prefix has one row below. `tests/test_semantic_layer.py` checks that the Term and Id columns match the YAML. |
 | Evidence sources | The seven YAML files in this folder; `docs/domain-specific-spec.md`; `docs/01-discovery/`; `docs/02-baseline/data-quality-baseline.md`; `docs/02-baseline/defect-list.md`; `docs/02-baseline/ai-qualification.md`; `apps/api/main.py`; `apps/api/services/ai_gateway.py`; `policy/opa/access.rego`; `data/synthetic/` |

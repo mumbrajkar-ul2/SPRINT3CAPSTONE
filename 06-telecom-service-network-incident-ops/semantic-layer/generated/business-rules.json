@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "file": "business-rules",
   "description": "The rules this system must keep. Each rule has a stable id, the entities and fields it touches, what the code does today, the defect rows that show the gap, and the stage that will enforce it. enforced_today is true when code under apps/ or etl/ runs the rule on a live route or in the batch. It is false when the rule is held only by a policy file, by a module that no route calls, or by nothing. At version 1.0.0 the flag was false on every rule. At 1.1.0 the file held 20 rules, with the flag true on nine and false on eleven. At 1.2.0 (stage S07) the file still holds 20 rules. The flag is true on 14 and false on 6. The sentence \"Now (S05R, 1.1.0)\" in each current_behaviour says what is true now and which stage changed it.",
   "source": [

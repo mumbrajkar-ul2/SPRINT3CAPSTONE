@@ -45,7 +45,7 @@ EXPECTED_TREE = {
     "schemas/semantic-layer.schema.json",
     "tests/test_semantic_layer.py",
 }
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 
 ID_RE = re.compile(r"^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$")
 # Every id in the tree starts with one of these words. A whole-string value with one of these

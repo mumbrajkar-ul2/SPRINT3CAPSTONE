@@ -1,6 +1,6 @@
-# relationships.yaml -- semantic layer 1.2.0
+# relationships.yaml -- semantic layer 1.2.1
 # Links between entities: which key joins them, how many on each side, and whether any code joins them today.
-version: "1.2.0"
+version: "1.2.1"
 file: relationships
 description: >-
   How the seven entities link to each other and to the id-only concepts. Each link names the key field on each

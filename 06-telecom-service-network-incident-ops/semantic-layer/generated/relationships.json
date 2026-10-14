@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "file": "relationships",
   "description": "How the seven entities link to each other and to the id-only concepts. Each link names the key field on each side and the cardinality. No Python file in the repo joins two tables today. Every join_observed_in_code is false. A link whose key is not in the files says join_key_status unknown.",
   "source": [

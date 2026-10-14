@@ -1,10 +1,10 @@
-# ai-context-policy.yaml -- semantic layer 1.2.0
+# ai-context-policy.yaml -- semantic layer 1.2.1
 # What may enter a prompt, what must come back, where the answer came from, the four outcomes,
 # what happens when the call fails, and the agency and approval point for each AI use.
 # Stage S05R (1.1.0) added model_now, policy_inputs, one forbidden field, four failure ids, and corrected
 # sentences that described the gateway before stage S04-09. The two lists that code reads, prompt_fields.allowed
 # and output_schema.required, keep the same names in the same order.
-version: "1.2.0"
+version: "1.2.1"
 file: ai-context-policy
 description: >-
   The rules around every model call. Fields that may enter a prompt. Fields that never may. The shape every

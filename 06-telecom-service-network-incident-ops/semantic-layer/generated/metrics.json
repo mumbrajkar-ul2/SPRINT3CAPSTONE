@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "file": "metrics",
   "description": "Measures that later stages compute and report. Each metric names the fields it reads, how it is worked out in words, and what the data shows today. No metric has a target value. A PROPOSED bound from the baseline is recorded as a note with Owner: Team-Force. It is not a target.",
   "source": [
@@ -103,13 +103,13 @@
       "name": "audit completeness",
       "unit": "fraction of required fields present",
       "description": "How much of a full decision record each audit row holds.",
-      "formula": "For one audit row, the count of required fields that are filled divided by the count of required fields. Required fields are ts, action, actor, correlation_id, record_id, and, for a model call, model, approval_id, and policy_result.",
+      "formula": "For one audit row, the count of required fields that are filled divided by the count of required fields. Required fields are ts, action, actor, correlation_id, record_id, and, for a model call, model, approval_id, and outcome.",
       "source_fields": [
         "field.event.correlation_id",
         "field.event.actor"
       ],
       "live_source": "Before stage S04-08, logs/audit.log rows held ts, action, and details. details held record_id and role for a read, and record_id and model for a summary. Then (S05R, 1.1.0): a row had the 15 keys in concept.audit_row and no record_id key. Now (S07, 1.2.0): a row has 17 keys. record_id is the 16th and final_action is the 17th.",
-      "today": "Before stage S04-08, a record.read row filled ts, action, record_id, and a role string. An ai.summary row filled ts, action, record_id, and model. No row had actor, correlation_id, approval_id, or policy_result. Now (S05R, 1.1.0): every row fills ts, correlation_id, role, action, and resource. A row fills actor when the role maps to a persona. A model call fills model, model_version, prompt_hash, tokens, and latency_ms. The keys approval_id and policy_decision are null on every row. The key record_id did not exist, so the formula below could not count it. Now (S07, 1.2.0): record_id is the 16th key, and a yes decision puts an approval_id on its ai.approval row. policy_decision is still null on every row, and no row holds a policy_result, so a model-call row can never fill every field the formula names. No route returns this metric. The audit gap report (AG-01) counts 96 old three-key lines in the log.",
+      "today": "Before stage S04-08, a record.read row filled ts, action, record_id, and a role string. An ai.summary row filled ts, action, record_id, and model. No row had actor, correlation_id, approval_id, or policy_result. Now (S05R, 1.1.0): every row fills ts, correlation_id, role, action, and resource. A row fills actor when the role maps to a persona. A model call fills model, model_version, prompt_hash, tokens, and latency_ms. The keys approval_id and policy_decision are null on every row. The key record_id did not exist, so the formula below could not count it. Now (S07, 1.2.0): record_id is the 16th key, and a yes decision puts an approval_id on its ai.approval row. policy_decision is still null on every row. The formula now names outcome, which a model-call row fills. No route returns this metric. The audit gap report (AG-01) counts 96 old three-key lines in the log.",
       "target": null,
       "required_fields_note": "The required-field list above is PROPOSED. Owner Team-Force. Stage S05-14 confirms it. The repo does not define a full decision record.",
       "proposed": true,
