@@ -8651,3 +8651,100 @@ Yes, both need small edits. I changed nothing. Both playbooks were written befor
 No change needed: the S10 slide outline, the Q5 done test and the S09 completion gate.
 
 I offered to apply the edits and log them in `playbook/STATUS.md`.
+
+## 2026-10-13
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+go ahead
+
+### Assistant
+
+I applied the edits to `playbook/S09-readiness-and-evidence-pack.md` and `playbook/S10-defence.md`, and added a "Playbook update" row to `playbook/STATUS.md`.
+
+**S09:** the S08 files and `docs/demo/evidence.md` section 7 are now inputs. The residual risk register now merges the seven open PRD gaps and the 13 unlisted differences. The pack gets a 16th section, "Second-Model Comparison Evidence", before the decision. The final `make evidence` step now records `logs/audit.log` line count and SHA-256 before and after, and re-runs the 36-file hash check.
+
+**S10:** question 9 names the run log, load fix and both hash files, and lists the facts the answer must state. Question 6 points at `docs/02-baseline/defect-list.md` and `docs/demo/evidence.md` section 7. Question 2 points at PRD section 9, the "Not built" table.
+
+## 2026-10-13
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+@playbook/S09-readiness-and-evidence-pack.md:26-95
+
+(The message attaches lines 26 to 95 of that file, the S09 prompt and its INPUT list: Challenge 15 readiness files in `docs/15-readiness/`, the production evidence pack, `docs/16-evidence-pack/path-check.md`, and a refreshed `evidence/` run.)
+
+### Assistant
+
+**1. Stage status: CONDITIONAL PASS.** The decision, the register and the pack are written and every pack path exists, but 41 of the 63 open risks have a PROPOSED owner and no written acceptance (contract row 10).
+
+**2. Key findings**
+- Decision: no-go for production. Go for the lab demo and the S10 defence under seven conditions (`docs/15-readiness/go-no-go-decision.md`).
+- Final evidence run: commit `ec56a34`, 469 tests pass, 0 skipped (REAL). Lint (30), pip-audit (9 advisory ids) and bandit (40) exit 1.
+- Audit log: 308 lines before the run, 314 after, 308 after the restore. The run added 6 rows. I restored the file. The 36 of 36 hashes still match.
+- Second model: the first app passes 469 of 469. The second app passes 378, fails 89 (35 differences a user can see, 54 internal names) and skips 2. The apps differ in 16 places: 3 listed, 13 unlisted. The second app keeps 1927 of 2000 audit rows when 8 threads write.
+- Operating contract: no change crossed a Prohibited row (1, 6, 8, 9). No row is PROVISIONAL at v1.4.
+- `../Project_Intent.md` section 6.3: 10 of 11 items are ticked. Item 11 (defence answers) is marked not ready, because S10 writes them.
+- Control areas: Policy and Audit are ready for the lab demo. The other 10 are partial. None is ready for production.
+
+**3. Major risks**
+- The role is a word the caller types (`SB-09`).
+- The model is the stand-in `local-sim-v1`. No test ran against a real model (`AIR-01`).
+- The audit log is a plain file that anyone with file access can edit (`SB-12`).
+- The policy checks that an approval id is not blank. It does not look the id up (`SB-08`).
+- The GitHub run on the last commit ended red.
+
+**4. Assumptions and unknowns**
+- "Lab demo" means one machine, synthetic data, the stand-in model, one process and a typed role word.
+- Unknown: encryption at rest and in transit, outside penetration tests, behaviour with two server processes, and the second app with `opa` installed.
+- 7 PRD gaps stay open (G-1 to G-4, G-6, G-8, G-9). PRD v1.9 had no full S06R review.
+- `make` is not installed, so `scripts/evidence.ps1` ran instead of `make evidence`.
+
+**5. Artifacts created**
+- `PRODUCTION_EVIDENCE_PACK.md` (16 sections, with "Second-Model Comparison Evidence" before "Production Readiness Decision")
+- `docs/15-readiness/readiness-checklist.md`
+- `docs/15-readiness/residual-risk-register.md`
+- `docs/15-readiness/go-no-go-decision.md`
+- `docs/15-readiness/risk-owner-table.md`
+- `docs/15-readiness/deferred-work-list.md`
+- `docs/15-readiness/operating-contract-check.md`
+- `docs/16-evidence-pack/path-check.md` (150 of 150 paths exist)
+- `docs/16-evidence-pack/audit-log-record.md`
+- `docs/16-evidence-pack/hash-recheck.md`
+- `docs/16-evidence-pack/ci-run-38521594275.txt`
+- `evidence/` refreshed by the final run
+- `../playbook/STATUS.md`: one S09 row added
+
+**6. Blocking issues**
+- None block the stage. Three points need your decision:
+  - The refreshed `evidence/` folder has no commit, so the next CI run cannot prove the final tree.
+  - The old shared password text is in `../transcript/chat_transcript.md` from earlier turns. The transcript is append-only, so I did not edit it. Redact it by hand or accept it (`S09-5`).
+  - Three live routes (`GET /`, `GET /ready`, `GET /audit/{correlation_id}`) and four files have no written exception under the contract.
+
+**7. Recommended next action**
+- Commit and push `evidence/` and the new S09 files, so the next CI run proves the final tree.
+- Ask Team-Force to accept or reassign the 41 PROPOSED rows in `docs/15-readiness/risk-owner-table.md`.
+- Then run S10, which presents from `PRODUCTION_EVIDENCE_PACK.md`.
+
+## 2026-10-14
+
+**Model:** Claude Sonnet 5.5
+
+### User
+
+what is the next step recommended?
+
+### Assistant
+
+The recommended next step is to commit and push the S09 work, then run S10.
+
+1. **Commit and push.** Include the refreshed `evidence/` folder, `PRODUCTION_EVIDENCE_PACK.md`, `docs/15-readiness/`, `docs/16-evidence-pack/` and the playbook and transcript changes. The GitHub run on `ec56a34` does not cover the final tree. A new run will. It is expected to stay red on lint, `pip-audit` and `bandit`, and the three scans are the only red steps to expect.
+2. **Decide the three open points** (risk `S09-5`): redact or accept the old password text in `transcript/chat_transcript.md`, and write an exception for the three extra routes and the four files with no named stage.
+3. **Ask Team-Force to accept or reassign the 41 PROPOSED risks** in `docs/15-readiness/risk-owner-table.md`. This turns the gate from CONDITIONAL PASS to PASS.
+4. **Run S10 (defence).** It presents from `PRODUCTION_EVIDENCE_PACK.md` and writes the answers to the section 3.3 questions. That closes item 11 of the 6.3 checklist.
+
+Steps 2 and 3 can happen in parallel with S10. Step 1 comes first, because the pack points at the evidence files.

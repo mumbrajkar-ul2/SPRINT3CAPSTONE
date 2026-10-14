@@ -14,6 +14,10 @@ Phase 10 in `Execution Plan.md`. Answers to the ten defence questions, each with
 - `06-telecom-service-network-incident-ops/docs/11-reliability/degraded-mode-design.md`
 - `06-telecom-service-network-incident-ops/docs/09-ai-guardrails/approval-workflow.md`
 - `06-telecom-service-network-incident-ops/docs/model-comparison/app-comparison.md`
+- `06-telecom-service-network-incident-ops/docs/model-comparison/second-model-run-log.md`
+- `06-telecom-service-network-incident-ops/docs/model-comparison/second-model-load-fix.md`
+- `06-telecom-service-network-incident-ops/docs/model-comparison/yaml-hashes-after.md`
+- `06-telecom-service-network-incident-ops/docs/02-baseline/defect-list.md`
 - `06-telecom-service-network-incident-ops/docs/prd/prd.md`
 
 ## Prompt
@@ -31,14 +35,14 @@ Exclude: any new claim not already in an artifact. If a question cannot be answe
 ## Required analysis
 For each of the ten questions write: the answer in plain speech (three to six sentences); the evidence (file path, test name, or audit row); what is still unproven.
 1. What event did you route, and which facts existed at decision time? (demo-script.md, prd.md data section)
-2. Which of the four flows did the demo run, and which routes still do not implement that flow? (prd.md routes-not-implemented)
+2. Which of the four flows did the demo run, and which routes still do not implement that flow? (prd.md section 9, the "Not built" table)
 3. What action cannot be undone, and where does a human approve it? (operating-contract.md, approval-workflow.md, /approvals route test)
 4. What would a retry duplicate, and how did you prove the count? (idempotency-plan.md, test_drills.py duplicate replay, /alarms/storms response)
 5. Rebuild one case: actor, request, data used, model and version, policy result, approval, final action, trace id, and what you still cannot prove. (docs/14-audit/evidence.md, /audit route output)
-6. Which inherited gap did you leave visible until a spec closed it? (defect-list.md, prd.md inherited gaps, deferred-work-list.md)
+6. Which inherited gap did you leave visible until a spec closed it? (docs/02-baseline/defect-list.md, the open PRD gaps G-1 to G-9 in docs/demo/evidence.md section 7, deferred-work-list.md)
 7. How does a person contest an AI recommendation? (approval-workflow.md, /approvals reject path)
 8. What still runs if the AI gateway times out? (degraded-mode-design.md, timeout test)
-9. How did the second model use the same semantic layer, and what changed in the second app? (app-comparison.md, yaml hashes)
+9. How did the second model use the same semantic layer, and what changed in the second app? (app-comparison.md, yaml-hashes-before.md and yaml-hashes-after.md, second-model-run-log.md, second-model-load-fix.md). The answer states the hash result, the 16 differences (3 listed gaps, 13 unlisted), that 78 tests of the second app first failed to load and were fixed, that the 24 dedupe tests use a copied file, and the S08 Part 3 verdict.
 10. Is the system production-ready? What risk is accepted, and who owns it? (go-no-go-decision.md, risk-owner-table.md)
 Slide outline: one slide per deliverable D1 to D8, plus opening (the brief and the irreversible action) and closing (the decision). Per slide: title as a fact, three bullets, the file to show.
 

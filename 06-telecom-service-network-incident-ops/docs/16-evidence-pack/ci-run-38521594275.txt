@@ -1,0 +1,32 @@
+gh run view 38521594275 (read on 2026-10-14). Commit and step results of the GitHub run on HEAD ec56a34.
+workflow=workshop-ci conclusion=failure headSha=ec56a3411f963e80b3f23e262801d22ef1cb121c branch=main created=2026-10-14T06:20:05Z
+title=After completing S08 - Second Model
+url=https://github.com/mumbrajkar-ul2/SPRINT3CAPSTONE/actions/runs/38521594275
+job=evidence conclusion=failure
+step 1   Set up job                                                             success
+step 2   Run actions/checkout@v4                                                success
+step 3   Run actions/setup-python@v5                                            success
+step 4   Install opa                                                            success
+step 5   Stage 0 prepare                                                        success
+step 6   Stage 1 install                                                        success
+step 7   Stage 2 lint (ruff)                                                    failure
+step 8   Stage 3 unit and characterization tests                                success
+step 9   Stage 4 semantic-layer tests                                           success
+step 10  Stage 5 policy tests (pytest and opa test)                             success
+step 11  Stage 6 security tests (pytest -m security, no skips allowed)          success
+step 12  Stage 7 SBOM (CycloneDX)                                               success
+step 13  Stage 8 dependency scan (pip-audit)                                    failure
+step 14  Stage 9 static scan (bandit)                                           failure
+step 15  Stage 10 source checksums                                              success
+step 16  Stage 12 upload evidence                                               success
+
+gh run list --limit 6 (read on 2026-10-14). Columns: status, conclusion, title, workflow, branch, event, run id, duration, created.
+completed	failure	After completing S08 - Second Model	workshop-ci	main	push	38521594275	2m8s	2026-10-14T06:20:05Z
+completed	failure	S07 completion w App running	workshop-ci	main	push	38483131194	2m6s	2026-10-13T23:15:37Z
+completed	failure	Final S06R (Iteration#6)-ready for S07	workshop-ci	main	push	38475103953	1m39s	2026-10-13T22:03:26Z
+completed	failure	After applying S05R decisions	workshop-ci	main	push	38322710205	2m5s	2026-10-12T23:32:55Z
+completed	failure	After running Stage S05R ? Semantic layer revision, before team revie...	workshop-ci	main	push	38312626284	1m58s	2026-10-12T21:45:38Z
+completed	failure	update to # S05R ? Semantic layer revision.md file	workshop-ci	main	push	38265345395	2m9s	2026-10-12T14:46:22Z
+
+Earlier proof runs named in STATUS.md: 38212456142 (commit a9b6bc8) and 38214470465 (commit e4ec045). Both printed the same stage results, and both ended red because of ruff, pip-audit and bandit.
+{"conclusion":"failure","headSha":"e4ec04572eb61e832a4ef8b8aa39ddfbc591fc28"}

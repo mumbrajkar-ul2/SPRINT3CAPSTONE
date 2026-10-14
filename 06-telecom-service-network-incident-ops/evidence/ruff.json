@@ -3,18 +3,18 @@
     "cell": null,
     "code": "I001",
     "end_location": {
-      "column": 85,
-      "row": 5
+      "column": 2,
+      "row": 14
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
     "fix": {
       "applicability": "safe",
       "edits": [
         {
-          "content": "from typing import Optional\n\nfrom fastapi import FastAPI, Header, Request\nfrom fastapi.responses import JSONResponse\n\nfrom apps.api.services import ai_gateway, audit, audit_query, domain_service, policy\n\n",
+          "content": "from pathlib import Path\nfrom typing import Optional\n\nfrom fastapi import FastAPI, Header, Request\nfrom fastapi.responses import FileResponse, JSONResponse\n\nfrom apps.api.services import (\n    ai_gateway,\n    alarm_service,\n    approvals,\n    audit,\n    audit_query,\n    domain_service,\n    policy,\n)\n\n",
           "end_location": {
             "column": 1,
-            "row": 7
+            "row": 16
           },
           "location": {
             "column": 1,
@@ -36,10 +36,45 @@
   },
   {
     "cell": null,
+    "code": "RUF100",
+    "end_location": {
+      "column": 45,
+      "row": 105
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 99,
+            "row": 105
+          },
+          "location": {
+            "column": 29,
+            "row": 105
+          }
+        }
+      ],
+      "message": "Remove unused `noqa` directive"
+    },
+    "location": {
+      "column": 31,
+      "row": 105
+    },
+    "message": "Unused `noqa` directive (unused: `BLE001`)",
+    "name": "unused-noqa",
+    "noqa_row": 105,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-noqa"
+  },
+  {
+    "cell": null,
     "code": "UP045",
     "end_location": {
       "column": 76,
-      "row": 83
+      "row": 166
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
     "fix": {
@@ -49,11 +84,11 @@
           "content": "str | None",
           "end_location": {
             "column": 76,
-            "row": 83
+            "row": 166
           },
           "location": {
             "column": 63,
-            "row": 83
+            "row": 166
           }
         }
       ],
@@ -61,11 +96,151 @@
     },
     "location": {
       "column": 63,
-      "row": 83
+      "row": 166
     },
     "message": "Use `X | None` for type annotations",
     "name": "non-pep604-annotation-optional",
-    "noqa_row": 83,
+    "noqa_row": 166,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional"
+  },
+  {
+    "cell": null,
+    "code": "UP045",
+    "end_location": {
+      "column": 80,
+      "row": 188
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "str | None",
+          "end_location": {
+            "column": 80,
+            "row": 188
+          },
+          "location": {
+            "column": 67,
+            "row": 188
+          }
+        }
+      ],
+      "message": "Convert to `X | None`"
+    },
+    "location": {
+      "column": 67,
+      "row": 188
+    },
+    "message": "Use `X | None` for type annotations",
+    "name": "non-pep604-annotation-optional",
+    "noqa_row": 188,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional"
+  },
+  {
+    "cell": null,
+    "code": "UP045",
+    "end_location": {
+      "column": 76,
+      "row": 203
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "str | None",
+          "end_location": {
+            "column": 76,
+            "row": 203
+          },
+          "location": {
+            "column": 63,
+            "row": 203
+          }
+        }
+      ],
+      "message": "Convert to `X | None`"
+    },
+    "location": {
+      "column": 63,
+      "row": 203
+    },
+    "message": "Use `X | None` for type annotations",
+    "name": "non-pep604-annotation-optional",
+    "noqa_row": 203,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional"
+  },
+  {
+    "cell": null,
+    "code": "UP045",
+    "end_location": {
+      "column": 78,
+      "row": 236
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "str | None",
+          "end_location": {
+            "column": 78,
+            "row": 236
+          },
+          "location": {
+            "column": 65,
+            "row": 236
+          }
+        }
+      ],
+      "message": "Convert to `X | None`"
+    },
+    "location": {
+      "column": 65,
+      "row": 236
+    },
+    "message": "Use `X | None` for type annotations",
+    "name": "non-pep604-annotation-optional",
+    "noqa_row": 236,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional"
+  },
+  {
+    "cell": null,
+    "code": "UP045",
+    "end_location": {
+      "column": 85,
+      "row": 275
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\main.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "str | None",
+          "end_location": {
+            "column": 85,
+            "row": 275
+          },
+          "location": {
+            "column": 72,
+            "row": 275
+          }
+        }
+      ],
+      "message": "Convert to `X | None`"
+    },
+    "location": {
+      "column": 72,
+      "row": 275
+    },
+    "message": "Use `X | None` for type annotations",
+    "name": "non-pep604-annotation-optional",
+    "noqa_row": 275,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional"
   },
@@ -73,18 +248,37 @@
     "cell": null,
     "code": "DTZ003",
     "end_location": {
+      "column": 47,
+      "row": 49
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\services\\approvals.py",
+    "fix": null,
+    "location": {
+      "column": 30,
+      "row": 49
+    },
+    "message": "`datetime.datetime.utcnow()` used",
+    "name": "call-datetime-utcnow",
+    "noqa_row": 49,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/call-datetime-utcnow"
+  },
+  {
+    "cell": null,
+    "code": "DTZ003",
+    "end_location": {
       "column": 32,
-      "row": 87
+      "row": 108
     },
     "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api\\services\\audit.py",
     "fix": null,
     "location": {
       "column": 15,
-      "row": 87
+      "row": 108
     },
     "message": "`datetime.datetime.utcnow()` used",
     "name": "call-datetime-utcnow",
-    "noqa_row": 87,
+    "noqa_row": 108,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/call-datetime-utcnow"
   },
@@ -133,6 +327,79 @@
     "noqa_row": 165,
     "severity": "error",
     "url": "https://docs.astral.sh/ruff/rules/if-with-same-arms"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 25,
+      "row": 7
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api_model_b\\main.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 8
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        }
+      ],
+      "message": "Remove unused import: `pathlib.Path`"
+    },
+    "location": {
+      "column": 21,
+      "row": 7
+    },
+    "message": "`pathlib.Path` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 7,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "BLE001",
+    "end_location": {
+      "column": 55,
+      "row": 194
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api_model_b\\services\\ai_gateway.py",
+    "fix": null,
+    "location": {
+      "column": 46,
+      "row": 194
+    },
+    "message": "Do not catch blind exception: `Exception`",
+    "name": "blind-except",
+    "noqa_row": 194,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/blind-except"
+  },
+  {
+    "cell": null,
+    "code": "PLW0602",
+    "end_location": {
+      "column": 22,
+      "row": 29
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\apps\\api_model_b\\services\\breaker.py",
+    "fix": null,
+    "location": {
+      "column": 12,
+      "row": 29
+    },
+    "message": "Using global for `_opened_at` but no assignment is done",
+    "name": "global-variable-not-assigned",
+    "noqa_row": 29,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/global-variable-not-assigned"
   },
   {
     "cell": null,
@@ -252,6 +519,446 @@
   },
   {
     "cell": null,
+    "code": "I001",
+    "end_location": {
+      "column": 59,
+      "row": 17
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\conftest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import json\nimport re\nimport threading\n\nimport pytest\nfrom fastapi.testclient import TestClient\n\nfrom apps.api.main import app\nfrom apps.api.services import ai_gateway, approvals, audit\n\n\n",
+          "end_location": {
+            "column": 1,
+            "row": 21
+          },
+          "location": {
+            "column": 1,
+            "row": 9
+          }
+        }
+      ],
+      "message": "Organize imports"
+    },
+    "location": {
+      "column": 1,
+      "row": 9
+    },
+    "message": "Import block is un-sorted or un-formatted",
+    "name": "unsorted-imports",
+    "noqa_row": 9,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
+  },
+  {
+    "cell": null,
+    "code": "I001",
+    "end_location": {
+      "column": 90,
+      "row": 14
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_approvals_route.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import hashlib\nimport json\nfrom pathlib import Path\n\nimport pytest\n\nfrom apps.api.services import approvals, policy\nfrom tests.app.helpers import (\n    ADMIN,\n    BLANK_FLAG_ID,\n    ENGINEER,\n    GOOD_ID,\n    OPERATOR,\n    STALE_ID,\n)\n\n",
+          "end_location": {
+            "column": 1,
+            "row": 16
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        }
+      ],
+      "message": "Organize imports"
+    },
+    "location": {
+      "column": 1,
+      "row": 7
+    },
+    "message": "Import block is un-sorted or un-formatted",
+    "name": "unsorted-imports",
+    "noqa_row": 7,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
+  },
+  {
+    "cell": null,
+    "code": "RUF015",
+    "end_location": {
+      "column": 70,
+      "row": 62
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_approvals_route.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "next(r for r in audit_log() if r[\"action\"] == \"ai.approval\")",
+          "end_location": {
+            "column": 70,
+            "row": 62
+          },
+          "location": {
+            "column": 11,
+            "row": 62
+          }
+        }
+      ],
+      "message": "Replace with `next(...)`"
+    },
+    "location": {
+      "column": 11,
+      "row": 62
+    },
+    "message": "Prefer `next(...)` over single element slice",
+    "name": "unnecessary-iterable-allocation-for-first-element",
+    "noqa_row": 62,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unnecessary-iterable-allocation-for-first-element"
+  },
+  {
+    "cell": null,
+    "code": "RUF015",
+    "end_location": {
+      "column": 70,
+      "row": 91
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_approvals_route.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "next(r for r in audit_log() if r[\"action\"] == \"ai.approval\")",
+          "end_location": {
+            "column": 70,
+            "row": 91
+          },
+          "location": {
+            "column": 11,
+            "row": 91
+          }
+        }
+      ],
+      "message": "Replace with `next(...)`"
+    },
+    "location": {
+      "column": 11,
+      "row": 91
+    },
+    "message": "Prefer `next(...)` over single element slice",
+    "name": "unnecessary-iterable-allocation-for-first-element",
+    "noqa_row": 91,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unnecessary-iterable-allocation-for-first-element"
+  },
+  {
+    "cell": null,
+    "code": "FURB167",
+    "end_location": {
+      "column": 59,
+      "row": 24
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_page.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import re",
+          "end_location": {
+            "column": 10,
+            "row": 7
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        },
+        {
+          "content": "re.DOTALL",
+          "end_location": {
+            "column": 59,
+            "row": 24
+          },
+          "location": {
+            "column": 55,
+            "row": 24
+          }
+        }
+      ],
+      "message": "Replace with `re.DOTALL`"
+    },
+    "location": {
+      "column": 55,
+      "row": 24
+    },
+    "message": "Use of regular expression alias `re.S`",
+    "name": "regex-flag-alias",
+    "noqa_row": 24,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/regex-flag-alias"
+  },
+  {
+    "cell": null,
+    "code": "FURB167",
+    "end_location": {
+      "column": 70,
+      "row": 59
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_page.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import re",
+          "end_location": {
+            "column": 10,
+            "row": 7
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        },
+        {
+          "content": "re.DOTALL",
+          "end_location": {
+            "column": 70,
+            "row": 59
+          },
+          "location": {
+            "column": 66,
+            "row": 59
+          }
+        }
+      ],
+      "message": "Replace with `re.DOTALL`"
+    },
+    "location": {
+      "column": 66,
+      "row": 59
+    },
+    "message": "Use of regular expression alias `re.S`",
+    "name": "regex-flag-alias",
+    "noqa_row": 59,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/regex-flag-alias"
+  },
+  {
+    "cell": null,
+    "code": "FURB167",
+    "end_location": {
+      "column": 60,
+      "row": 89
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_page.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import re",
+          "end_location": {
+            "column": 10,
+            "row": 7
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        },
+        {
+          "content": "re.IGNORECASE",
+          "end_location": {
+            "column": 60,
+            "row": 89
+          },
+          "location": {
+            "column": 56,
+            "row": 89
+          }
+        }
+      ],
+      "message": "Replace with `re.IGNORECASE`"
+    },
+    "location": {
+      "column": 56,
+      "row": 89
+    },
+    "message": "Use of regular expression alias `re.I`",
+    "name": "regex-flag-alias",
+    "noqa_row": 89,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/regex-flag-alias"
+  },
+  {
+    "cell": null,
+    "code": "FURB167",
+    "end_location": {
+      "column": 49,
+      "row": 90
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_page.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import re",
+          "end_location": {
+            "column": 10,
+            "row": 7
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        },
+        {
+          "content": "re.IGNORECASE",
+          "end_location": {
+            "column": 49,
+            "row": 90
+          },
+          "location": {
+            "column": 45,
+            "row": 90
+          }
+        }
+      ],
+      "message": "Replace with `re.IGNORECASE`"
+    },
+    "location": {
+      "column": 45,
+      "row": 90
+    },
+    "message": "Use of regular expression alias `re.I`",
+    "name": "regex-flag-alias",
+    "noqa_row": 90,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/regex-flag-alias"
+  },
+  {
+    "cell": null,
+    "code": "FURB167",
+    "end_location": {
+      "column": 83,
+      "row": 120
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_page.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import re",
+          "end_location": {
+            "column": 10,
+            "row": 7
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        },
+        {
+          "content": "re.DOTALL",
+          "end_location": {
+            "column": 83,
+            "row": 120
+          },
+          "location": {
+            "column": 79,
+            "row": 120
+          }
+        }
+      ],
+      "message": "Replace with `re.DOTALL`"
+    },
+    "location": {
+      "column": 79,
+      "row": 120
+    },
+    "message": "Use of regular expression alias `re.S`",
+    "name": "regex-flag-alias",
+    "noqa_row": 120,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/regex-flag-alias"
+  },
+  {
+    "cell": null,
+    "code": "I001",
+    "end_location": {
+      "column": 102,
+      "row": 14
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_recommend_route.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "import json\nimport time\n\nimport pytest\n\nfrom apps.api.services import ai_gateway, domain_service\nfrom tests.app.helpers import (\n    ADMIN,\n    BLANK_FLAG_ID,\n    ENGINEER,\n    GOOD_ID,\n    MISSING_ID,\n    OPERATOR,\n    STALE_ID,\n)\n\n",
+          "end_location": {
+            "column": 1,
+            "row": 16
+          },
+          "location": {
+            "column": 1,
+            "row": 8
+          }
+        }
+      ],
+      "message": "Organize imports"
+    },
+    "location": {
+      "column": 1,
+      "row": 8
+    },
+    "message": "Import block is un-sorted or un-formatted",
+    "name": "unsorted-imports",
+    "noqa_row": 8,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
+  },
+  {
+    "cell": null,
+    "code": "I001",
+    "end_location": {
+      "column": 77,
+      "row": 7
+    },
+    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\app\\test_records_route.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from tests.app.helpers import ADMIN, ENGINEER, GOOD_ID, MISSING_ID, OPERATOR\n\n",
+          "end_location": {
+            "column": 1,
+            "row": 9
+          },
+          "location": {
+            "column": 1,
+            "row": 7
+          }
+        }
+      ],
+      "message": "Organize imports"
+    },
+    "location": {
+      "column": 1,
+      "row": 7
+    },
+    "message": "Import block is un-sorted or un-formatted",
+    "name": "unsorted-imports",
+    "noqa_row": 7,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
+  },
+  {
+    "cell": null,
     "code": "SIM103",
     "end_location": {
       "column": 16,
@@ -336,41 +1043,6 @@
           "end_location": {
             "column": 1,
             "row": 4
-          },
-          "location": {
-            "column": 1,
-            "row": 1
-          }
-        }
-      ],
-      "message": "Organize imports"
-    },
-    "location": {
-      "column": 1,
-      "row": 1
-    },
-    "message": "Import block is un-sorted or un-formatted",
-    "name": "unsorted-imports",
-    "noqa_row": 1,
-    "severity": "error",
-    "url": "https://docs.astral.sh/ruff/rules/unsorted-imports"
-  },
-  {
-    "cell": null,
-    "code": "I001",
-    "end_location": {
-      "column": 45,
-      "row": 1
-    },
-    "filename": "C:\\MangeshStudy\\FDE\\Labs\\SPRINT3CAPSTONE\\06-telecom-service-network-incident-ops\\tests\\test_characterization.py",
-    "fix": {
-      "applicability": "safe",
-      "edits": [
-        {
-          "content": "from apps.api.services import domain_service\n\n\n",
-          "end_location": {
-            "column": 1,
-            "row": 3
           },
           "location": {
             "column": 1,

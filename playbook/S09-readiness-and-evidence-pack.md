@@ -8,6 +8,10 @@ Phase 9 in `Execution Plan.md`. This stage decides what is ready and assembles t
 - `AI-FDE_Brownfield_Repo_Transformation_Challenge_Guide.pdf` (final standard)
 - `06-telecom-service-network-incident-ops/PRODUCTION_EVIDENCE_PACK_TEMPLATE.md`
 - `06-telecom-service-network-incident-ops/docs/` (every folder 00 to 14, prd, demo, model-comparison)
+- `06-telecom-service-network-incident-ops/docs/model-comparison/app-comparison.md` (verdict, difference register D-01 to D-16, open questions Q-1 to Q-13)
+- `06-telecom-service-network-incident-ops/docs/model-comparison/second-model-load-fix.md`
+- `06-telecom-service-network-incident-ops/docs/model-comparison/yaml-hashes-after.md`
+- `06-telecom-service-network-incident-ops/docs/demo/evidence.md` (section 7, PRD gaps G-1 to G-9)
 - `06-telecom-service-network-incident-ops/docs/00-contract/operating-contract.md`
 - `06-telecom-service-network-incident-ops/docs/00-contract/challenge-to-spine-crosswalk.md`
 - `06-telecom-service-network-incident-ops/docs/01-discovery/brownfield-risk-register.md`
@@ -30,17 +34,17 @@ Exclude: new work; any claim without a file pointer; any change to code or YAML.
 
 ## Required analysis (Challenge 15)
 1. Readiness checklist: one row per control area (identity, secrets, IaC, policy, CI/CD, observability, AI guardrails, performance, reliability, FinOps, security validation, audit). Per row: ready / not ready / partial; the file or test that proves it; the stage status from STATUS.md.
-2. Residual risk register: merge the open items from docs/01-discovery/brownfield-risk-register.md, docs/09-ai-guardrails/ai-risk-register.md, docs/11-reliability/failure-mode-catalogue.md, and docs/13-security-validation/remediation-backlog.md. Per risk: still open, mitigated by what, accepted by whom (or Unknown).
+2. Residual risk register: merge the open items from docs/01-discovery/brownfield-risk-register.md, docs/09-ai-guardrails/ai-risk-register.md, docs/11-reliability/failure-mode-catalogue.md, and docs/13-security-validation/remediation-backlog.md. Also merge two S08 sources: the PRD gaps still open in docs/demo/evidence.md section 7 (G-1 to G-4, G-6, G-8, G-9), and the 13 unlisted differences and the open questions Q-1 to Q-13 in docs/model-comparison/app-comparison.md. Per risk: still open, mitigated by what, accepted by whom (or Unknown).
 3. Go/no-go decision: one paragraph. Ready for what, not ready for what, under which conditions. No hedging word without a stated reason.
 4. Risk owner table: every accepted risk with a named owner role. Unknown where the packet names none, with PROPOSED.
 5. Deferred work list: everything the plan named and did not finish, with the stage and the reason.
 6. Check every change made against docs/00-contract/operating-contract.md. List any change that crossed a Prohibited or PROVISIONAL boundary.
 
 ## Required work (Challenge 16)
-7. Copy PRODUCTION_EVIDENCE_PACK_TEMPLATE.md to PRODUCTION_EVIDENCE_PACK.md. Fill every heading. Per section: the claim, the evidence file or test (path), the honesty label of any number, and what is still unproven.
+7. Copy PRODUCTION_EVIDENCE_PACK_TEMPLATE.md to PRODUCTION_EVIDENCE_PACK.md. Fill every heading. Per section: the claim, the evidence file or test (path), the honesty label of any number, and what is still unproven. The template has no heading for the second model (D7). Add one section, "Second-Model Comparison Evidence", before "Production Readiness Decision". Fill it from docs/model-comparison/: the hash result, the test counts of both apps, the 16 differences (3 listed, 13 unlisted), and the verdict.
 8. Add an executive summary at the top and the challenge-to-spine crosswalk at the end.
 9. Verify every path in the pack exists. Write the check output into docs/16-evidence-pack/path-check.md.
-10. Run make evidence one final time so evidence/ is current. Note the run id in the pack.
+10. Run make evidence one final time so evidence/ is current. Note the run id in the pack. Before the run, record the line count and SHA-256 of logs/audit.log. Test runs append rows to that file. After the run, record both again and say in the pack whether the rows were added by the run or restored. Then re-run the 36-file hash check from docs/model-comparison/yaml-hashes-after.md and record the result.
 For each finding: finding, evidence, impact, risk, confidence, open questions.
 
 ## Evidence rules
@@ -58,7 +62,7 @@ For each finding: finding, evidence, impact, risk, confidence, open questions.
 ## Locked facts (read, do not re-derive)
 | Item | Value |
 |---|---|
-| Template headings | Release Summary; Behavioural Baseline; IAM; Secrets; IaC; Policy-as-Code; CI/CD and Supply Chain; Observability; AI Security; Performance; Reliability; AI FinOps; Automated Security Validation; Auditability; Production Readiness Decision |
+| Template headings | Release Summary; Behavioural Baseline; IAM; Secrets; IaC; Policy-as-Code; CI/CD and Supply Chain; Observability; AI Security; Performance; Reliability; AI FinOps; Automated Security Validation; Auditability; Production Readiness Decision. Add one more, "Second-Model Comparison Evidence", before the decision (16 headings in total). |
 | Final standard (challenge guide) | A reviewer can verify the transformation from the pack without a verbal tour |
 | 6.3 items | D1 to D8 exist; AI cannot silently execute; timeout sends to a person; labels on demo numbers; owners on accepted risk |
 
@@ -101,7 +105,7 @@ Cite every stage's completion gate result from playbook/STATUS.md and docs/00-co
 | `risk-owner-table.md` | Header. Owner per accepted risk. |
 | `deferred-work-list.md` | Header. Unfinished items with stage and reason. |
 | `operating-contract-check.md` | Header. Changes vs boundaries. |
-| `PRODUCTION_EVIDENCE_PACK.md` | Executive summary. Every heading filled with claim, path, label, unproven. Crosswalk at the end. |
+| `PRODUCTION_EVIDENCE_PACK.md` | Executive summary. Every heading filled with claim, path, label, unproven, including the added "Second-Model Comparison Evidence" section. Crosswalk at the end. |
 | `path-check.md` | Header. Every pack path checked. |
 
 ## Done test
